@@ -5,27 +5,21 @@
 
 In keeping with the ["KISS Principle"](https://en.wikipedia.org/wiki/KISS_principle), this was an attempt
 to offer the MVC design pattern to Flutter in a simple 
-and intrinsic fashion. Simply extend three classes, and you've then
-the means to implement the Model-View-Controller Design Pattern.
+and hopefully intrinsic fashion. I've made the effort to incorporate much of the Flutter framework.
 
-**MVC** aims to decouple its three major components allowing
-for efficient code reuse and parallel development, each responsible
-for separate tasks:
+Like many design patterns, **MVC** aims to separate 'the areas of work', to separate 'the areas of responsibiltiy.' With this design pattern, it decouples three major components to allow for efficient code reuse and parallel development, each responsible for separate tasks:
 
-* Model - the Controller’s source for data
-* View - concerned with how data is displayed.
-* Controller - controls what data is displayed. ("Answers to both system or user events.")
+* Model - the Controller’s source for data. Likely contains the business logic.
+* View - concerned with how data is displayed. Primarily concern with the UI.
+* Controller - controls what data is displayed. Answers to both system or user events.
 
-Ideally, this design pattern would have the  code in the 'View' not directly
-affect or interfere with the code involved in the 'Model' or vice versa.
-While the 'Contoller', in this arrangement, controls the
-'state' of the application during its lifecycle. The View can 'talk to' the Controller;
-The Controller can 'talk to' the Model.
+The version of MVC conveyed in this implementation is more of a [PAC (Presentation-abstraction-control)](https://softwareengineering.stackexchange.com/questions/207620/what-are-the-downfalls-of-mvc#answer-207672) pattern instead of the classic MVC. In the PAC pattern, the Controller can contain a business layer. Ideally, this design pattern would have the code in the 'View' not directly affect or interfere with the code involved in the 'Model' or vice versa. While the 'Contoller', in this arrangement, controls the 'state' of the application during its lifecycle. The View can 'talk to' the Controller; The Controller can 'talk to' the Model.
 
 ![MVC Diagram](https://i.imgur.com/r4C1y28.png)
 
-Placed in your **main.dart** file, only four simple Classes are involved with the intent here
-to make the implementation of **MVC** in Flutter as intuitive as possible.
+This implementation does allow you to implement a more classic pattern, and allowing the Model to talk to the View.  
+
+Placed in your **main.dart** file, only four simple Classes are involved with the intent here to make the implementation of **MVC** in Flutter as intuitive as possible.
 Further notice how Dependency Injection is introduced in its purest form:
 Each **MVC** component is appropriately passed to another as a parameter.
 ![4 Classes](https://i.imgur.com/BqxMSeP.png)
@@ -52,20 +46,15 @@ Controller Class
 > The 'Controller' is everything else. It deals with the business logic in the app.
                                   
 ## 'View' is the `build()` function
-You override the **build()** function found in the 'View' Class.
-Of course, this being a MVC design pattern, most of the 'data' the View needs to display
-or what have you comes from the Controller (e.g. _con.telephoneNumber()).
+You override the **build()** function found in the `State<T extends StatefulWidget>`('the View').
+Of course, this being a MVC design pattern, most of the 'data' the View needs to display or what have you comes from the Controller `(e.g. _con.telephoneNumber()).`
 The Controller is passed as a parameter to your 'View'. You are to let the Controller
 worry about what data to display, and the View worry about how to display it.
-Finally, like the traditional build function, you do the **setState()** function if you
-need it. Although most calls, by MVC design, will now instead come from the passed
+Finally, like the traditional build function, you do the **setState()** function if you need it. Although most calls, by MVC design, will now instead come from the passed
 Controller reference (e.g _con.invoiceTotal()).
  
 ## 'Controller' is `StatefulWidget` + `State<T extends StatefulWidget>`
-And like the State object, you have access to the 
-usual properties: **widget**, **context** and **mounted**. Further,
-the Controller (and it's data info.) will persist between **build()** function calls like
-the State object.
+And like the State object, you have access to the usual properties: **widget**, **context** and **mounted**. Further, the Controller (and it's data info.) will persist between **build()** function calls like the State object.
 
 ## Dart Programming Language
 Further, with Flutter written in the Dart programming language, you can have your 'View'
