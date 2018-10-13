@@ -231,44 +231,6 @@ abstract class MVController extends StateEvents {
   // details.exception, details.stack
   void onError(FlutterErrorDetails details) =>
       FlutterError.dumpErrorToConsole(details);
-
-
-  static List<MVController> ofControllers<T extends StatefulWidgetMVC>(BuildContext context, List<String> keys){
-    List<MVController> controllers;
-    //   controllers = ofStateless(context)?.controllers;
-    if(controllers == null){
-      final MVCState state = ofState<T>(context);
-      controllers = state?.listControllers(keys);
-    }
-    return controllers;
-  }
-
-//  static MVCState ofState(BuildContext context){
-//    final StatefulWidgetMVC widget = context.ancestorWidgetOfExactType(StatefulWidget);
-//    return widget?.state;
-//  }
-  static MVCState ofState<T extends StatefulWidgetMVC>(BuildContext context){
-    final Type type = _type<T>();
-    Widget widget;
-    if(context.widget.runtimeType == type) {
-      widget = context.widget;
-    } else{
-      widget = context.ancestorWidgetOfExactType(type);
-    }
-    return (widget as T)?.state;
-  }
-
-  static StatelessWidgetMVC ofStateless(BuildContext context){
-    final widget = context.ancestorWidgetOfExactType(StatelessWidgetMVC);
-    return widget;
-  }
-
-//  static T ofApp<T extends MVCFrameworkApp>(BuildContext context){
-//    final WidgetsApp widget = context.ancestorWidgetOfExactType(WidgetsApp);
-//    if(widget.)
-//  }
-
-  static Type _type<T>() => T;
 }
 
 
