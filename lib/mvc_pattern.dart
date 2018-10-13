@@ -293,7 +293,7 @@ abstract class MVCState extends State<StatefulWidget>
   List<MVController> get _controllerList => conListing.controllerList;
   List<MVController> listControllers(List<String> keys) => conListing.listControllers(keys);
 
-  void set controller(MVController c){
+  set controller(MVController c){
     add(c);
   }
 
