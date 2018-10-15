@@ -562,7 +562,7 @@ abstract class MVCState extends State<StatefulWidget>
   }
 
   /// Allows 'external' routines can call this function.
-  void setState(fn) {
+  void setState(VoidCallback fn) {
 
     if(_rebuildAllowed) {
       /// Call the State object's setState() function.
