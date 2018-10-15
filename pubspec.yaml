@@ -1,11 +1,8 @@
 name: mvc_pattern
-description: The Flutter package to untilze a MVC design pattern to develop an app.
+description: A framework to develop apps using the MVC design pattern.
 version: 0.0.1
-author: Greg Perry
-homepage: www.andrioussolutions.com
-
-environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+author: Greg Perry <support@andrioussolutions.com>
+homepage: https://github.com/Andrious/mvc_pattern
 
 dependencies:
   flutter:
