@@ -266,20 +266,22 @@ abstract class MVCState extends State<StatefulWidget>
       onError(details);
     };
     _eventHandler = _StateEventList(this);
-    conListing = _ControllerListing(this);
+    _conListing = _ControllerListing(this);
     add(_con);
   }
-  _ControllerListing conListing ;
   /// Save the original Error Handler.
   final Function(FlutterErrorDetails details) _oldError;
   static final _defaultError = FlutterError.onError;
 
-  MVController con(String keyId) => conListing.con(keyId);
+  /// Contains a listing of all the Controllers assigned to this View.
+  _ControllerListing _conListing ;
 
-  Map<String, MVController> controllers(List<String> keys) => conListing.getControllers(keys);
+  MVController con(String keyId) => _conListing.con(keyId);
 
-  List<MVController> get _controllerList => conListing.controllerList;
-  List<MVController> listControllers(List<String> keys) => conListing.listControllers(keys);
+  Map<String, MVController> controllers(List<String> keys) => _conListing.getControllers(keys);
+
+  List<MVController> get _controllerList => _conListing.controllerList;
+  List<MVController> listControllers(List<String> keys) => _conListing.listControllers(keys);
 
   set controller(MVController c){
     add(c);
@@ -289,12 +291,12 @@ abstract class MVCState extends State<StatefulWidget>
     /// It may have been a listener. Can't be both.
     bool removed = removeListener(c);
     assert(!removed, "Removed Listener as it is now a Contoller!");
-    return conListing.add(c);
+    return _conListing.add(c);
   }
 
-  void addList(List<MVController> list) => conListing.addList(list);
+  void addList(List<MVController> list) => _conListing.addList(list);
 
-  bool remove(String keyId) => conListing.remove(keyId);
+  bool remove(String keyId) => _conListing.remove(keyId);
 
   List<StateEvents> get beforeList => _eventHandler.beforeList;
   List<StateEvents> get afterList => _eventHandler.afterList;
@@ -369,7 +371,7 @@ abstract class MVCState extends State<StatefulWidget>
     _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.dispose());
     _controllerList.forEach((MVController con) => con.dispose());
-    conListing.dispose();
+    _conListing.dispose();
     _eventHandler.afterList.forEach((StateEvents obj) => obj.dispose());
     _eventHandler.dispose();
     /// Should not be 'rebuilding' anyway. This Widget is going away.
