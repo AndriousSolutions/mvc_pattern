@@ -277,6 +277,11 @@ abstract class MVCState extends State<StatefulWidget>
   String get keyId => _keyId;
   String _keyId;
 
+  /// May be set false to prevent unnecessary 'rebuilds'.
+  bool _rebuildAllowed = true;
+  /// May be set true to request a 'rebuild.'
+  bool _rebuildRequested = false;
+
   @mustCallSuper
   @override
   void initState() {
@@ -291,10 +296,18 @@ abstract class MVCState extends State<StatefulWidget>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     MVCApp.addState(this);
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _controllerList.forEach((MVController con) => con.widget = widget);
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.initState());
     _controllerList.forEach((MVController con) => con.initState());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.initState());
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   @mustCallSuper
@@ -304,10 +317,19 @@ abstract class MVCState extends State<StatefulWidget>
     /// Subclasses should override this method to clean up any links between
     /// this object and other elements in the tree (e.g. if you have provided an
     /// ancestor with a pointer to a descendant's [RenderObject]).
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.deactivate());
     _controllerList.forEach((MVController con) => con.deactivate());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.deactivate());
     super.deactivate();
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   @mustCallSuper
@@ -316,11 +338,17 @@ abstract class MVCState extends State<StatefulWidget>
     /// build again. The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.dispose());
     _controllerList.forEach((MVController con) => con.dispose());
     conListing.dispose();
     _eventHandler.afterList.forEach((StateEvents obj) => obj.dispose());
     _eventHandler.dispose();
+    /// Should not be 'rebuilding' anyway. This Widget is going away.
+    _rebuildAllowed = true;
+    _rebuildRequested = false;
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -328,23 +356,41 @@ abstract class MVCState extends State<StatefulWidget>
   @mustCallSuper
   @override
   void didUpdateWidget(StatefulWidget oldWidget) {
-    _eventHandler.beforeList.forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
-    _controllerList.forEach((MVController con) => con.didUpdateWidget(oldWidget));
-    _eventHandler.afterList.forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
     /// Override this method to respond when the [widget] changes (e.g., to start
     /// implicit animations).
     /// The framework always calls [build] after calling [didUpdateWidget], which
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
+    _eventHandler.beforeList.forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
+    _controllerList.forEach((MVController con) => con.didUpdateWidget(oldWidget));
+    _eventHandler.afterList.forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
     super.didUpdateWidget(oldWidget);
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   @mustCallSuper
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.didChangeAppLifecycleState(state));
     _controllerList.forEach((MVController con) => con.didChangeAppLifecycleState(state));
     _eventHandler.afterList.forEach((StateEvents obj) => obj.didChangeAppLifecycleState(state));
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   void didChangeMetrics() {
@@ -361,9 +407,18 @@ abstract class MVCState extends State<StatefulWidget>
     ///   void didChangeMetrics() {
     ///     setState(() { _lastSize = ui.window.physicalSize; });
     ///   }
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.didChangeMetrics());
     _controllerList.forEach((MVController con) => con.didChangeMetrics());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.didChangeMetrics());
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   void didChangeTextScaleFactor() {
@@ -379,9 +434,18 @@ abstract class MVCState extends State<StatefulWidget>
     ///   void didChangeTextScaleFactor() {
     ///     setState(() { _lastTextScaleFactor = ui.window.textScaleFactor; });
     ///   }
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.didChangeTextScaleFactor());
     _controllerList.forEach((MVController con) => con.didChangeTextScaleFactor());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.didChangeTextScaleFactor());
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   void didChangeLocale(Locale locale) {
@@ -390,9 +454,18 @@ abstract class MVCState extends State<StatefulWidget>
     /// settings.
     ///
     /// This method exposes notifications from [Window.onLocaleChanged].
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.didChangeLocale(locale));
     _controllerList.forEach((MVController con) => con.didChangeLocale(locale));
     _eventHandler.afterList.forEach((StateEvents obj) => obj.didChangeLocale(locale));
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   void didHaveMemoryPressure() {
@@ -400,9 +473,18 @@ abstract class MVCState extends State<StatefulWidget>
     ///
     /// This method exposes the `memoryPressure` notification from
     /// [SystemChannels.system].
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.didHaveMemoryPressure());
     _controllerList.forEach((MVController con) => con.didHaveMemoryPressure());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.didHaveMemoryPressure());
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   void didChangeAccessibilityFeatures() {
@@ -410,27 +492,54 @@ abstract class MVCState extends State<StatefulWidget>
     /// features.
     ///
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.didChangeAccessibilityFeatures());
     _controllerList.forEach((MVController con) => con.didChangeAccessibilityFeatures());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.didChangeAccessibilityFeatures());
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   @mustCallSuper
   @override
   void didChangeDependencies() {
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.didChangeDependencies());
     _controllerList.forEach((MVController con) => con.didChangeDependencies());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.didChangeDependencies());
     super.didChangeDependencies();
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   @mustCallSuper
   @override
   void reassemble() {
+
+    /// No 'setState()' functions are allowed to fully function at the point.
+    _rebuildAllowed = false;
     _eventHandler.beforeList.forEach((StateEvents obj) => obj.reassemble());
     _controllerList.forEach((MVController con) => con.reassemble());
     _eventHandler.afterList.forEach((StateEvents obj) => obj.reassemble());
     super.reassemble();
+    _rebuildAllowed = true;
+    if(_rebuildRequested){
+      _rebuildRequested = false;
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
   }
 
   bool addBeforeListener(StateEvents obj) {
@@ -454,8 +563,14 @@ abstract class MVCState extends State<StatefulWidget>
 
   /// Allows 'external' routines can call this function.
   void setState(fn) {
-    /// Call the State object's setState() function.
-    super.setState(fn);
+
+    if(_rebuildAllowed) {
+      /// Call the State object's setState() function.
+      super.setState(fn);
+    }else{
+      /// Can't rebuild at this moment but at least make the request.
+      _rebuildRequested = true;
+    }
   }
 
   /// Allows the user to call setState() within the Controller.
