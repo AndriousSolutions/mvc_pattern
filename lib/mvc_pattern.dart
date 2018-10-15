@@ -28,14 +28,7 @@ import 'package:flutter/material.dart';
 /// You've got to extend this class to create a Controller
 abstract class MVController extends StateEvents {
 
-  MVController(): _oldError = FlutterError.onError {
-    /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
-    FlutterError.onError = (FlutterErrorDetails details) {
-      onError(details);
-    };
-  }
-  /// Save the original Error Handler.
-  final Function(FlutterErrorDetails details) _oldError;
+  MVController(): super();
 
   /// The View is a State object after all.
   State get state => _state;
@@ -95,9 +88,38 @@ abstract class MVController extends StateEvents {
     return _stateView?.removeListener(obj);
   }
 
-  /// ******  Below are extended methods from Class, StateEvents. Overridden here for easy readability. ********
-
   @override
+  @mustCallSuper
+  void dispose() {
+    /// The framework calls this method when this [State] object will never
+    /// build again. The [State] object's lifecycle is terminated.
+    /// Subclasses should override this method to release any resources retained
+    /// by this object (e.g., stop any active animations).
+
+    /// The view association is severed.
+    _stateView = null;
+    _state = null;
+    super.dispose();
+  }
+}
+
+
+
+class StateEvents {
+
+  StateEvents(): _oldOnError = _recError() {
+    /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
+    FlutterError.onError = (FlutterErrorDetails details) {
+      onError(details);
+    };
+  }
+  /// Save the current Error Handler.
+  final Function(FlutterErrorDetails details) _oldOnError;
+  static final _defaultError = FlutterError.onError;
+
+  /// Allow for a reference to the State object.
+  State _state;
+
   void initState() {
     /// The framework will call this method exactly once.
     /// Only when the [State] object is first created.
@@ -109,21 +131,6 @@ abstract class MVController extends StateEvents {
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
   }
 
-  @mustCallSuper
-  @override
-  void dispose() {
-    /// The framework calls this method when this [State] object will never
-    /// build again. The [State] object's lifecycle is terminated.
-    /// Subclasses should override this method to release any resources retained
-    /// by this object (e.g., stop any active animations).
-
-    /// The view association is severed.
-    _stateView = null;
-    _state = null;
-    FlutterError.onError = _oldError;
-  }
-
-  @override
   void deactivate() {
     /// The framework calls this method whenever it removes this [State] object
     /// from the tree. It might reinsert it into another part of the tree.
@@ -132,7 +139,17 @@ abstract class MVController extends StateEvents {
     /// ancestor with a pointer to a descendant's [RenderObject]).
   }
 
-  @override
+  @mustCallSuper
+  void dispose() {
+    /// The framework calls this method when this [State] object will never
+    /// build again. The [State] object's lifecycle is terminated.
+    /// Subclasses should override this method to release any resources retained
+    /// by this object (e.g., stop any active animations).
+
+    /// Return to the original error routine.
+    FlutterError.onError = _oldOnError;
+  }
+
   void didUpdateWidget(StatefulWidget oldWidget) {
     /// Override this method to respond when the [widget] changes (e.g., to start
     /// implicit animations).
@@ -140,34 +157,10 @@ abstract class MVController extends StateEvents {
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
   }
 
-  @override
-  void didChangeDependencies() {
-    /// Called when a dependency of this [State] object changes.
-    ///
-    /// For example, if the previous call to [build] referenced an
-    /// [InheritedWidget] that later changed, the framework would call this
-    /// method to notify this object about the change.
-    ///
-    /// This method is also called immediately after [initState]. It is safe to
-    /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
-  }
-
-  @override
-  void reassemble() {
-    /// Called whenever the application is reassembled during debugging, for
-    /// example during hot reload.
-    ///
-    /// This method should rerun any initialization logic that depends on global
-    /// state, for example, image loading from asset bundles (since the asset
-    /// bundle may have changed).
-  }
-
-  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
   }
 
-  @override
   void didChangeMetrics() {
     /// Called when the application's dimensions change. For example,
     /// when a phone is rotated.
@@ -184,7 +177,6 @@ abstract class MVController extends StateEvents {
     ///   }
   }
 
-  @override
   void didChangeTextScaleFactor() {
     /// Called when the platform's text scale factor changes.
     ///
@@ -200,7 +192,6 @@ abstract class MVController extends StateEvents {
     ///   }
   }
 
-  @override
   void didChangeLocale(Locale locale) {
     /// Called when the system tells the app that the user's locale has
     /// changed. For example, if the user changes the system language
@@ -209,7 +200,6 @@ abstract class MVController extends StateEvents {
     /// This method exposes notifications from [Window.onLocaleChanged].
   }
 
-  @override
   void didHaveMemoryPressure() {
     /// Called when the system is running low on memory.
     ///
@@ -217,7 +207,6 @@ abstract class MVController extends StateEvents {
     /// [SystemChannels.system].
   }
 
-  @override
   void didChangeAccessibilityFeatures() {
     /// Called when the system changes the set of currently active accessibility
     /// features.
@@ -225,12 +214,42 @@ abstract class MVController extends StateEvents {
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
   }
 
+  void didChangeDependencies() {
+    /// Called when a dependency of this [State] object changes.
+    ///
+    /// For example, if the previous call to [build] referenced an
+    /// [InheritedWidget] that later changed, the framework would call this
+    /// method to notify this object about the change.
+    ///
+    /// This method is also called immediately after [initState]. It is safe to
+    /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
+  }
+
+  void reassemble() {
+    /// Called whenever the application is reassembled during debugging, for
+    /// example during hot reload.
+    ///
+    /// This method should rerun any initialization logic that depends on global
+    /// state, for example, image loading from asset bundles (since the asset
+    /// bundle may have changed).
+  }
+
   /// Supply an 'error handler' routine to fire when an error occurs.
   /// Allows the user to define their own with each Controller.
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
-  void onError(FlutterErrorDetails details) =>
-      FlutterError.dumpErrorToConsole(details);
+  void onError(FlutterErrorDetails details) => FlutterError.dumpErrorToConsole(details);
+
+  static Function(FlutterErrorDetails details) _recError(){
+    var func;
+    /// If it's not the 'default' routine, you better save it.
+    if(FlutterError.onError != _defaultError){
+      func = FlutterError.onError;
+    }else{
+      func = _defaultError;
+    }
+    return func;
+  }
 }
 
 
@@ -241,12 +260,19 @@ abstract class MVCState extends State<StatefulWidget>
   /// The View!
   Widget build(BuildContext context);
 
-  MVCState([MVController _con]) {
+  MVCState([MVController _con]):_oldError = _recError(){
+    /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
+    FlutterError.onError = (FlutterErrorDetails details) {
+      onError(details);
+    };
     _eventHandler = _StateEventList(this);
     conListing = _ControllerListing(this);
     add(_con);
   }
   _ControllerListing conListing ;
+  /// Save the original Error Handler.
+  final Function(FlutterErrorDetails details) _oldError;
+  static final _defaultError = FlutterError.onError;
 
   MVController con(String keyId) => conListing.con(keyId);
 
@@ -350,6 +376,8 @@ abstract class MVCState extends State<StatefulWidget>
     _rebuildAllowed = true;
     _rebuildRequested = false;
     WidgetsBinding.instance.removeObserver(this);
+    /// Return the original error routine.
+    FlutterError.onError = _oldError;
     super.dispose();
   }
 
@@ -578,6 +606,23 @@ abstract class MVCState extends State<StatefulWidget>
     /// Refresh the interface by 'rebuilding' the Widget Tree
     setState((){});
   }
+
+  /// Supply an 'error handler' routine to fire when an error occurs.
+  /// Allows the user to define their own with each Controller.
+  /// The default routine is to dump the error to the console.
+  // details.exception, details.stack
+  void onError(FlutterErrorDetails details) => FlutterError.dumpErrorToConsole(details);
+  
+  static Function(FlutterErrorDetails details) _recError(){
+    var func;
+    /// If it's not the 'default' routine, you better save it.
+    if(FlutterError.onError != _defaultError){
+      func = FlutterError.onError;
+    }else{
+      func = _defaultError;
+    }
+    return func;
+  }
 }
 
 
@@ -617,123 +662,6 @@ class _StateEventList{
   void dispose(){
     _listenersBefore.removeAll(_listenersBefore);
     _listenersAfter.removeAll(_listenersAfter);
-  }
-}
-
-
-class StateEvents {
-
-  /// Allow for a reference to the State object.
-  State _state;
-
-  void initState() {
-    /// The framework will call this method exactly once.
-    /// Only when the [State] object is first created.
-    ///
-    /// Override this method to perform initialization that depends on the
-    /// location at which this object was inserted into the tree.
-    /// (i.e. Subscribe to another object it depends on during [initState],
-    /// unsubscribe object and subscribe to a new object when it changes in
-    /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
-  }
-
-  void deactivate() {
-    /// The framework calls this method whenever it removes this [State] object
-    /// from the tree. It might reinsert it into another part of the tree.
-    /// Subclasses should override this method to clean up any links between
-    /// this object and other elements in the tree (e.g. if you have provided an
-    /// ancestor with a pointer to a descendant's [RenderObject]).
-  }
-
-  void dispose() {
-    /// The framework calls this method when this [State] object will never
-    /// build again. The [State] object's lifecycle is terminated.
-    /// Subclasses should override this method to release any resources retained
-    /// by this object (e.g., stop any active animations).
-  }
-
-  void didUpdateWidget(StatefulWidget oldWidget) {
-    /// Override this method to respond when the [widget] changes (e.g., to start
-    /// implicit animations).
-    /// The framework always calls [build] after calling [didUpdateWidget], which
-    /// means any calls to [setState] in [didUpdateWidget] are redundant.
-  }
-
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
-  }
-
-  void didChangeMetrics() {
-    /// Called when the application's dimensions change. For example,
-    /// when a phone is rotated.
-    ///
-    /// In general, this is not overriden often as the layout system takes care of
-    /// automatically recomputing the application geometry when the application
-    /// size changes
-    ///
-    /// This method exposes notifications from [Window.onMetricsChanged].
-    /// See sample code below. No need to call super if you override.
-    ///   @override
-    ///   void didChangeMetrics() {
-    ///     setState(() { _lastSize = ui.window.physicalSize; });
-    ///   }
-  }
-
-  void didChangeTextScaleFactor() {
-    /// Called when the platform's text scale factor changes.
-    ///
-    /// This typically happens as the result of the user changing system
-    /// preferences, and it should affect all of the text sizes in the
-    /// application.
-    ///
-    /// This method exposes notifications from [Window.onTextScaleFactorChanged].
-    /// See sample code below. No need to call super if you override.
-    ///   @override
-    ///   void didChangeTextScaleFactor() {
-    ///     setState(() { _lastTextScaleFactor = ui.window.textScaleFactor; });
-    ///   }
-  }
-
-  void didChangeLocale(Locale locale) {
-    /// Called when the system tells the app that the user's locale has
-    /// changed. For example, if the user changes the system language
-    /// settings.
-    ///
-    /// This method exposes notifications from [Window.onLocaleChanged].
-  }
-
-  void didHaveMemoryPressure() {
-    /// Called when the system is running low on memory.
-    ///
-    /// This method exposes the `memoryPressure` notification from
-    /// [SystemChannels.system].
-  }
-
-  void didChangeAccessibilityFeatures() {
-    /// Called when the system changes the set of currently active accessibility
-    /// features.
-    ///
-    /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
-  }
-
-  void didChangeDependencies() {
-    /// Called when a dependency of this [State] object changes.
-    ///
-    /// For example, if the previous call to [build] referenced an
-    /// [InheritedWidget] that later changed, the framework would call this
-    /// method to notify this object about the change.
-    ///
-    /// This method is also called immediately after [initState]. It is safe to
-    /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
-  }
-
-  void reassemble() {
-    /// Called whenever the application is reassembled during debugging, for
-    /// example during hot reload.
-    ///
-    /// This method should rerun any initialization logic that depends on global
-    /// state, for example, image loading from asset bundles (since the asset
-    /// bundle may have changed).
   }
 }
 
