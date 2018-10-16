@@ -272,14 +272,18 @@ class StateViewMVC extends StateMVC{
   Widget get buildWidget => _widget;
   Widget _widget;
 
+  Function(FlutterErrorDetails details) _OnError;
+
   Widget build(BuildContext context){
-    /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
+    /// Save the current Error Handler if any.
+    _OnError =  StateMVC._recError();
     FlutterError.onError = (FlutterErrorDetails details) {
+      /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       onError(details);
     };
     /// Where the magic happens!
     _widget = _vw.build(context);
-    FlutterError.onError = _oldError;
+    FlutterError.onError = _OnError;
     return _widget;
   }
 }
