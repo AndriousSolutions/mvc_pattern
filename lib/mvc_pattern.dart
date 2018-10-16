@@ -103,7 +103,7 @@ class _StateView extends StateEvents{
 
 class StateEvents {
 
-  StateEvents(): _oldOnError = _recError() {
+  StateEvents(): _oldOnError = _recError(_defaultError) {
     /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
     FlutterError.onError = (FlutterErrorDetails details) {
       onError(details);
@@ -246,16 +246,16 @@ class StateEvents {
   // details.exception, details.stack
   void onError(FlutterErrorDetails details) => FlutterError.dumpErrorToConsole(details);
 
-  static Function(FlutterErrorDetails details) _recError(){
-    var func;
-    /// If it's not the 'default' routine, you better save it.
-    if(FlutterError.onError != _defaultError){
-      func = FlutterError.onError;
-    }else{
-      func = _defaultError;
-    }
-    return func;
-  }
+//  static Function(FlutterErrorDetails details) _recError(){
+//    var func;
+//    /// If it's not the 'default' routine, you better save it.
+//    if(FlutterError.onError != _defaultError){
+//      func = FlutterError.onError;
+//    }else{
+//      func = _defaultError;
+//    }
+//    return func;
+//  }
 }
 
 
@@ -272,18 +272,18 @@ class StateViewMVC extends StateMVC{
   Widget get buildWidget => _widget;
   Widget _widget;
 
-  Function(FlutterErrorDetails details) _OnError;
+  Function(FlutterErrorDetails details) _onError;
 
   Widget build(BuildContext context){
     /// Save the current Error Handler if any.
-    _OnError =  StateMVC._recError();
+    _onError =  StateMVC._recStateError();
     FlutterError.onError = (FlutterErrorDetails details) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       onError(details);
     };
     /// Where the magic happens!
     _widget = _vw.build(context);
-    FlutterError.onError = _OnError;
+    FlutterError.onError = _onError;
     return _widget;
   }
 }
@@ -296,7 +296,7 @@ abstract class StateMVC extends State<StatefulWidget>
   /// The View!
   Widget build(BuildContext context);
 
-  StateMVC([ControllerMVC _con]):_oldError = _recError(){
+  StateMVC([ControllerMVC _con]):_oldError = _recError(_defaultError){
     /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
     FlutterError.onError = (FlutterErrorDetails details) {
       onError(details);
@@ -650,19 +650,22 @@ abstract class StateMVC extends State<StatefulWidget>
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
   void onError(FlutterErrorDetails details) => FlutterError.dumpErrorToConsole(details);
-  
-  static Function(FlutterErrorDetails details) _recError(){
-    var func;
-    /// If it's not the 'default' routine, you better save it.
-    if(FlutterError.onError != _defaultError){
-      func = FlutterError.onError;
-    }else{
-      func = _defaultError;
-    }
-    return func;
+
+  static Function(FlutterErrorDetails details) _recStateError(){
+    return _recError(_defaultError);
   }
 }
 
+Function(FlutterErrorDetails details) _recError(Function(FlutterErrorDetails _details) _defaultError){
+  var func;
+  /// If it's not the 'default' routine, you better save it.
+  if(FlutterError.onError != _defaultError){
+    func = FlutterError.onError;
+  }else{
+    func = _defaultError;
+  }
+  return func;
+}
 
 
 class _StateEventList{
