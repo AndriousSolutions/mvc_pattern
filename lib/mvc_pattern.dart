@@ -1,6 +1,6 @@
 library mvc_pattern;
 ///
-/// Copyright (C) 2018 Andrious Solutions
+/// Copyright (C) 2018 Andrious Solutions Ltd.
 ///
 /// This program is free software; you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License

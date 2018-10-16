@@ -4,6 +4,9 @@ version: 0.0.1
 author: Greg Perry <support@andrioussolutions.com>
 homepage: https://github.com/Andrious/mvc_pattern
 
+environment:
+  sdk: ">=1.19.0 <4.0.0"
+
 dependencies:
   flutter:
     sdk: flutter
