@@ -158,7 +158,7 @@ know! It’s your app! ;)
 
 **A Function for every Event**
 
-Below, you’ll see the twelve events available to you. Turn to this documentation
+Below, you’ll see the twelve events available to you. Turn to the [WidgetsBindingObserver Class](https://docs.flutter.io/flutter/widgets/WidgetsBindingObserver-class.html)
 for details.
 ![initstate](https://user-images.githubusercontent.com/32497443/47088498-a5dcd400-d1ec-11e8-9d02-60fdef9501d2.jpg)
 ![dispose](https://user-images.githubusercontent.com/32497443/47088532-bb51fe00-d1ec-11e8-90e9-070d7a3300b2.jpg) 
