@@ -279,11 +279,17 @@ class StateViewMVC extends StateMVC{
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       var thisOnError = onError;
       /// Always favour a custom error handler.
-      if(thisOnError == StateMVC._defaultError && _currentOnError != StateMVC._defaultError){
+      if(thisOnError != StateMVC._defaultError){
+        onError(details);
+      /// As long as it's not this routine.
+      }else if(_currentOnError != FlutterError.onError && _currentOnError != StateMVC._defaultError){
+        /// Likely a Controller Error Handler.
         _currentOnError(details);
       }else if(_oldOnError != StateMVC._defaultError){
+        /// An even older routine is available? App level routine?
         _oldOnError(details);
       }else{
+        /// You've not choice. Run the ol' 'red screen of death'
         onError(details);
       }
     };
