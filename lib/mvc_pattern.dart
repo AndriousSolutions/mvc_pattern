@@ -281,8 +281,7 @@ class StateViewMVC extends StateMVC{
       /// Always favour a custom error handler.
       if(thisOnError != StateMVC._defaultError){
         onError(details);
-      /// As long as it's not this routine.
-      }else if(_currentOnError != FlutterError.onError && _currentOnError != StateMVC._defaultError){
+      }else if(_currentOnError != StateMVC._defaultError){
         /// Likely a Controller Error Handler.
         _currentOnError(details);
       }else if(_oldOnError != StateMVC._defaultError){
