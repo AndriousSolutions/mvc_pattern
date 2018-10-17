@@ -53,10 +53,10 @@ class _StateView extends StateEvents{
 
   StateViewMVC get stateView => _stateView;
   /// VERY IMPORTANT! This setter connects the State Object!
-  set stateView(StateViewMVC state){
+  set stateView(StateViewMVC stateView){
     assert(_stateView == null, "A View is already assigned!");
-    _stateView = state;
-    _state = state;
+    _stateView = stateView;
+    _state = stateView;
   }
   StateViewMVC _stateView;
 
