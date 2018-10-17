@@ -352,7 +352,7 @@ abstract class StateMVC extends State<StatefulWidget>
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    MVCApp.addState(this);
+    AppMVC.addState(this);
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
     _controllerList.forEach((ControllerMVC con) => con._widget = widget);
@@ -994,9 +994,9 @@ class _ConInfo{
 
 
 
-abstract class MVCApp extends StatedWidget{
+abstract class AppMVC extends StatedWidget{
 
-  MVCApp(){
+  AppMVC(){
     _running = true;
     initApp();
   }
