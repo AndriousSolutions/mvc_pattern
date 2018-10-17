@@ -53,7 +53,7 @@ developer. Also, notice what I did with the app’s title? I created a static
 String field in the MyApp class called, title. It’s named ‘MyApp’ after all—It
 should know its own title.
 
-**How about a Model?**
+**How about Model?**
 
 Currently, in this example, it’s the Controller that’s containing all the
 ‘business logic’ for the application. In some MVC implementations, it’s the
