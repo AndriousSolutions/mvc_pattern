@@ -110,11 +110,18 @@ class StateEvents {
   StateEvents(): _oldOnError = _recError(_defaultError) {
     /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
     FlutterError.onError = (FlutterErrorDetails details) {
-      onError(details);
+      var thisOnError = onError;
+      /// Always favour a custom error handler.
+      if(thisOnError == _defaultError && _oldOnError != _defaultError){
+        _oldOnError(details);
+      }else{
+        onError(details);
+      }
     };
   }
   /// Save the current Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
+  /// Record the 'default' error routine used by Flutter.
   static final _defaultError = FlutterError.onError;
 
   /// Allow for a reference to the State object.
@@ -289,17 +296,23 @@ abstract class StateMVC extends State<StatefulWidget>
   /// The View!
   Widget build(BuildContext context);
 
-  StateMVC([ControllerMVC _con]):_oldError = _recError(_defaultError){
+  StateMVC([ControllerMVC _con]):_oldOnError = _recError(_defaultError){
     /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
     FlutterError.onError = (FlutterErrorDetails details) {
-      onError(details);
+      var thisOnError = onError;
+      /// Always favour a custom error handler.
+      if(thisOnError == _defaultError && _oldOnError != _defaultError){
+        _oldOnError(details);
+      }else{
+        onError(details);
+      }
     };
     _eventHandler = _StateEventList(this);
     _conListing = _ControllerListing(this);
     add(_con);
   }
   /// Save the original Error Handler.
-  final Function(FlutterErrorDetails details) _oldError;
+  final Function(FlutterErrorDetails details) _oldOnError;
   static final _defaultError = FlutterError.onError;
 
   /// Contains a listing of all the Controllers assigned to this View.
@@ -408,7 +421,7 @@ abstract class StateMVC extends State<StatefulWidget>
     _rebuildRequested = false;
     WidgetsBinding.instance.removeObserver(this);
     /// Return the original error routine.
-    FlutterError.onError = _oldError;
+    FlutterError.onError = _oldOnError;
     super.dispose();
   }
 
@@ -651,7 +664,7 @@ abstract class StateMVC extends State<StatefulWidget>
 
 Function(FlutterErrorDetails details) _recError(Function(FlutterErrorDetails _details) _defaultError){
   var func;
-  /// If it's not the 'default' routine, you better save it.
+  /// If the 'current' Error Handler is not the 'default' routine, you better save it.
   if(FlutterError.onError != _defaultError){
     func = FlutterError.onError;
   }else{
