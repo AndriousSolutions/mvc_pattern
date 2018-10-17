@@ -42,6 +42,7 @@ View’s function, **setState()**, to tell it to rebuild.
 
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
 interface and only determine when to rebuild or not. It’s a simply change.
+
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
 ![myhomepage](https://user-images.githubusercontent.com/32497443/47087698-aa07f200-d1ea-11e8-8193-38fc3fca6976.jpg)  
@@ -65,6 +66,7 @@ I decided to make the Model’s API a little cleaner with the use of a static
 members. As you can deduce, the changes were just made in the Controller. The
 View doesn’t even know the Model exists. It doesn’t need to. It still ‘talks to’
 the Controller, but it is now the Model that has all the ‘brains.’
+
 ![pac pattern](https://camo.githubusercontent.com/a5b152ecc2f2b96b8019941a7382f47f4ac4c2b6/68747470733a2f2f692e696d6775722e636f6d2f723443317932382e706e67)
 
 However, what if you want the View to talk to the Model? Maybe because the Model
@@ -97,7 +99,6 @@ approach because it then allows, for example, easy access to your Controller
 throughout the app. It’s now in a static field called **con**. See how it’s now
 easily accessed in another Dart file below:
 ![addeditscreen](https://user-images.githubusercontent.com/32497443/47087913-3adecd80-d1eb-11e8-9a90-5c625d184503.jpg) 
-  
 Now, in any View or any Widget for that matter, you can access the app’s data or
 business logic easily and cleanly through it’s Controller (e.g. Easily reference
 the Controller in a **build()** function.)
@@ -149,7 +150,6 @@ directly.
 ![addbeforelistener](https://user-images.githubusercontent.com/32497443/47088245-00c1fb80-d1ec-11e8-91a0-44484f5b46d3.jpg)
 ![addafterlistener](https://user-images.githubusercontent.com/32497443/47088404-6dd59100-d1ec-11e8-8e59-841cedc902e3.jpg)
 ![addlistener](https://user-images.githubusercontent.com/32497443/47088422-7a59e980-d1ec-11e8-803d-0785d0d30474.jpg)
-
 Of course, you have a means to remove a listener if and when it’s necessary.
 ![16 removelistener](https://user-images.githubusercontent.com/32497443/47088465-93fb3100-d1ec-11e8-8bb1-0e09e22bbf4d.jpg)
 
@@ -201,7 +201,7 @@ see this plugin places an Error Handler in everything you make: in every
 Controller, every Listener, every View and even, in certain circumstances, every
 State Object’s build() function! You’ll soon realize that Error Handling is
 paramount in this framework!
-![appmvc](https://user-images.githubusercontent.com/32497443/47088907-93af6580-d1ed-11e8-9a3d-e086e5559187.jpg)
+![appmvc](https://user-images.githubusercontent.com/32497443/47093615-96af5380-d1f7-11e8-8d8e-f36ae1c67a25.jpg)
 
 Two ‘new’ functions exist solely for the ‘App Class’: **initApp()** and
 **init()**. A lot of things have to ‘start up’ when starting up an App, and
@@ -213,8 +213,8 @@ stuff’ to complete before continuing, and so, for example, a ‘Loading Screen
 displayed while we wait.
 ![futurebuilder](https://user-images.githubusercontent.com/32497443/47088920-a0cc5480-d1ed-11e8-8e87-b4e8e46042b0.jpg)
 
-Flutter + MVC at Last! - for more a more extensive explanation for this
-framework plugin.
+Read, Flutter + MVC at Last! - for more a more extensive explanation for this
+framework plugin. (coming soon!)
 
 The website, [Flutter Architecture Samples](http://fluttersamples.com/), will
 showcase this framework and a number of other framework architectures
