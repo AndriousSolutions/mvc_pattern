@@ -1034,6 +1034,13 @@ abstract class AppMVC extends StatedWidget{
     _running = false;
     _states.clear();
   }
+
+  /// Determines if running in an IDE or in production.
+  static bool get inDebugger {
+    var inDebugMode = false;
+    assert(inDebugMode = true);
+    return inDebugMode;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
