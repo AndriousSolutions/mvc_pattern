@@ -245,17 +245,6 @@ class StateEvents {
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
   void onError(FlutterErrorDetails details) => FlutterError.dumpErrorToConsole(details);
-
-//  static Function(FlutterErrorDetails details) _recError(){
-//    var func;
-//    /// If it's not the 'default' routine, you better save it.
-//    if(FlutterError.onError != _defaultError){
-//      func = FlutterError.onError;
-//    }else{
-//      func = _defaultError;
-//    }
-//    return func;
-//  }
 }
 
 
