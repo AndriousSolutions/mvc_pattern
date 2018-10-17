@@ -17,7 +17,7 @@ architectures.
 Let’s demonstrate its usage with the ol’ ‘Counter app’ created every time you
 start a new Flutter project. In the example below, to utilize the plugin, three
 things are changed in the Counter app. The Class, \_MyHomePageState, is extended
-with the Class StateMVC, A ‘Controller’ Class is introduced that extends the
+with the Class StateMVC, a ‘Controller’ Class is introduced that extends the
 Class, ControllerMVC, and a static instance of that Class is made available to
 the **build()** function. Done!
 
@@ -41,12 +41,11 @@ In this arrangement, the Controller is ‘talking back’ to the View by calling
 View’s function, **setState()**, to tell it to rebuild.
 
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
-interface and only determine when to rebuild or not. It’s a simply change.
+interface and only determine when to rebuild or not. It’s a simple change.
 
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
 ![myhomepage](https://user-images.githubusercontent.com/32497443/47087698-aa07f200-d1ea-11e8-8193-38fc3fca6976.jpg)  
-  
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this plugin, such things are left to the
@@ -61,7 +60,6 @@ Currently, in this example, it’s the Controller that’s containing all the
 Model that contains the business rules for the application. So how would that
 look? Well, it could maybe look like this:
 ![controller](https://user-images.githubusercontent.com/32497443/47087743-ca37b100-d1ea-11e8-9e38-92acea125668.jpg)
-
 I decided to make the Model’s API a little cleaner with the use of a static
 members. As you can deduce, the changes were just made in the Controller. The
 View doesn’t even know the Model exists. It doesn’t need to. It still ‘talks to’
@@ -74,11 +72,10 @@ has zillions of functions, and you don’t want the Controller there merely ‘t
 relay’ the Model’s functions and properties over to the View. You could simply
 provide the Model to the View. The View then calls the Model’s properties and
 functions directly.
+
 ![mvc pattern classic](https://user-images.githubusercontent.com/32497443/47087797-ef2c2400-d1ea-11e8-8a90-41bbb6b07bf0.jpg)
 
 ![myhomepagestate](https://user-images.githubusercontent.com/32497443/47087832-0b2fc580-d1eb-11e8-8977-0c2bc206e8be.jpg)
- 
-  
 Not particularly pretty. I would have just kept the Static members in the Model,
 and have the View call them instead (or not do that at all frankly), but I’m
 merely demonstrating the possibilities. With this MVC implementation, you have
@@ -90,7 +87,6 @@ When working with is MVC implementation, you generally override two classes: The
 Controller (Class ControllerMVC) and the StateView (Class StateMVC). Below is a
 typical approach to overriding the Controller.
 ![con](https://user-images.githubusercontent.com/32497443/47087878-24387680-d1eb-11e8-820e-dd677a18a854.jpg)
-
 The Controller has ‘direct access’ to the View (aka. the StateView, aka. the
 Class StateMVC). This is represented by the property, stateView in the Class,
 ControllerMVC. In this example, a ‘static’ reference to the View as well as to
@@ -213,8 +209,8 @@ stuff’ to complete before continuing, and so, for example, a ‘Loading Screen
 displayed while we wait.
 ![futurebuilder](https://user-images.githubusercontent.com/32497443/47088920-a0cc5480-d1ed-11e8-8e87-b4e8e46042b0.jpg)
 
-Read, Flutter + MVC at Last! - for more a more extensive explanation for this
-framework plugin. (coming soon!)
+Read, (coming soon!)Flutter + MVC at Last! - for more a more extensive explanation for this
+framework plugin.
 
 The website, [Flutter Architecture Samples](http://fluttersamples.com/), will
 showcase this framework and a number of other framework architectures
