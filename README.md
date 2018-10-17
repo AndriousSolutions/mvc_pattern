@@ -212,6 +212,3 @@ displayed while we wait.
 Read, (coming soon!)Flutter + MVC at Last! - for more a more extensive explanation for this
 framework plugin.
 
-The website, [Flutter Architecture Samples](http://fluttersamples.com/), will
-showcase this framework and a number of other framework architectures
-demonstrating how to organize and architect your apps.
