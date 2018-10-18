@@ -940,53 +940,54 @@ class _StatedState extends StateMVC {
 }
 
 class _StatedController extends ControllerMVC {
-  StatedWidget _statefulWidget;
+
+  StatedWidget _statedWidget;
 
   @override
   void initState() {
-    _statefulWidget = widget;
-    _statefulWidget.initState();
+    _statedWidget = widget;
+    _statedWidget.initState();
   }
 
   @override
   void deactivate() {
-    _statefulWidget.deactivate();
+    _statedWidget.deactivate();
     super.deactivate();
   }
 
   @override
   @mustCallSuper
   void dispose() {
-    _statefulWidget.dispose();
+    _statedWidget.dispose();
     super.dispose();
   }
 
   @override
   void didUpdateWidget(StatefulWidget oldWidget) {
-    _statefulWidget.didUpdateWidget(oldWidget);
+    _statedWidget.didUpdateWidget(oldWidget);
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _statefulWidget.didChangeAppLifecycleState(state);
+    _statedWidget.didChangeAppLifecycleState(state);
     super.didChangeAppLifecycleState(state);
   }
 
   @override
   void didChangeDependencies() {
-    _statefulWidget.didChangeDependencies();
+    _statedWidget.didChangeDependencies();
     super.didChangeDependencies();
   }
 
   @override
   void reassemble() {
-    _statefulWidget.reassemble();
+    _statedWidget.reassemble();
     super.reassemble();
   }
 
   @override
-  void onError(FlutterErrorDetails details) => _statefulWidget.onError(details);
+  void onError(FlutterErrorDetails details) => _statedWidget.onError(details);
 }
 
 /// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
