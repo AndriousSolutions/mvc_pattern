@@ -808,6 +808,7 @@ class _ControllerList {
   List<ControllerMVC> get asList => _map.values.toList();
 
   ControllerMVC controller(String keyId) {
+    if(keyId == null || keyId.isEmpty) return null;
     return _map[keyId];
   }
 
@@ -995,7 +996,6 @@ class _StatedState extends StateMVC {
 
 /// If there's a new event in StateEvent, update this Class!
 class _StatedController extends ControllerMVC {
-
   StatedWidget _statedWidget;
 
   @override
