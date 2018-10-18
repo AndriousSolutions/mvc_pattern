@@ -107,7 +107,7 @@ class _StateView extends StateEvents{
 
 class StateEvents {
 
-  StateEvents(): _oldOnError = _recError(StateMVC._defaultError) {
+  StateEvents(): _oldOnError = _recOnError() {
     /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
     FlutterError.onError = (FlutterErrorDetails details) {
       var thisOnError = onError;
@@ -308,7 +308,10 @@ abstract class StateMVC extends State<StatefulWidget>
   /// The View!
   Widget build(BuildContext context);
 
-  StateMVC([ControllerMVC _con]):_oldOnError = _recError(_defaultError){
+  /// Record the 'default' error handler for Flutter.
+  static final _defaultError = FlutterError.onError;
+
+  StateMVC([ControllerMVC _con]):_oldOnError = _recOnError(){
     /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
     FlutterError.onError = (FlutterErrorDetails details) {
       var thisOnError = onError;
@@ -325,8 +328,6 @@ abstract class StateMVC extends State<StatefulWidget>
   }
   /// Save the original Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
-  /// Record the 'default' error handler for Flutter.
-  static final _defaultError = FlutterError.onError;
 
   /// Contains a listing of all the Controllers assigned to this View.
   _ControllerListing _conListing ;
@@ -344,8 +345,7 @@ abstract class StateMVC extends State<StatefulWidget>
 
   String add(ControllerMVC c){
     /// It may have been a listener. Can't be both.
-    bool removed = removeListener(c);
-    assert(!removed, "Removed Listener as it is now a Contoller!");
+    removeListener(c);
     return _conListing.add(c);
   }
 
@@ -671,13 +671,13 @@ abstract class StateMVC extends State<StatefulWidget>
   void onError(FlutterErrorDetails details) => FlutterError.dumpErrorToConsole(details);
 }
 
-Function(FlutterErrorDetails details) _recError(Function(FlutterErrorDetails _details) _defaultError){
+Function(FlutterErrorDetails details) _recOnError(){
   var func;
   /// If the 'current' Error Handler is not the 'default' routine, you better save it.
-  if(FlutterError.onError != _defaultError){
+  if(FlutterError.onError != StateMVC._defaultError){
     func = FlutterError.onError;
   }else{
-    func = _defaultError;
+    func = StateMVC._defaultError;
   }
   return func;
 }
@@ -792,7 +792,8 @@ class _ControllerList{
     assert(unassigned, "A Controller can only be assigned to one View!");
     /// If already assigned to another view.
     if(!unassigned) return '';
-    if(_map.containsValue(con))return '';
+    /// It's already there?! Return its key.
+    if(_map.containsValue(con))return con._keyId;
     /// This setter connects the State Object! Associates to a View!
     con.stateView = mvcState;
     var keyId = Uuid().generateV4();
