@@ -100,6 +100,7 @@ class _StateView extends StateEvents {
   }
 }
 
+/// If there's a new event, update StatedWidget &  _StatedController! -gp
 class StateEvents {
   StateEvents() : _oldOnError = _recOnError() {
     /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
@@ -898,6 +899,59 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
   }
 
+  void didChangeMetrics() {
+    /// Called when the application's dimensions change. For example,
+    /// when a phone is rotated.
+    ///
+    /// In general, this is not overriden often as the layout system takes care of
+    /// automatically recomputing the application geometry when the application
+    /// size changes
+    ///
+    /// This method exposes notifications from [Window.onMetricsChanged].
+    /// See sample code below. No need to call super if you override.
+    ///   @override
+    ///   void didChangeMetrics() {
+    ///     setState(() { _lastSize = ui.window.physicalSize; });
+    ///   }
+  }
+
+  void didChangeTextScaleFactor() {
+    /// Called when the platform's text scale factor changes.
+    ///
+    /// This typically happens as the result of the user changing system
+    /// preferences, and it should affect all of the text sizes in the
+    /// application.
+    ///
+    /// This method exposes notifications from [Window.onTextScaleFactorChanged].
+    /// See sample code below. No need to call super if you override.
+    ///   @override
+    ///   void didChangeTextScaleFactor() {
+    ///     setState(() { _lastTextScaleFactor = ui.window.textScaleFactor; });
+    ///   }
+  }
+
+  void didChangeLocale(Locale locale) {
+    /// Called when the system tells the app that the user's locale has
+    /// changed. For example, if the user changes the system language
+    /// settings.
+    ///
+    /// This method exposes notifications from [Window.onLocaleChanged].
+  }
+
+  void didHaveMemoryPressure() {
+    /// Called when the system is running low on memory.
+    ///
+    /// This method exposes the `memoryPressure` notification from
+    /// [SystemChannels.system].
+  }
+
+  void didChangeAccessibilityFeatures() {
+    /// Called when the system changes the set of currently active accessibility
+    /// features.
+    ///
+    /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
+  }
+
   void didChangeDependencies() {
     /// Called when a dependency of this [State] object changes.
     ///
@@ -939,6 +993,7 @@ class _StatedState extends StateMVC {
   }
 }
 
+/// If there's a new event in StateEvent, update this Class!
 class _StatedController extends ControllerMVC {
 
   StatedWidget _statedWidget;
@@ -972,6 +1027,36 @@ class _StatedController extends ControllerMVC {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _statedWidget.didChangeAppLifecycleState(state);
     super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void didChangeMetrics() {
+    _statedWidget.didChangeMetrics();
+    super.didChangeMetrics();
+  }
+
+  @override
+  void didChangeTextScaleFactor() {
+    _statedWidget.didChangeTextScaleFactor();
+    super.didChangeTextScaleFactor();
+  }
+
+  @override
+  void didChangeLocale(Locale locale) {
+    _statedWidget.didChangeLocale(locale);
+    super.didChangeLocale(locale);
+  }
+
+  @override
+  void didHaveMemoryPressure() {
+    _statedWidget.didHaveMemoryPressure();
+    super.didHaveMemoryPressure();
+  }
+
+  @override
+  void didChangeAccessibilityFeatures() {
+    _statedWidget.didChangeAccessibilityFeatures();
+    super.didChangeAccessibilityFeatures();
   }
 
   @override
