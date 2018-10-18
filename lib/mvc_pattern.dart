@@ -51,54 +51,54 @@ class _StateView extends StateEvents{
   /// The View is a State object after all.
   State get state => _state;
 
-  StateViewMVC get stateView => _stateView;
+  StateMVC get stateView => _stateMVC;
   /// VERY IMPORTANT! This setter connects the State Object!
-  set stateView(StateViewMVC stateView){
-    assert(_stateView == null, "A View is already assigned!");
-    _stateView = stateView;
+  set stateView(StateMVC stateView){
+    assert(_stateMVC == null, "A View is already assigned!");
+    _stateMVC = stateView;
     _state = stateView;
   }
-  StateViewMVC _stateView;
+  StateMVC _stateMVC;
 
   /// The controller is assigned an unique key.
   String get keyId => _keyId;
   String _keyId = '';
 
-  List<ControllerMVC> listControllers(List<String> keys) => _stateView.listControllers(keys);
+  List<ControllerMVC> listControllers(List<String> keys) => _stateMVC.listControllers(keys);
 
   /// Provide the setState() function to the build() function.
   setState(fn) {
-    _stateView?.setState(fn);
+    _stateMVC?.setState(fn);
   }
 
   refresh(){
-    _stateView?.refresh();
+    _stateMVC?.refresh();
   }
 
   bool addBeforeListener(StateEvents obj){
     /// Add a listener fired 'before' the main controller runs.
-    return _stateView?.addBeforeListener(obj);
+    return _stateMVC?.addBeforeListener(obj);
   }
 
   bool addAfterListener(StateEvents obj){
     /// Add a listener fired 'after' the main controller runs.
-    return _stateView?.addAfterListener(obj);
+    return _stateMVC?.addAfterListener(obj);
   }
 
   bool addListener(StateEvents obj) {
     /// Add a listener fired 'after' the main controller runs.
-    return _stateView?.addAfterListener(obj);
+    return _stateMVC?.addAfterListener(obj);
   }
 
   bool removeListener(Object obj) {
-    return _stateView?.removeListener(obj);
+    return _stateMVC?.removeListener(obj);
   }
 
   @mustCallSuper
   void dispose() {
     /// The view association is severed.
     _state = null;
-    _stateView = null;
+    _stateMVC = null;
     super.dispose();
   }
 }
@@ -1028,7 +1028,7 @@ abstract class AppMVC extends StatedWidget{
   static String _appStatus = '';
 
   get states => _states;
-  static List<Map<String, StateViewMVC>> _states = [];
+  static List<Map<String, StateMVC>> _states = [];
 
   void initApp(){
     /// Initialize any immediate 'none time-consuming' operations at the very beginning.
@@ -1042,11 +1042,11 @@ abstract class AppMVC extends StatedWidget{
     return Future.value(true);
   }
 
-  static addState(StateViewMVC state){
+  static addState(StateMVC state){
     state._keyId = Uuid().generateV4();
     if (_appStatus == 'not running') return;
     if (_appStatus.isEmpty) _appStatus = _running ? 'running' : 'not running';
-    var map = Map<String, StateViewMVC>();
+    var map = Map<String, StateMVC>();
     map[state._keyId] = state;
     _states.add(map);
   }
