@@ -1,6 +1,6 @@
 name: mvc_pattern
 description: A framework to develop apps using the MVC design pattern.
-version: 0.0.1
+version: 0.0.3
 author: Greg Perry <support@andrioussolutions.com>
 homepage: https://github.com/AndriousSolutions/mvc_pattern
 
