@@ -30,7 +30,7 @@ are displayed. While, in this case, it is the Controller that’s concerned with
 What data does the View display? It doesn’t know nor does it care! It ‘talks to’
 the Controller instead. Again, it is the Controller that determines ‘what’ data
 the View displays. In this case, it’s a title and a counter. When a button is
-pressed, again, the View again ‘talks to’ the Controller to address the event
+pressed, the View again ‘talks to’ the Controller to address the event
 (i.e. It calls one of the Controller’s public functions,
 **incrementCounter()**).
 ![myhomepage](https://user-images.githubusercontent.com/32497443/47087491-2221e800-d1ea-11e8-8304-681c5d1e5858.jpg)
@@ -58,7 +58,7 @@ should know its own title.
 Currently, in this example, it’s the Controller that’s containing all the
 ‘business logic’ for the application. In some MVC implementations, it’s the
 Model that contains the business rules for the application. So how would that
-look? Well, it could maybe look like this:
+look? Well, it maybe could look like this:
 ![controller](https://user-images.githubusercontent.com/32497443/47087743-ca37b100-d1ea-11e8-9e38-92acea125668.jpg)
 I decided to make the Model’s API a little cleaner with the use of a static
 members. As you can deduce, the changes were just made in the Controller. The
@@ -85,7 +85,7 @@ options, and developers love options.
 
 When working with is MVC implementation, you generally override two classes: The
 Controller (Class ControllerMVC) and the StateView (Class StateMVC). Below is a
-typical approach to overriding the Controller.
+typical approach to implementing the Controller.
 ![con](https://user-images.githubusercontent.com/32497443/47087878-24387680-d1eb-11e8-820e-dd677a18a854.jpg)
 The Controller has ‘direct access’ to the View (aka. the StateView, aka. the
 Class StateMVC). This is represented by the property, stateView in the Class,
@@ -99,7 +99,7 @@ Now, in any View or any Widget for that matter, you can access the app’s data 
 business logic easily and cleanly through it’s Controller (e.g. Easily reference
 the Controller in a **build()** function.)
 
-The other Class (StateMVC) has called ‘StateView’ as it is a State object as
+The other Class (StateMVC) has been called ‘StateView’ as it is a State object as
 well as ‘the View.’
 ![homescreen](https://user-images.githubusercontent.com/32497443/47087951-58139c00-d1eb-11e8-93ec-95eb29e8cf24.jpg)
 
