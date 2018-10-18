@@ -95,7 +95,7 @@ pubspec.lock
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
 
-#.gitignore
+.gitignore
 /.DS_Store
 .atom/
 .idea/
@@ -106,6 +106,7 @@ pubspec.lock
 /.flutter-plugins
 doc/api/
 .dart_tool/
+test/
 
 # Don't need the Android stuff
 android/
