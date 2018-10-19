@@ -25,10 +25,10 @@
 
 import 'package:flutter/material.dart';
 
+/// Uncomment at 'get packages' to try out this example.
 //import 'package:english_words/english_words.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
-import 'src/Controller.dart';
 
 void main() => runApp(MyApp());
 
@@ -157,4 +157,60 @@ class RandomWordsState extends StateMVC {
           );
         },
       );
+}
+
+
+class Con extends ControllerMVC {
+  static int get length => Model.length;
+
+  static void addAll(int count) => Model.addAll(count);
+
+  static String something(int index) => Model.wordPair(index);
+
+  static bool contains(String something) => Model.contains(something);
+
+  static void somethingHappens(String something) => Model.save(something);
+
+  static Iterable<ListTile> mapHappens<ListTile>(Function f) => Model.saved(f);
+}
+
+
+class Model {
+  static final List<String> _suggestions = [];
+  static int get length => _suggestions.length;
+
+  static String wordPair(int index) {
+    if (index == null || index < 0) index = 0;
+    return _suggestions[index];
+  }
+
+  static bool contains(String pair) {
+    if (pair == null || pair.isEmpty) return false;
+    return _saved.contains(pair);
+  }
+
+  static final Set<String> _saved = Set();
+
+  static void save(String pair) {
+    if (pair == null || pair.isEmpty) return;
+    final alreadySaved = contains(pair);
+    if (alreadySaved) {
+      _saved.remove(pair);
+    } else {
+      _saved.add(pair);
+    }
+  }
+
+  static Iterable<ListTile> saved<ListTile>(Function f) => _saved.map(f);
+
+  static Iterable<String> wordPairs([int count = 10]) => makeWordPairs(count);
+
+  static void addAll(int count) {
+    _suggestions.addAll(wordPairs(count));
+  }
+}
+
+Iterable<String> makeWordPairs(int count) {
+  /// Uncomment to try this example.
+//  return generateWordPairs().take(count).map((pair){return pair.asPascalCase;});
 }
