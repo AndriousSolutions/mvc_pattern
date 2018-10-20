@@ -81,6 +81,147 @@ and have the View call them instead (or not do that at all frankly), but I’m
 merely demonstrating the possibilities. With this MVC implementation, you have
 options, and developers love options.
 
+```dart
+import 'package:flutter/material.dart';
+
+import 'package:mvc_pattern/mvc_pattern.dart';
+
+void main() => runApp(new MyApp());
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: 'Flutter Demo',
+      theme: new ThemeData(
+        // This is the theme of your application.
+        //
+        // Try running your application with "flutter run". You'll see the
+        // application has a blue toolbar. Then, without quitting the app, try
+        // changing the primarySwatch below to Colors.green and then invoke
+        // "hot reload" (press "r" in the console where you ran "flutter run",
+        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+        // counter didn't reset back to zero; the application is not restarted.
+        primarySwatch: Colors.blue,
+      ),
+      home: new MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key}) : super(key: key);
+
+  // Fields in a Widget subclass are always marked "final".
+
+  static final String title = 'Flutter Demo Home Page';
+
+  @override
+  _MyHomePageState createState() => new _MyHomePageState();
+}
+
+class _MyHomePageState extends StateMVC {
+
+  _MyHomePageState():super(Controller()){
+
+    _con = Controller.con;
+  }
+  Controller _con;
+
+  @override
+  Widget build(BuildContext context) {
+    // This method is rerun every time setState is called.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+    return new Scaffold(
+      appBar: new AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: new Text(MyHomePage.title),
+      ),
+      body: new Center(
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: new Column(
+          // Column is also layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Invoke "debug paint" (press "p" in the console where you ran
+          // "flutter run", or select "Toggle Debug Paint" from the Flutter tool
+          // window in IntelliJ) to see the wireframe for each widget.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text(MyHomePage.title,
+            ),
+            new Text(
+              '${_con.displayThis}',
+              style: Theme.of(context).textTheme.display1,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: new FloatingActionButton(
+        onPressed: (){
+          setState(
+            _con.whatever
+          );
+        },
+        tooltip: 'Increment',
+        child: new Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+
+
+class Controller extends ControllerMVC{
+
+  Controller(){
+    con = this;
+  }
+  static Controller con;
+
+  @override
+  initState(){
+    /// Demonstrating how the 'initState()' is easily implemented.
+    _counter = Model.counter;
+  }
+
+  int get displayThis => _counter;
+  int _counter;
+
+  void whatever(){
+    /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
+    _counter = Model._incrementCounter();
+  }
+}
+
+
+
+class Model{
+
+  static int get counter => _counter;
+  static int _counter = 0;
+
+  static int _incrementCounter(){
+    return ++_counter;
+  }
+}
+
+```
+
 
 ```dart
 import 'package:flutter/material.dart';
