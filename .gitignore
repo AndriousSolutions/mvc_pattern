@@ -2,7 +2,11 @@
 /.gradle
 /backup
 /build
-/*.txt
+
+#Arbitary Files
+*.txt
+*.doc
+*.docx
 
 # Windows image file caches
 Thumbs.db
