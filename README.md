@@ -81,134 +81,208 @@ and have the View call them instead (or not do that at all frankly), but I’m
 merely demonstrating the possibilities. With this MVC implementation, you have
 options, and developers love options.
 
-**How’s It Works?**
 
-When working with is MVC implementation, you generally override two classes: The
-Controller (Class ControllerMVC) and the StateView (Class StateMVC). Below is a
-typical approach to implementing the Controller.
-![con](https://user-images.githubusercontent.com/32497443/47087878-24387680-d1eb-11e8-820e-dd677a18a854.jpg)
-The Controller has ‘direct access’ to the View (aka. the StateView, aka. the
-Class StateMVC). This is represented by the property, stateView in the Class,
-ControllerMVC. In this example, a ‘static’ reference to the View as well as to
-the Controller itself is made in the Constructor. This example conveys a good
-approach because it then allows, for example, easy access to your Controller
-throughout the app. It’s now in a static field called **con**. See how it’s now
-easily accessed in another Dart file below:
-![addeditscreen](https://user-images.githubusercontent.com/32497443/47087913-3adecd80-d1eb-11e8-9a90-5c625d184503.jpg) 
-Now, in any View or any Widget for that matter, you can access the app’s data or
-business logic easily and cleanly through it’s Controller (e.g. Easily reference
-the Controller in a **build()** function.)
+```dart
+**import** 'package:flutter/material.dart';  
+  
+*/// Uncomment at 'get packages' to try out this example.*  
+**import** 'package:english_words/english_words.dart';  
+  
+**import** 'package:mvc_pattern/mvc_pattern.dart';  
+  
+**void** main() =\> runApp(MyApp());  
+  
+**class** MyApp **extends** AppMVC {  
+\@override  
+Widget build(BuildContext context) {  
+**return** MaterialApp(  
+title: 'Startup Name Generator',  
+theme: ThemeData(  
+primaryColor: Colors.*white*,  
+),  
+home: RandomWords(),  
+);  
+}  
+}  
+  
+**class** RandomWords **extends** StatefulWidgetMVC {  
+RandomWords() : **super**(RandomWordsState(Con()));  
+}  
+  
+**class** RandomWordsState **extends** StateMVC {  
+RandomWordsState(Con con) : **super**(con);  
+  
+**final** TextStyle \_biggerFont = **const** TextStyle(fontSize: 18.0);  
+  
+\@override  
+  
+*/// the View*  
+Widget build(BuildContext context) {  
+**return** Scaffold(  
+appBar: AppBar(  
+title: **const** Text('Startup Name Generator'),  
+actions: \<Widget\>[  
+IconButton(  
+icon: **const** Icon(Icons.*list*),  
+onPressed: () {  
+pushSaved(context);  
+}),  
+],  
+),  
+body: \_buildSuggestions(),  
+);  
+}  
+  
+Widget \_buildSuggestions() {  
+**return** ListView.builder(  
+padding: **const** EdgeInsets.all(16.0),  
+// The itemBuilder callback is called once per suggested word pairing,  
+// and places each suggestion into a ListTile row.  
+// For even rows, the function adds a ListTile row for the word pairing.  
+// For odd rows, the function adds a Divider widget to visually  
+// separate the entries. Note that the divider may be difficult  
+// to see on smaller devices.  
+itemBuilder: (context, i) {  
+// Add a one-pixel-high divider widget before each row in theListView.  
+**if** (i.isOdd) **return** Divider();  
+  
+// The syntax "i \~/ 2" divides i by 2 and returns an integer result.  
+// For example: 1, 2, 3, 4, 5 becomes 0, 1, 1, 2, 2.  
+// This calculates the actual number of word pairings in the ListView,  
+// minus the divider widgets.  
+**final** index = i \~/ 2;  
+// If you've reached the end of the available word pairings...  
+**if** (index \>= Con.*length*) {  
+// ...then generate 10 more and add them to the suggestions list.  
+Con.*addAll*(10);  
+}  
+**return** buildRow(index);  
+},  
+);  
+}  
+  
+**void** pushSaved(BuildContext context) {  
+Navigator.*of*(context).push(  
+MaterialPageRoute\<**void**\>(  
+builder: (BuildContext context) {  
+**final** Iterable\<ListTile\> tiles = **this**.tiles;  
+  
+**final** List\<Widget\> divided = ListTile.*divideTiles*(  
+context: context,  
+tiles: tiles,  
+).toList();  
+  
+**return** Scaffold(  
+appBar: AppBar(  
+title: **const** Text('Saved Suggestions'),  
+),  
+body: ListView(children: divided),  
+);  
+},  
+),  
+);  
+}  
+  
+Widget buildRow(int index) {  
+**if** (index == **null** && index \< 0) index = 0;  
+  
+String something = Con.*something*(index);  
+  
+**final** alreadySaved = Con.*contains*(something);  
+  
+**return** ListTile(  
+title: Text(  
+something,  
+style: \_biggerFont,  
+),  
+trailing: Icon(  
+alreadySaved ? Icons.*favorite* : Icons.*favorite_border*,  
+color: alreadySaved ? Colors.*red* : **null**,  
+),  
+onTap: () {  
+setState(() {  
+Con.*somethingHappens*(something);  
+});  
+},  
+);  
+}  
+  
+Iterable\<ListTile\> **get** tiles =\> Con.*mapHappens*(  
+(String something) {  
+**return** ListTile(  
+title: Text(  
+something,  
+style: \_biggerFont,  
+),  
+);  
+},  
+);  
+}
+```
 
-The other Class (StateMVC) has been called ‘StateView’ as it is a State object as
-well as ‘the View.’
-![homescreen](https://user-images.githubusercontent.com/32497443/47087951-58139c00-d1eb-11e8-93ec-95eb29e8cf24.jpg)
+```dart
+**class** Con **extends** ControllerMVC {  
+**static** int **get** *length* =\> Model.*length*;  
+  
+**static void** *addAll*(int count) =\> Model.*addAll*(count);  
+  
+**static** String *something*(int index) =\> Model.*wordPair*(index);  
+  
+**static** bool *contains*(String something) =\> Model.*contains*(something);  
+  
+**static void** *somethingHappens*(String something) =\>
+Model.*save*(something);  
+  
+**static** Iterable\<ListTile\> *mapHappens*\<ListTile\>(Function f) =\>
+Model.*saved*(f);  
+}
+```
 
-Note, the StateView, like the State Class is abstract and must be extended to
-implement its **build()** function. So the View, in this MVC implementation, is
-simply the State’s object’s **build()** function.
-![statemvc](https://user-images.githubusercontent.com/32497443/47088002-78dbf180-d1eb-11e8-9ad4-c719678c381d.jpg)
+```dart
+**class** Model {  
+**static final** List\<String\> *\_suggestions* = [];  
+**static** int **get** *length* =\> *\_suggestions*.length;  
+  
+**static** String *wordPair*(int index) {  
+**if** (index == **null** \|\| index \< 0) index = 0;  
+**return** *\_suggestions*[index];  
+}  
+  
+**static** bool *contains*(String pair) {  
+**if** (pair == **null** \|\| pair.isEmpty) **return false**;  
+**return** *\_saved*.contains(pair);  
+}  
+  
+**static final** Set\<String\> *\_saved* = Set();  
+  
+**static void** *save*(String pair) {  
+**if** (pair == **null** \|\| pair.isEmpty) **return**;  
+**final** alreadySaved = *contains*(pair);  
+**if** (alreadySaved) {  
+*\_saved*.remove(pair);  
+} **else** {  
+*\_saved*.add(pair);  
+}  
+}  
+  
+**static** Iterable\<ListTile\> *saved*\<ListTile\>(Function f) =\>
+*\_saved*.map(f);  
+  
+**static** Iterable\<String\> *wordPairs*([int count = 10]) =\>
+makeWordPairs(count);  
+  
+**static void** *addAll*(int count) {  
+*\_suggestions*.addAll(*wordPairs*(count));  
+}  
+}  
+  
+Iterable\<String\> makeWordPairs(int count) {  
+*/// Uncomment to try this example.*  
+// return generateWordPairs().take(count).map((pair){return
+pair.asPascalCase;});  
+}
 
-**The Controller**
-
-Note, the Controller class (ControllerMVC) looks pretty thin at first glance.
-That’s to give you all the room you need to code your app! Don’t worry. All the
-‘leg work’ is done in the Class, \_StateView.
-![controllermvc](https://user-images.githubusercontent.com/32497443/47088047-901adf00-d1eb-11e8-8979-5d31db576ccd.jpg)
-
-**Set the State**
-
-The ‘StateView’, of course, has the *setState()* function. It’s a State Object
-after all. However, with this implementation, you also have the *setState()*
-function in the Controller! You can call it in both Classes. Nice.
-![setstate](https://user-images.githubusercontent.com/32497443/47088112-b3de2500-d1eb-11e8-9bfa-f20df455ab02.jpg)
-Both Classes, also have the refresh() function. To ‘refresh’ or ‘rebuild’ the User Interface (The View).
-![refresh](https://user-images.githubusercontent.com/32497443/47088148-cc4e3f80-d1eb-11e8-9e02-0ea71528bb8b.jpg)
-
-**Listen! There’re listeners!**
-
-Also note, the ‘Controller’ class has a parent Class called StateEvents. It is
-this Class that allows the Controller to response to events generated by the
-phone or (indirectly) by the user. As of this release, there are twelve separate
-events available to the Class. This StateEvents Class is also available to you.
-Extend this Class, and you’ll have an ‘event listener’ to use in your app.
-Listeners will fire along side any Controllers assigned to a particular View.
-![stateevents](https://user-images.githubusercontent.com/32497443/47088204-eab43b00-d1eb-11e8-9dae-2c782284c7ec.jpg)
-
-Note, a ‘StateEvents Listener’ will not have access to the ‘StateView’ object,
-but instead it’s ‘State’ object. If you want more access to ‘the View’, then
-your class should extend the class, ControllerMVC.
-
-Below are the three functions used by the Controller (and by the ‘StateView’ for
-that matter) to register such Listener objects. Using such functions, the
-Controller (Class ControllerMVC) can assign listeners to the View it itself is
-assigned to, while the ‘StateView’ (Class StateMVC) can assign listeners
-directly.
-![addbeforelistener](https://user-images.githubusercontent.com/32497443/47088245-00c1fb80-d1ec-11e8-91a0-44484f5b46d3.jpg)
-![addafterlistener](https://user-images.githubusercontent.com/32497443/47088404-6dd59100-d1ec-11e8-8e59-841cedc902e3.jpg)
-![addlistener](https://user-images.githubusercontent.com/32497443/47088422-7a59e980-d1ec-11e8-803d-0785d0d30474.jpg)
-Of course, you have a means to remove a listener if and when it’s necessary.
-![16 removelistener](https://user-images.githubusercontent.com/32497443/47088465-93fb3100-d1ec-11e8-8bb1-0e09e22bbf4d.jpg)
-
-**Before and After**
-
-Note, the function, **addListener()**, does the same thing as the function,
-**addAfterListener()**. The ‘before’ and ‘after’ reference means you can assign
-listeners that will fire ‘before’ or ‘after’ the Controllers fire. Why? I don’t
-know! It’s your app! ;)
-
-**A Function for every Event**
-
-Below, you’ll see the twelve events available to you. Turn to the [WidgetsBindingObserver Class](https://docs.flutter.io/flutter/widgets/WidgetsBindingObserver-class.html)
-for details.
-![initstate](https://user-images.githubusercontent.com/32497443/47088498-a5dcd400-d1ec-11e8-9d02-60fdef9501d2.jpg)
-![dispose](https://user-images.githubusercontent.com/32497443/47088532-bb51fe00-d1ec-11e8-90e9-070d7a3300b2.jpg) 
-![deactivate](https://user-images.githubusercontent.com/32497443/47088595-dcb2ea00-d1ec-11e8-9c15-bcf7e5096562.jpg)
-![didupdatewidget](https://user-images.githubusercontent.com/32497443/47088622-eb999c80-d1ec-11e8-8ebf-402fa510bf95.jpg)
-![didchangedependencies](https://user-images.githubusercontent.com/32497443/47088641-f8b68b80-d1ec-11e8-9c0e-7f69de145cfd.jpg)
-![reassemble](https://user-images.githubusercontent.com/32497443/47088713-1a177780-d1ed-11e8-97f1-85c4bc3362e5.jpg)
-![didchangeapplifecyclestate](https://user-images.githubusercontent.com/32497443/47088734-2996c080-d1ed-11e8-9e59-4d57126e99e9.jpg)
-![didchangemetrics](https://user-images.githubusercontent.com/32497443/47088761-36b3af80-d1ed-11e8-8c3a-8791addd67d3.jpg)
-![didchangetextscalefactor](https://user-images.githubusercontent.com/32497443/47088779-46cb8f00-d1ed-11e8-9465-7dc65eb53267.jpg)
-![didchangelocale](https://user-images.githubusercontent.com/32497443/47088802-521eba80-d1ed-11e8-99c1-23852f8c5407.jpg)
-![didhavememorypressure](https://user-images.githubusercontent.com/32497443/47088825-5ea31300-d1ed-11e8-9fb0-7a48ab9e8779.jpg)
-![didchangeaccessibilityfeatures](https://user-images.githubusercontent.com/32497443/47088842-68c51180-d1ed-11e8-8522-7832c998c48b.jpg)
-
-**How to Start**
-
-Below would be a typical approach to start up an app using this plugin. This is
-done by using yet another Class in the MVC Pattern package. It’s called AppMVC.
-![app](https://user-images.githubusercontent.com/32497443/47088888-83978600-d1ed-11e8-9e00-6127d72aad13.jpg)
-
-Below is a ‘conceptual representation’ of the AppMVC Class with its logic
-removed for brevity. However, what’s left will give you an appreciation of just
-what you can do with this Class, and it’s a lot. Again, some of the events are
-not listed here, but all twelve of the events mention above could be addressed
-at the ‘Application level’ if the developer wishes to. This Class also has the
-same functions you would find in a State Object and more.
-
-It even has its own Error Handler…sort of. Currently, its response, if an error
-does occur, by default is the usual ‘red screen of death’ response. However, you
-are free to ‘override’ its **onError()** function and possibly ‘catch’ the
-errors and have your application fail, if possible, in a more graceful
-fashion….maybe even email an error report somewhere.
-
-In fact, read my (soon to publish) article, Flutter + MVC at last!, and you’ll
-see this plugin places an Error Handler in everything you make: in every
-Controller, every Listener, every View and even, in certain circumstances, every
-State Object’s build() function! You’ll soon realize that Error Handling is
-paramount in this framework!
-![appmvc](https://user-images.githubusercontent.com/32497443/47093615-96af5380-d1f7-11e8-8d8e-f36ae1c67a25.jpg)
-
-Two ‘new’ functions exist solely for the ‘App Class’: **initApp()** and
-**init()**. A lot of things have to ‘start up’ when starting up an App, and
-these two functions provide a place just for that. The function, **initApp()**,
-is for ‘quick’ synchronous processes while the **init()** function returns a
-Future and so is for asynchronous operations. Usually a **FutureBuilder()**
-function is then called upon. One usually has to wait for such ‘asynchronous
-stuff’ to complete before continuing, and so, for example, a ‘Loading Screen’ is
-displayed while we wait.
-![futurebuilder](https://user-images.githubusercontent.com/32497443/47088920-a0cc5480-d1ed-11e8-8e87-b4e8e46042b0.jpg)
-
-Read, (coming soon!)Flutter + MVC at Last! - for more a more extensive explanation for this
-framework plugin.
+Read the Medium article, Flutter + MVC at Last!, coming soon for more a more
+extensive explanation for this framework plugin.
+```
 
