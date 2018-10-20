@@ -112,7 +112,6 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
-## MyHomePage
 ```dart
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -125,7 +124,6 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 ```
-## _MyHomePageState
 ```dart
 class _MyHomePageState extends StateMVC {
 
@@ -189,7 +187,6 @@ class _MyHomePageState extends StateMVC {
   }
 }
 ```
-## Controller.dart
 ```dart
 class Controller extends ControllerMVC{
 
@@ -213,7 +210,6 @@ class Controller extends ControllerMVC{
   }
 }
 ```
-## Model.dart
 ```dart
 class Model{
 
@@ -225,9 +221,10 @@ class Model{
   }
 }
 ```
-# startup_namer Application
+# Your First Flutter App: startup_namer
 This is the application offered in the website, [Write Your First Flutter App](https://flutter.io/get-started/codelab/),
-when your first learning Flutter. 
+when your first learning Flutter.  
+### MyApp.dart
 ```dart
 import 'package:flutter/material.dart';
 
@@ -249,7 +246,12 @@ class MyApp extends AppMVC {
     );
   }
 }
-
+```
+## StateView
+Note the two classes below. One is extended by the **StatefulWidgetMVC** and the other by **StateMVC**.
+With the class, RandomWords, the super constructor is passed the 'State Object', RandomWordsState (**StateMVC**).
+In turn, the State Object takes in the Controller Class, **Con**. 
+```dart
 class RandomWords extends StatefulWidgetMVC {
   RandomWords() : super(RandomWordsState(Con()));
 }
@@ -364,7 +366,7 @@ class RandomWordsState extends StateMVC {
       );
 }
 ```
-## Controller.dart
+### Controller.dart
 ```dart
 class Con extends ControllerMVC {
   static int get length => Model.length;
@@ -380,7 +382,7 @@ class Con extends ControllerMVC {
   static Iterable<ListTile> mapHappens<ListTile>(Function f) => Model.saved(f);
 }
 ```
-## Model.dart
+### Model.dart
 ```dart
 class Model {
   static final List<String> _suggestions = [];
