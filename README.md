@@ -223,12 +223,10 @@ class Model{
 ```
 # Your First Flutter App: startup_namer
 This is the application offered in the website, [Write Your First Flutter App](https://flutter.io/get-started/codelab/),
-when your first learning Flutter.  
+when you're first learning Flutter.  
 ### MyApp.dart
 ```dart
 import 'package:flutter/material.dart';
-
-import 'package:english_words/english_words.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
@@ -247,11 +245,13 @@ class MyApp extends AppMVC {
   }
 }
 ```
-## StateView
-Note the two classes below. One is extended by the **StatefulWidgetMVC** and the other by **StateMVC**.
-With the class, RandomWords, the super constructor is passed the 'State Object', RandomWordsState (**StateMVC**).
+### StateView
+Note the two classes below. RandomWords is extended by the **StatefulWidgetMVC** and the other, RandomWordsState, 
+ extended by **StateMVC**. With the class, RandomWords, the super constructor is passed the 'State Object', RandomWordsState (**StateMVC**).
 In turn, the State Object takes in the Controller Class, **Con**. 
 ```dart
+import 'package:mvc_pattern/mvc_pattern.dart';
+
 class RandomWords extends StatefulWidgetMVC {
   RandomWords() : super(RandomWordsState(Con()));
 }
@@ -366,7 +366,8 @@ class RandomWordsState extends StateMVC {
       );
 }
 ```
-### Controller.dart
+### Controller.dart 
+Note how its all made up of static members.
 ```dart
 class Con extends ControllerMVC {
   static int get length => Model.length;
@@ -383,7 +384,11 @@ class Con extends ControllerMVC {
 }
 ```
 ### Model.dart
+This Model works with the third-party library, english_words. The rest of the application has no idea.
+The Model is solely concern with where the 'words' originate from.
 ```dart
+import 'package:english_words/english_words.dart';
+
 class Model {
   static final List<String> _suggestions = [];
   static int get length => _suggestions.length;
