@@ -187,6 +187,7 @@ class _MyHomePageState extends StateMVC {
 }
 ```
 
+Controller.dart
 ```dart
 class Controller extends ControllerMVC{
 
@@ -211,6 +212,7 @@ class Controller extends ControllerMVC{
 }
 ```
 
+Model.dart
 ```dart
 class Model{
 
@@ -224,6 +226,7 @@ class Model{
 ```
 
 
+startup_namer
 ```dart
 import 'package:flutter/material.dart';
 
@@ -361,6 +364,7 @@ class RandomWordsState extends StateMVC {
 }
 ```
 
+Controller.dart
 ```dart
 class Con extends ControllerMVC {
   static int get length => Model.length;
@@ -377,6 +381,7 @@ class Con extends ControllerMVC {
 }
 ```
 
+Model.dart
 ```dart
 class Model {
   static final List<String> _suggestions = [];
