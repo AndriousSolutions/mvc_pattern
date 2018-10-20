@@ -81,6 +81,7 @@ and have the View call them instead (or not do that at all frankly), but I’m
 merely demonstrating the possibilities. With this MVC implementation, you have
 options, and developers love options.
 
+Below is the full Counter App with the MVC implementation. 
 ```dart
 import 'package:flutter/material.dart';
 
@@ -111,6 +112,7 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
+## MyHomePage
 ```dart
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -123,6 +125,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 ```
+## _MyHomePageState
 ```dart
 class _MyHomePageState extends StateMVC {
 
@@ -186,8 +189,7 @@ class _MyHomePageState extends StateMVC {
   }
 }
 ```
-
-Controller.dart
+## Controller.dart
 ```dart
 class Controller extends ControllerMVC{
 
@@ -211,8 +213,7 @@ class Controller extends ControllerMVC{
   }
 }
 ```
-
-Model.dart
+## Model.dart
 ```dart
 class Model{
 
@@ -224,9 +225,9 @@ class Model{
   }
 }
 ```
-
-
-startup_namer
+# startup_namer Application
+This is the application offered in the website, [Write Your First Flutter App](https://flutter.io/get-started/codelab/),
+when your first learning Flutter. 
 ```dart
 import 'package:flutter/material.dart';
 
@@ -363,8 +364,7 @@ class RandomWordsState extends StateMVC {
       );
 }
 ```
-
-Controller.dart
+## Controller.dart
 ```dart
 class Con extends ControllerMVC {
   static int get length => Model.length;
@@ -380,8 +380,7 @@ class Con extends ControllerMVC {
   static Iterable<ListTile> mapHappens<ListTile>(Function f) => Model.saved(f);
 }
 ```
-
-Model.dart
+## Model.dart
 ```dart
 class Model {
   static final List<String> _suggestions = [];
