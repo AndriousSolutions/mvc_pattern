@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 /// You've got to extend this class to create a Controller
 abstract class ControllerMVC extends _StateView {}
 
+/// Extend to create a View.
 abstract class ViewMVC extends _StateView {
   ViewMVC(this._con);
 
