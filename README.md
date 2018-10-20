@@ -110,7 +110,8 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
+```
+```dart
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
 
@@ -121,7 +122,8 @@ class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => new _MyHomePageState();
 }
-
+```
+```dart
 class _MyHomePageState extends StateMVC {
 
   _MyHomePageState():super(Controller()){
@@ -183,9 +185,9 @@ class _MyHomePageState extends StateMVC {
     );
   }
 }
+```
 
-
-
+```dart
 class Controller extends ControllerMVC{
 
   Controller(){
@@ -207,9 +209,9 @@ class Controller extends ControllerMVC{
     _counter = Model._incrementCounter();
   }
 }
+```
 
-
-
+```dart
 class Model{
 
   static int get counter => _counter;
@@ -219,7 +221,6 @@ class Model{
     return ++_counter;
   }
 }
-
 ```
 
 
