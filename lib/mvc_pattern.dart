@@ -35,9 +35,10 @@ abstract class ControllerMVC extends _StateView {}
 
 /// Extend to create a View.
 abstract class ViewMVC extends _StateView {
-  ViewMVC(this._con);
+  ViewMVC(this._controller);
 
-  ControllerMVC _con;
+  ControllerMVC get controller => _controller;
+  ControllerMVC _controller;
 
   build(BuildContext context);
 }
@@ -257,7 +258,7 @@ class StateEvents {
 }
 
 class StateViewMVC extends StateMVC {
-  StateViewMVC(this._vw) : super(_vw._con) {
+  StateViewMVC(this._vw) : super(_vw._controller) {
     assert(_vw != null, "View can't be null! Pass a view to StateViewMVC.");
 
     /// This setter connects the State Object!
