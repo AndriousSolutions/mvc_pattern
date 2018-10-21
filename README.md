@@ -247,9 +247,9 @@ class MyApp extends AppMVC {
 }
 ```
 ## StateView
-Note the two classes below. RandomWords is extended by the **StatefulWidgetMVC** and the other, RandomWordsState, 
- extended by **StateMVC**. With the class, RandomWords, the super constructor is passed the 'State Object', RandomWordsState (**StateMVC**).
-In turn, the State Object takes in the Controller Class, **Con**. 
+Note the two classes below. RandomWords is extended by the StatefulWidgetMVC and the other, RandomWordsState, 
+ extended by StateMVC. With the class, RandomWords, the super constructor is passed the 'State Object', RandomWordsState (StateMVC).
+In turn, the State Object takes in the Controller Class, Con. 
 ### RandomWords.dart
 ```dart
 import 'package:mvc_pattern/mvc_pattern.dart';
