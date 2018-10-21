@@ -5,3 +5,4 @@
 ###### [0.0.5] - Oct. 18, 2018. fix on StatedWidget
 ###### [0.0.6] - Oct. 18, 2018. fix on StateMVC.con()
 ###### [0.0.7] - Oct. 19, 2018. Provide example/main.dart
+###### [0.0.8] - Oct. 20, 2018. Updated the README.md
