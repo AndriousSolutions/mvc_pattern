@@ -35,10 +35,9 @@ abstract class ControllerMVC extends _StateView {}
 
 /// Extend to create a View.
 abstract class ViewMVC extends _StateView {
-  ViewMVC(this._controller);
+  ViewMVC(this.controller);
 
-  ControllerMVC get controller => _controller;
-  ControllerMVC _controller;
+  final ControllerMVC controller;
 
   build(BuildContext context);
 }
@@ -258,13 +257,13 @@ class StateEvents {
 }
 
 class StateViewMVC extends StateMVC {
-  StateViewMVC(this._vw) : super(_vw._controller) {
-    assert(_vw != null, "View can't be null! Pass a view to StateViewMVC.");
+  StateViewMVC(this.view) : super(view.controller) {
+    assert(view != null, "View can't be null! Pass a view to StateViewMVC.");
 
     /// This setter connects the State Object!
-    _vw.stateView = this;
+    view.stateView = this;
   }
-  final ViewMVC _vw;
+  final ViewMVC view;
 
   Widget get buildWidget => _widget;
   Widget _widget;
@@ -294,7 +293,7 @@ class StateViewMVC extends StateMVC {
     };
 
     /// Where the magic happens!
-    _widget = _vw.build(context);
+    _widget = view.build(context);
 
     /// Restore the current error handler.
     FlutterError.onError = _currentOnError;
