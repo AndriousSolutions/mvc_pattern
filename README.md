@@ -33,7 +33,7 @@ the View displays. In this case, it’s a title and a counter. When a button is
 pressed, the View again ‘talks to’ the Controller to address the event
 (i.e. It calls one of the Controller’s public functions,
 **incrementCounter()**).
-![myhomepage](https://user-images.githubusercontent.com/32497443/47087491-2221e800-d1ea-11e8-8304-681c5d1e5858.jpg)
+![myhomepage](https://user-images.githubusercontent.com/32497443/47261683-b6b66f80-d4a2-11e8-9db3-66e17b3b838f.jpg)
 
 ![mvc pattern](https://user-images.githubusercontent.com/32497443/47087587-6614ed00-d1ea-11e8-8fc3-ced0ac6af12a.jpg)
 
@@ -45,7 +45,7 @@ interface and only determine when to rebuild or not. It’s a simple change.
 
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
-![myhomepage](https://user-images.githubusercontent.com/32497443/47087698-aa07f200-d1ea-11e8-8193-38fc3fca6976.jpg)  
+![myhomepage](https://user-images.githubusercontent.com/32497443/47261691-e4031d80-d4a2-11e8-8d57-edf48a7949ae.jpg)
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this plugin, such things are left to the
@@ -81,6 +81,7 @@ and have the View call them instead (or not do that at all frankly), but I’m
 merely demonstrating the possibilities. With this MVC implementation, you have
 options, and developers love options.
 
+# The Counter App
 Below is the full Counter App with the MVC implementation. 
 ```dart
 import 'package:flutter/material.dart';
@@ -223,7 +224,7 @@ class Model{
 ```
 # Your First Flutter App: startup_namer
 This is the application offered in the website, [Write Your First Flutter App](https://flutter.io/get-started/codelab/),
-when you're first learning Flutter.  
+when you're first learning Flutter. This version has this MVC implementation.  
 ### MyApp.dart
 ```dart
 import 'package:flutter/material.dart';
@@ -368,7 +369,7 @@ class RandomWordsState extends StateMVC {
 }
 ```
 ### Controller.dart 
-Note how its all made up of static members.
+Note how its all made up of static members and turns to Model for all the data.
 ```dart
 import 'package:mvc_pattern/mvc_pattern.dart';
 
