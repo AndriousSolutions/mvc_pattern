@@ -110,7 +110,7 @@ pubspec.lock
 /.flutter-plugins
 doc/api/
 .dart_tool/
-test/
+# test/
 
 # Don't need the Android stuff
 android/
