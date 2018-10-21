@@ -35,7 +35,11 @@ abstract class ControllerMVC extends _StateView {}
 
 /// Extend to create a View.
 abstract class ViewMVC extends _StateView {
-  ViewMVC(this.controller);
+  ViewMVC(this.controller) {
+    _addKeyId(this);
+    /// Assign a key id to this controller.
+    _addKeyId(controller);
+  }
 
   final ControllerMVC controller;
 
@@ -830,10 +834,7 @@ class _ControllerList {
 
     /// This setter connects the State Object! Associates to a View!
     con.stateView = mvcState;
-    var keyId = Uuid().generateV4();
-    con._keyId = keyId;
-    _map[keyId] = con;
-    return keyId;
+    return _addConId(con, _map);
   }
 
   bool remove(String keyId) {
@@ -845,6 +846,22 @@ class _ControllerList {
   bool contains(ControllerMVC con) => _map.containsValue(con);
 
   void dispose() => _map.clear();
+}
+
+String _addConId(ControllerMVC con, Map<String, ControllerMVC> map) {
+  String keyId = _addKeyId(con);
+  map[keyId] = con;
+  return keyId;
+}
+
+String _addKeyId(_StateView sv) {
+  String keyId = sv._keyId;
+  /// May already have been assigned a key.
+  if (keyId.isEmpty) {
+    keyId = Uuid().generateV4();
+    sv._keyId = keyId;
+  }
+  return keyId;
 }
 
 abstract class StatefulWidgetMVC extends StatefulWidget {
