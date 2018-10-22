@@ -25,8 +25,8 @@ library mvc_pattern;
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'dart:async';
 import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -363,8 +363,13 @@ abstract class StateMVC extends State<StatefulWidget>
   List<StateEvents> get afterList => _eventHandler.afterList;
   _StateEventList _eventHandler;
 
-  String get keyId => _keyId;
-  String _keyId;
+  /// The Unique key identifier for this State object.
+  String get keyId {
+    if(_keyId.isEmpty)
+      _keyId = Uuid().generateV4();
+    return _keyId;
+  }
+  String _keyId = '';
 
   /// May be set false to prevent unnecessary 'rebuilds'.
   bool _rebuildAllowed = true;
@@ -1162,7 +1167,6 @@ abstract class AppMVC extends StatedWidget {
   }
 
   static addState(StateMVC state) {
-    state._keyId = Uuid().generateV4();
     if (_appStatus == 'not running') return;
     if (_appStatus.isEmpty) _appStatus = _running ? 'running' : 'not running';
     var map = Map<String, StateMVC>();
