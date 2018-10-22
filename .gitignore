@@ -3,6 +3,8 @@
 /backup
 /build
 
+/.travis.yml
+
 #Arbitary Files
 *.txt
 *.doc
