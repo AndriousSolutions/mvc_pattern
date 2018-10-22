@@ -40,7 +40,6 @@ abstract class ViewMVC extends _StateView {
     /// Assign a key id to this controller.
     _addKeyId(controller);
   }
-
   final ControllerMVC controller;
 
   build(BuildContext context);
