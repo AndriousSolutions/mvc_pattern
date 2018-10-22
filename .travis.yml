@@ -1,3 +1,5 @@
 language: dart
-
-
+dart_task:
+  - dartfmt
+script:
+  - ./flutter/bin/flutter test
