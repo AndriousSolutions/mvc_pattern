@@ -34,11 +34,12 @@ import 'package:flutter/material.dart';
 abstract class ControllerMVC extends _StateView {}
 
 /// Extend to create a View.
-abstract class ViewMVC extends _StateView {
+abstract class ViewMVC extends _StateView with _ControllerListing {
   ViewMVC(this.controller) {
     _addKeyId(this);
     /// Assign a key id to this controller.
-    _addKeyId(controller);
+//    _addKeyId(controller);
+    controller = controller;
   }
   final ControllerMVC controller;
 
@@ -305,7 +306,7 @@ class StateViewMVC extends StateMVC {
 }
 
 abstract class StateMVC extends State<StatefulWidget>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, _ControllerListing, _StateEventList {
   /// The View!
   Widget build(BuildContext context);
 
@@ -324,8 +325,10 @@ abstract class StateMVC extends State<StatefulWidget>
         onError(details);
       }
     };
-    _eventHandler = _StateEventList(this);
-    _conListing = _ControllerListing(this);
+//    _eventHandler = _StateEventList();
+//    _conListing = _ControllerListing(this);
+    /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
+    stateView = this;
     add(_con);
   }
 
@@ -333,17 +336,17 @@ abstract class StateMVC extends State<StatefulWidget>
   final Function(FlutterErrorDetails details) _oldOnError;
 
   /// Contains a listing of all the Controllers assigned to this View.
-  _ControllerListing _conListing;
+//  _ControllerListing _conListing;
 
-  ControllerMVC con(String keyId) => _conListing.con(keyId);
+//  ControllerMVC con(String keyId) => _conListing.con(keyId);
 
-  Map<String, ControllerMVC> controllers(List<String> keys) =>
-      _conListing.getControllers(keys);
+//  Map<String, ControllerMVC> controllers(List<String> keys) =>
+//      _conListing.getControllers(keys);
 
-  List<ControllerMVC> get _controllerList => _conListing.controllerList;
+  List<ControllerMVC> get _controllerList => super.controllerList;
 
-  List<ControllerMVC> listControllers(List<String> keys) =>
-      _conListing.listControllers(keys);
+//  List<ControllerMVC> listControllers(List<String> keys) =>
+//      _conListing.listControllers(keys);
 
   set controller(ControllerMVC c) {
     add(c);
@@ -352,20 +355,23 @@ abstract class StateMVC extends State<StatefulWidget>
   String add(ControllerMVC c) {
     /// It may have been a listener. Can't be both.
     removeListener(c);
-    return _conListing.add(c);
+    return super.add(c);
+//    return _conListing.add(c);
   }
 
   void addList(List<ControllerMVC> list) {
     /// It may have been a listener. Can't be both.
     list.forEach((ControllerMVC con) => removeListener(con));
-    _conListing.addList(list);
+    super.addList(list);
+//    _conListing.addList(list);
   }
 
-  bool remove(String keyId) => _conListing.remove(keyId);
+//  bool remove(String keyId) => _conListing.remove(keyId);
 
-  List<StateEvents> get beforeList => _eventHandler.beforeList;
-  List<StateEvents> get afterList => _eventHandler.afterList;
-  _StateEventList _eventHandler;
+//  List<StateEvents> get beforeList => _eventHandler.beforeList;
+//  List<StateEvents> get afterList => _eventHandler.afterList;
+//  _StateEventList _eventHandler;
+
 
   /// The Unique key identifier for this State object.
   String get keyId {
@@ -399,9 +405,9 @@ abstract class StateMVC extends State<StatefulWidget>
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
     _controllerList.forEach((ControllerMVC con) => con._widget = widget);
-    _eventHandler.beforeList.forEach((StateEvents obj) => obj.initState());
+    beforeList.forEach((StateEvents obj) => obj.initState());
     _controllerList.forEach((ControllerMVC con) => con.initState());
-    _eventHandler.afterList.forEach((StateEvents obj) => obj.initState());
+    afterList.forEach((StateEvents obj) => obj.initState());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -421,9 +427,9 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList.forEach((StateEvents obj) => obj.deactivate());
+    beforeList.forEach((StateEvents obj) => obj.deactivate());
     _controllerList.forEach((ControllerMVC con) => con.deactivate());
-    _eventHandler.afterList.forEach((StateEvents obj) => obj.deactivate());
+    afterList.forEach((StateEvents obj) => obj.deactivate());
     super.deactivate();
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -443,11 +449,13 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList.forEach((StateEvents obj) => obj.dispose());
+    beforeList.forEach((StateEvents obj) => obj.dispose());
     _controllerList.forEach((ControllerMVC con) => con.dispose());
-    _conListing.dispose();
-    _eventHandler.afterList.forEach((StateEvents obj) => obj.dispose());
-    _eventHandler.dispose();
+//_conListing.dispose();
+    disposeControllerListing();
+    afterList.forEach((StateEvents obj) => obj.dispose());
+//    _eventHandler.dispose();
+    disposeStateEventList();
 
     /// Should not be 'rebuilding' anyway. This Widget is going away.
     _rebuildAllowed = true;
@@ -469,11 +477,11 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
     _controllerList
         .forEach((ControllerMVC con) => con.didUpdateWidget(oldWidget));
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
     super.didUpdateWidget(oldWidget);
     _rebuildAllowed = true;
@@ -492,11 +500,11 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didChangeAppLifecycleState(state));
     _controllerList
         .forEach((ControllerMVC con) => con.didChangeAppLifecycleState(state));
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didChangeAppLifecycleState(state));
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -524,10 +532,10 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didChangeMetrics());
     _controllerList.forEach((ControllerMVC con) => con.didChangeMetrics());
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didChangeMetrics());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -554,11 +562,11 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didChangeTextScaleFactor());
     _controllerList
         .forEach((ControllerMVC con) => con.didChangeTextScaleFactor());
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didChangeTextScaleFactor());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -578,10 +586,10 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didChangeLocale(locale));
     _controllerList.forEach((ControllerMVC con) => con.didChangeLocale(locale));
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didChangeLocale(locale));
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -600,10 +608,10 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didHaveMemoryPressure());
     _controllerList.forEach((ControllerMVC con) => con.didHaveMemoryPressure());
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didHaveMemoryPressure());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -622,11 +630,11 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didChangeAccessibilityFeatures());
     _controllerList
         .forEach((ControllerMVC con) => con.didChangeAccessibilityFeatures());
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didChangeAccessibilityFeatures());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -642,10 +650,10 @@ abstract class StateMVC extends State<StatefulWidget>
   void didChangeDependencies() {
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList
+    beforeList
         .forEach((StateEvents obj) => obj.didChangeDependencies());
     _controllerList.forEach((ControllerMVC con) => con.didChangeDependencies());
-    _eventHandler.afterList
+    afterList
         .forEach((StateEvents obj) => obj.didChangeDependencies());
     super.didChangeDependencies();
     _rebuildAllowed = true;
@@ -662,9 +670,9 @@ abstract class StateMVC extends State<StatefulWidget>
   void reassemble() {
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _eventHandler.beforeList.forEach((StateEvents obj) => obj.reassemble());
+    beforeList.forEach((StateEvents obj) => obj.reassemble());
     _controllerList.forEach((ControllerMVC con) => con.reassemble());
-    _eventHandler.afterList.forEach((StateEvents obj) => obj.reassemble());
+    afterList.forEach((StateEvents obj) => obj.reassemble());
     super.reassemble();
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -675,24 +683,24 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
-  bool addBeforeListener(StateEvents obj) {
-    /// Add a listener fired 'before' the main controller runs.
-    return _eventHandler.addBefore(obj);
-  }
-
-  bool addAfterListener(StateEvents obj) {
-    /// Add a listener fired 'after' the main controller runs.
-    return _eventHandler.addAfter(obj);
-  }
-
-  bool addListener(StateEvents obj) {
-    /// Add a listener fired 'after' the main controller runs.
-    return addAfterListener(obj);
-  }
-
-  bool removeListener(StateEvents obj) {
-    return _eventHandler.remove(obj);
-  }
+//  bool addBeforeListener(StateEvents obj) {
+//    /// Add a listener fired 'before' the main controller runs.
+//    return _eventHandler.addBefore(obj);
+//  }
+//
+//  bool addAfterListener(StateEvents obj) {
+//    /// Add a listener fired 'after' the main controller runs.
+//    return _eventHandler.addAfter(obj);
+//  }
+//
+//  bool addListener(StateEvents obj) {
+//    /// Add a listener fired 'after' the main controller runs.
+//    return addAfterListener(obj);
+//  }
+//
+//  bool removeListener(StateEvents obj) {
+//    return _eventHandler.remove(obj);
+//  }
 
   /// Allows 'external' routines can call this function.
   void setState(VoidCallback fn) {
@@ -732,9 +740,9 @@ Function(FlutterErrorDetails details) _recOnError() {
 }
 
 class _StateEventList {
-  _StateEventList(this.view);
-
-  final StateMVC view;
+//  _StateEventList(this.view);
+//
+//  final StateMVC view;
 
   final Set<StateEvents> _listenersBefore = Set();
   List<StateEvents> get beforeList => _listenersBefore.toList();
@@ -742,15 +750,22 @@ class _StateEventList {
   final Set<StateEvents> _listenersAfter = Set();
   List<StateEvents> get afterList => _listenersAfter.toList();
 
-  bool addBefore(StateEvents obj) {
+  bool addBeforeListener(StateEvents obj) {
+    /// Add a listener fired 'before' the main controller runs.
     return _listenersBefore.add(obj);
   }
 
-  bool addAfter(StateEvents obj) {
+  bool addAfterListener(StateEvents obj) {
+    /// Add a listener fired 'after' the main controller runs.
     return _listenersAfter.add(obj);
   }
 
-  bool remove(StateEvents obj) {
+  bool addListener(StateEvents obj) {
+    /// Add a listener fired 'after' the main controller runs.
+    return addAfterListener(obj);
+  }
+
+  bool removeListener(StateEvents obj) {
     bool removed;
     removed = _listenersBefore.remove(obj);
     if (_listenersAfter.remove(obj)) removed = true;
@@ -761,17 +776,26 @@ class _StateEventList {
 
   bool afterContains(StateEvents obj) => _listenersAfter.contains(obj);
 
-  void dispose() {
+  void disposeStateEventList() {
     _listenersBefore.removeAll(_listenersBefore);
     _listenersAfter.removeAll(_listenersAfter);
   }
 }
 
 class _ControllerListing {
-  _ControllerListing([StateMVC state]) {
-    _controllers = _ControllerList(state);
+//  _ControllerListing([StateMVC state]) {
+//    _controllers = _ControllerList();
+//    _controllers.mvcState = state;
+//  }
+//  _ControllerList _controllers;
+  _ControllerList _controllers = _ControllerList();
+
+  set stateView(StateMVC stateMVC) {
+    bool unassigned = _controllers.mvcState == null;
+    assert(unassigned, "Already assigned a 'StateView!'");
+    if(unassigned)
+      _controllers.mvcState = stateMVC;
   }
-  _ControllerList _controllers;
 
   set controller(ControllerMVC c) {
     add(c);
@@ -808,11 +832,11 @@ class _ControllerListing {
   Map<String, ControllerMVC> get cons => _controllers.map;
   Map<String, ControllerMVC> get controllers => cons;
 
-  void dispose() => _controllers.dispose();
+  void disposeControllerListing() => _controllers.dispose();
 }
 
 class _ControllerList {
-  _ControllerList([this.mvcState]);
+//  _ControllerList([this.mvcState]);
 
   StateMVC mvcState;
 
