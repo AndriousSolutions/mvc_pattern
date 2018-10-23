@@ -345,7 +345,8 @@ class StateViewMVC extends StateMVC {
     /// IMPORTANT! Add the View's controllers first before calling setter. -gp
     addList(view.consList);
     view.disposeControllerListing();
-    /// This setter connects the State Object!
+    /// IMPORTNANT! This setter connects the State Object!
+    view.stateMVC = this;
     view.stateView = this;
   }
   final ViewMVC view;
@@ -415,7 +416,7 @@ abstract class StateMVC extends State<StatefulWidget>
       }
     };
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
-    stateView = this;
+    stateMVC = this;
     add(_con);
   }
 
@@ -433,12 +434,6 @@ abstract class StateMVC extends State<StatefulWidget>
     /// It may have been a listener. Can't be both.
     removeListener(c);
     return super.add(c);
-  }
-
-  void addList(List<ControllerMVC> list) {
-    /// It may have been a listener. Can't be both.
-    list.forEach((ControllerMVC con) => removeListener(con));
-    super.addList(list);
   }
 
   /// The Unique key identifier for this State object.
@@ -830,7 +825,7 @@ class _ControllerListing {
 
   _ControllerList _controllers = _ControllerList();
 
-  set stateView(StateMVC stateMVC) {
+  set stateMVC(StateMVC stateMVC) {
     bool unassigned = _controllers.mvcState == null;
     assert(unassigned, "Already assigned a 'StateView!'");
     if(unassigned)
@@ -891,6 +886,10 @@ class _ControllerList {
 
   String add(ControllerMVC con) {
     if (con == null) return '';
+
+    /// It's being passed in again. It happens. Simply return key id.
+    if(con.stateView != null && con.stateView == mvcState)
+      return con._keyId;
 
     bool unassigned = con.stateView == null;
     assert(unassigned, "A Controller can only be assigned to one View!");
