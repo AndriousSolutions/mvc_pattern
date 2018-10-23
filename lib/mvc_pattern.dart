@@ -355,7 +355,11 @@ abstract class StateMVC extends State<StatefulWidget>
     return _conListing.add(c);
   }
 
-  void addList(List<ControllerMVC> list) => _conListing.addList(list);
+  void addList(List<ControllerMVC> list) {
+    /// It may have been a listener. Can't be both.
+    list.forEach((ControllerMVC con) => removeListener(con));
+    _conListing.addList(list);
+  }
 
   bool remove(String keyId) => _conListing.remove(keyId);
 
@@ -825,20 +829,18 @@ class _ControllerList {
   String add(ControllerMVC con) {
     if (con == null) return '';
 
-    /// Already added to this list.
-    if (contains(con)) return '';
     bool unassigned = con.stateView == null;
     assert(unassigned, "A Controller can only be assigned to one View!");
 
+    /// Return blank in production.
     /// If already assigned to another view.
     if (!unassigned) return '';
 
-    /// It's already there?! Return its key.
-    if (_map.containsValue(con)) return con._keyId;
-
     /// This setter connects the State Object! Associates to a View!
     con.stateView = mvcState;
-    return _addConId(con, _map);
+
+    /// It's already there?! Return its key.
+    return (contains(con)) ? con._keyId : _addConId(con, _map);
   }
 
   bool remove(String keyId) {
