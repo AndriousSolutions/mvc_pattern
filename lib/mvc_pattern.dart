@@ -325,8 +325,6 @@ abstract class StateMVC extends State<StatefulWidget>
         onError(details);
       }
     };
-//    _eventHandler = _StateEventList();
-//    _conListing = _ControllerListing(this);
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
     stateView = this;
     add(_con);
@@ -336,17 +334,7 @@ abstract class StateMVC extends State<StatefulWidget>
   final Function(FlutterErrorDetails details) _oldOnError;
 
   /// Contains a listing of all the Controllers assigned to this View.
-//  _ControllerListing _conListing;
-
-//  ControllerMVC con(String keyId) => _conListing.con(keyId);
-
-//  Map<String, ControllerMVC> controllers(List<String> keys) =>
-//      _conListing.getControllers(keys);
-
   List<ControllerMVC> get _controllerList => super.controllerList;
-
-//  List<ControllerMVC> listControllers(List<String> keys) =>
-//      _conListing.listControllers(keys);
 
   set controller(ControllerMVC c) {
     add(c);
@@ -356,22 +344,13 @@ abstract class StateMVC extends State<StatefulWidget>
     /// It may have been a listener. Can't be both.
     removeListener(c);
     return super.add(c);
-//    return _conListing.add(c);
   }
 
   void addList(List<ControllerMVC> list) {
     /// It may have been a listener. Can't be both.
     list.forEach((ControllerMVC con) => removeListener(con));
     super.addList(list);
-//    _conListing.addList(list);
   }
-
-//  bool remove(String keyId) => _conListing.remove(keyId);
-
-//  List<StateEvents> get beforeList => _eventHandler.beforeList;
-//  List<StateEvents> get afterList => _eventHandler.afterList;
-//  _StateEventList _eventHandler;
-
 
   /// The Unique key identifier for this State object.
   String get keyId {
@@ -451,10 +430,8 @@ abstract class StateMVC extends State<StatefulWidget>
     _rebuildAllowed = false;
     beforeList.forEach((StateEvents obj) => obj.dispose());
     _controllerList.forEach((ControllerMVC con) => con.dispose());
-//_conListing.dispose();
     disposeControllerListing();
     afterList.forEach((StateEvents obj) => obj.dispose());
-//    _eventHandler.dispose();
     disposeStateEventList();
 
     /// Should not be 'rebuilding' anyway. This Widget is going away.
@@ -683,25 +660,6 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
-//  bool addBeforeListener(StateEvents obj) {
-//    /// Add a listener fired 'before' the main controller runs.
-//    return _eventHandler.addBefore(obj);
-//  }
-//
-//  bool addAfterListener(StateEvents obj) {
-//    /// Add a listener fired 'after' the main controller runs.
-//    return _eventHandler.addAfter(obj);
-//  }
-//
-//  bool addListener(StateEvents obj) {
-//    /// Add a listener fired 'after' the main controller runs.
-//    return addAfterListener(obj);
-//  }
-//
-//  bool removeListener(StateEvents obj) {
-//    return _eventHandler.remove(obj);
-//  }
-
   /// Allows 'external' routines can call this function.
   void setState(VoidCallback fn) {
     if (_rebuildAllowed) {
@@ -740,9 +698,6 @@ Function(FlutterErrorDetails details) _recOnError() {
 }
 
 class _StateEventList {
-//  _StateEventList(this.view);
-//
-//  final StateMVC view;
 
   final Set<StateEvents> _listenersBefore = Set();
   List<StateEvents> get beforeList => _listenersBefore.toList();
@@ -783,11 +738,7 @@ class _StateEventList {
 }
 
 class _ControllerListing {
-//  _ControllerListing([StateMVC state]) {
-//    _controllers = _ControllerList();
-//    _controllers.mvcState = state;
-//  }
-//  _ControllerList _controllers;
+
   _ControllerList _controllers = _ControllerList();
 
   set stateView(StateMVC stateMVC) {
@@ -836,7 +787,6 @@ class _ControllerListing {
 }
 
 class _ControllerList {
-//  _ControllerList([this.mvcState]);
 
   StateMVC mvcState;
 
