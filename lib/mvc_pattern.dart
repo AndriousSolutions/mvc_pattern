@@ -85,39 +85,39 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
 
   List<ControllerMVC> listControllers(List<String> keys) {
     if (_stateMVC == null) {
-      return super.getControllers(keys).values.toList();
+      return super.controllers(keys).values.toList();
     } else {
-      return _stateMVC.getControllers(keys).values.toList();
+      return _stateMVC.controllers(keys).values.toList();
     }
   }
 
-  List<ControllerMVC> get consList {
+//  List<ControllerMVC> get consList {
+//    if (_stateMVC == null) {
+//      return _controllers.asList;
+//    } else {
+//      return _stateMVC.consList;
+//    }
+//  }
+
+//  List<ControllerMVC> get controllerList => consList;
+
+  Map<String, ControllerMVC> controllers(List<String> keys) {
     if (_stateMVC == null) {
-      return _controllers.asList;
+      return super.controllers(keys);
     } else {
-      return _stateMVC.consList;
+      return _stateMVC.controllers(keys);
     }
   }
 
-  List<ControllerMVC> get controllerList => consList;
+//  Map<String, ControllerMVC> get cons {
+//    if (_stateMVC == null) {
+//      return _controllers.map;
+//    } else {
+//      return _stateMVC.cons;
+//    }
+//  }
 
-  Map<String, ControllerMVC> getControllers(List<String> keys) {
-    if (_stateMVC == null) {
-      return super.getControllers(keys);
-    } else {
-      return _stateMVC.getControllers(keys);
-    }
-  }
-
-  Map<String, ControllerMVC> get cons {
-    if (_stateMVC == null) {
-      return _controllers.map;
-    } else {
-      return _stateMVC.cons;
-    }
-  }
-
-  Map<String, ControllerMVC> get controllers => cons;
+//  Map<String, ControllerMVC> get controllers => cons;
 
   @override
   void dispose() {
@@ -345,7 +345,7 @@ class StateViewMVC extends StateMVC {
     assert(view != null, "View can't be null! Pass a view to StateViewMVC.");
 
     /// IMPORTANT! Add the View's controllers first before calling setter. -gp
-    addList(view.consList);
+    addList(view._controllerList);
     view.disposeControllerListing();
 
     /// IMPORTNANT! This setter connects the State Object!
@@ -428,7 +428,7 @@ abstract class StateMVC extends State<StatefulWidget>
   final Function(FlutterErrorDetails details) _oldOnError;
 
   /// Contains a listing of all the Controllers assigned to this View.
-  List<ControllerMVC> get _controllerList => super.controllerList;
+  List<ControllerMVC> get _controllerList => super._controllerList;
 
   set controller(ControllerMVC c) {
     add(c);
@@ -841,20 +841,18 @@ class _ControllerListing {
   bool remove(String keyId) => _controllers.remove(keyId);
 
   List<ControllerMVC> listControllers(List<String> keys) {
-    return getControllers(keys).values.toList();
+    return controllers(keys).values.toList();
   }
+/// Never supply a public list of Controllers. User must know the key identifier(s).
+  List<ControllerMVC> get _controllerList => _controllers.asList;
 
-  List<ControllerMVC> get consList => _controllers.asList;
-  List<ControllerMVC> get controllerList => consList;
-
-  Map<String, ControllerMVC> getControllers(List<String> keys) {
+  Map<String, ControllerMVC> controllers(List<String> keys) {
     Map controllers = Map<String, ControllerMVC>();
     keys.forEach((String key) => controllers[key] = _controllers.map[key]);
     return controllers;
   }
-
-  Map<String, ControllerMVC> get cons => _controllers.map;
-  Map<String, ControllerMVC> get controllers => cons;
+/// Never supply a public list of Controllers. User must know the key identifier(s).
+  Map<String, ControllerMVC> get _cons => _controllers.map;
 
   void disposeControllerListing() => _controllers.dispose();
 }
@@ -1166,10 +1164,10 @@ abstract class StatelessWidgetMVC extends StatelessWidget {
   ControllerMVC get controller => conInfo.con;
 
   ///  List<ControllerMVC> get consList => conListing.controllerList;
-  List<ControllerMVC> get controllerList => conListing.controllerList;
+  List<ControllerMVC> get controllerList => conListing._controllerList;
 
   ///  Map<String, ControllerMVC> get cons => conListing.cons;
-  Map<String, ControllerMVC> get controllers => conListing.cons;
+  Map<String, ControllerMVC> get controllers => conListing._cons;
 
   ///  set con(ControllerMVC c) => conListing.con = c;
   set controller(ControllerMVC c) => add(c);
