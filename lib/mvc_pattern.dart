@@ -35,15 +35,93 @@ abstract class ControllerMVC extends _StateView {}
 
 /// Extend to create a View.
 abstract class ViewMVC extends _StateView with _ControllerListing {
+
+  /// Implement this View!
+  build(BuildContext context);
+
   ViewMVC(this.controller) {
     _addKeyId(this);
-    /// Assign a key id to this controller.
-//    _addKeyId(controller);
+    /// Add this Controller to the Controller Listing!
     controller = controller;
   }
   final ControllerMVC controller;
 
-  build(BuildContext context);
+  set controller(ControllerMVC c) => add(c);
+
+  ControllerMVC con(String keyId) {
+    if(stateView == null) {
+      return super.con(keyId);
+    }else{
+      return stateView.con(keyId);
+    }
+  }
+
+  String add(ControllerMVC c) {
+    if(stateView == null) {
+      return super.add(c);
+    }else{
+      return stateView.add(c);
+    }
+  }
+
+  void addList(List<ControllerMVC> list) =>
+      list.forEach((ControllerMVC con) => add(con));
+
+  bool contains(ControllerMVC c) {
+    if(stateView == null) {
+      return super.contains(c);
+    }else{
+      return stateView.contains(c);
+    }
+  }
+
+  bool remove(String keyId) {
+    if(stateView == null) {
+      return super.remove(keyId);
+    }else{
+      return stateView.remove(keyId);
+    }
+  }
+
+  List<ControllerMVC> listControllers(List<String> keys) {
+    if(stateView == null) {
+      return super.getControllers(keys).values.toList();
+    }else{
+      return stateView.getControllers(keys).values.toList();
+    }
+  }
+
+  List<ControllerMVC> get consList {
+    if(stateView == null) {
+      return _controllers.asList;
+    }else{
+      return stateView.consList;
+    }
+  }
+  List<ControllerMVC> get controllerList => consList;
+
+  Map<String, ControllerMVC> getControllers(List<String> keys) {
+    if(stateView == null) {
+      return super.getControllers(keys);
+    }else{
+      return stateView.getControllers(keys);
+    }
+  }
+
+  Map<String, ControllerMVC> get cons {
+    if(stateView == null) {
+      return _controllers.map;
+    }else{
+      return stateView.cons;
+    }
+  }
+  Map<String, ControllerMVC> get controllers => cons;
+
+  @override
+  void dispose() {
+    disposeControllerListing();
+    super.dispose();
+  }
 }
 
 class _StateView extends StateEvents {
@@ -264,6 +342,9 @@ class StateViewMVC extends StateMVC {
   StateViewMVC(this.view) : super(view.controller) {
     assert(view != null, "View can't be null! Pass a view to StateViewMVC.");
 
+    /// IMPORTANT! Add the View's controllers first before calling setter. -gp
+    addList(view.consList);
+    view.disposeControllerListing();
     /// This setter connects the State Object!
     view.stateView = this;
   }
@@ -274,6 +355,7 @@ class StateViewMVC extends StateMVC {
 
   Function(FlutterErrorDetails details) _currentOnError;
 
+  @override
   Widget build(BuildContext context) {
     /// Save the current Error Handler if any.
     _currentOnError = FlutterError.onError;
@@ -302,6 +384,13 @@ class StateViewMVC extends StateMVC {
     /// Restore the current error handler.
     FlutterError.onError = _currentOnError;
     return _widget;
+  }
+
+  @override
+  @mustCallSuper
+  void dispose(){
+    view.dispose();
+    super.dispose();
   }
 }
 
