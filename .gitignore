@@ -3,8 +3,6 @@
 /backup
 /build
 
-/.travis.yml
-
 #Arbitary Files
 *.txt
 *.doc
@@ -54,7 +52,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-
 /captures
 
 # Built application files
@@ -71,7 +68,6 @@ Temporary Items
 bin/
 gen/
 out/
-
 
 # Local configuration file (sdk path, etc)
 /local.properties
