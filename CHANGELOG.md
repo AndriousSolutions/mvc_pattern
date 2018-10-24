@@ -10,4 +10,5 @@
 ###### [0.0.10] - Oct. 22, 2018. include travis.yml
 ###### [0.0.11] - Oct. 23, 2018. class StateMVC with _ControllerListing, _StateEventList 
 ###### [0.0.12] - Oct. 23, 2018. class ViewMVC with _ControllerListing
+###### [0.0.13] - Oct. 23, 2018. fix on _ControllerListing
 
