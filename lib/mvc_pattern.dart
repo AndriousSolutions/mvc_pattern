@@ -36,6 +36,7 @@ abstract class ControllerMVC extends _StateView {}
 /// Extend to create a View.
 abstract class ViewMVC extends _StateView with _ControllerListing {
   /// Implement this View!
+  @protected
   build(BuildContext context);
 
   ViewMVC(this.controller) {
@@ -91,16 +92,6 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
     }
   }
 
-//  List<ControllerMVC> get consList {
-//    if (_stateMVC == null) {
-//      return _controllers.asList;
-//    } else {
-//      return _stateMVC.consList;
-//    }
-//  }
-
-//  List<ControllerMVC> get controllerList => consList;
-
   Map<String, ControllerMVC> controllers(List<String> keys) {
     if (_stateMVC == null) {
       return super.controllers(keys);
@@ -109,16 +100,7 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
     }
   }
 
-//  Map<String, ControllerMVC> get cons {
-//    if (_stateMVC == null) {
-//      return _controllers.map;
-//    } else {
-//      return _stateMVC.cons;
-//    }
-//  }
-
-//  Map<String, ControllerMVC> get controllers => cons;
-
+  @protected
   @override
   void dispose() {
     disposeControllerListing();
@@ -133,6 +115,8 @@ class _StateView extends StateEvents {
   StateMVC get stateView => _stateMVC;
 
   /// VERY IMPORTANT! This setter connects the State Object!
+  /// Protect this method for now, but maybe later expose it to public classes? -gp
+  @protected
   set stateView(StateMVC stateView) {
     assert(_stateMVC == null, "A View is already assigned!");
     _stateMVC = stateView;
@@ -176,6 +160,7 @@ class _StateView extends StateEvents {
     return _stateMVC?.removeListener(obj);
   }
 
+  @protected
   @mustCallSuper
   void dispose() {
     /// The view association is severed.
@@ -218,6 +203,7 @@ class StateEvents {
   /// Ensure the State Object is 'mounted' and not being terminated.
   bool get mounted => _state?.mounted ?? false;
 
+  @protected
   void initState() {
     /// The framework will call this method exactly once.
     /// Only when the [State] object is first created.
@@ -229,6 +215,7 @@ class StateEvents {
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
   }
 
+  @protected
   void deactivate() {
     /// The framework calls this method whenever it removes this [State] object
     /// from the tree. It might reinsert it into another part of the tree.
@@ -237,6 +224,7 @@ class StateEvents {
     /// ancestor with a pointer to a descendant's [RenderObject]).
   }
 
+  @protected
   @mustCallSuper
   void dispose() {
     /// The framework calls this method when this [State] object will never
@@ -248,6 +236,7 @@ class StateEvents {
     FlutterError.onError = _oldOnError;
   }
 
+  @protected
   void didUpdateWidget(StatefulWidget oldWidget) {
     /// Override this method to respond when the [widget] changes (e.g., to start
     /// implicit animations).
@@ -255,10 +244,12 @@ class StateEvents {
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
   }
 
+  @protected
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
   }
 
+  @protected
   void didChangeMetrics() {
     /// Called when the application's dimensions change. For example,
     /// when a phone is rotated.
@@ -275,6 +266,7 @@ class StateEvents {
     ///   }
   }
 
+  @protected
   void didChangeTextScaleFactor() {
     /// Called when the platform's text scale factor changes.
     ///
@@ -290,6 +282,7 @@ class StateEvents {
     ///   }
   }
 
+  @protected
   void didChangeLocale(Locale locale) {
     /// Called when the system tells the app that the user's locale has
     /// changed. For example, if the user changes the system language
@@ -298,6 +291,7 @@ class StateEvents {
     /// This method exposes notifications from [Window.onLocaleChanged].
   }
 
+  @protected
   void didHaveMemoryPressure() {
     /// Called when the system is running low on memory.
     ///
@@ -305,6 +299,7 @@ class StateEvents {
     /// [SystemChannels.system].
   }
 
+  @protected
   void didChangeAccessibilityFeatures() {
     /// Called when the system changes the set of currently active accessibility
     /// features.
@@ -312,6 +307,7 @@ class StateEvents {
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
   }
 
+  @protected
   void didChangeDependencies() {
     /// Called when a dependency of this [State] object changes.
     ///
@@ -323,6 +319,7 @@ class StateEvents {
     /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
   }
 
+  @protected
   void reassemble() {
     /// Called whenever the application is reassembled during debugging, for
     /// example during hot reload.
@@ -336,11 +333,12 @@ class StateEvents {
   /// Allows the user to define their own with each Controller.
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
+  @protected
   void onError(FlutterErrorDetails details) =>
       FlutterError.dumpErrorToConsole(details);
 }
 
-class StateViewMVC extends StateMVC {
+abstract class StateViewMVC extends StateMVC {
   StateViewMVC(this.view) : super(view.controller) {
     assert(view != null, "View can't be null! Pass a view to StateViewMVC.");
 
@@ -360,6 +358,7 @@ class StateViewMVC extends StateMVC {
   Function(FlutterErrorDetails details) _currentOnError;
 
   @override
+  @protected
   Widget build(BuildContext context) {
     /// Save the current Error Handler if any.
     _currentOnError = FlutterError.onError;
@@ -390,6 +389,7 @@ class StateViewMVC extends StateMVC {
     return _widget;
   }
 
+  @protected
   @override
   @mustCallSuper
   void dispose() {
@@ -434,6 +434,7 @@ abstract class StateMVC extends State<StatefulWidget>
     add(c);
   }
 
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   String add(ControllerMVC c) {
     /// It may have been a listener. Can't be both.
     removeListener(c);
@@ -454,8 +455,9 @@ abstract class StateMVC extends State<StatefulWidget>
   /// May be set true to request a 'rebuild.'
   bool _rebuildRequested = false;
 
-  @mustCallSuper
+  @protected
   @override
+  @mustCallSuper
   void initState() {
     /// The framework will call this method exactly once.
     /// Only when the [State] object is first created.
@@ -467,7 +469,7 @@ abstract class StateMVC extends State<StatefulWidget>
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    AppMVC.addState(this);
+    AppMVC._addState(this);
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
@@ -478,12 +480,13 @@ abstract class StateMVC extends State<StatefulWidget>
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
-
       /// Perform a 'rebuild' if requested.
       refresh();
     }
   }
 
+  @protected
+  @override
   @mustCallSuper
   void deactivate() {
     /// The framework calls this method whenever it removes this [State] object
@@ -507,6 +510,8 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
+  @protected
+  @override
   @mustCallSuper
   void dispose() {
     /// The framework calls this method when this [State] object will never
@@ -532,8 +537,9 @@ abstract class StateMVC extends State<StatefulWidget>
     super.dispose();
   }
 
-  @mustCallSuper
+  @protected
   @override
+  @mustCallSuper
   void didUpdateWidget(StatefulWidget oldWidget) {
     /// Override this method to respond when the [widget] changes (e.g., to start
     /// implicit animations).
@@ -556,8 +562,9 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
-  @mustCallSuper
+  @protected
   @override
+  @mustCallSuper
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
 
@@ -578,6 +585,8 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
+  @protected
+  @override
   void didChangeMetrics() {
     /// Called when the application's dimensions change. For example,
     /// when a phone is rotated.
@@ -607,6 +616,8 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
+  @protected
+  @override
   void didChangeTextScaleFactor() {
     /// Called when the platform's text scale factor changes.
     ///
@@ -636,6 +647,8 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
+  @protected
+  @override
   void didChangeLocale(Locale locale) {
     /// Called when the system tells the app that the user's locale has
     /// changed. For example, if the user changes the system language
@@ -657,6 +670,8 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
+  @protected
+  @override
   void didHaveMemoryPressure() {
     /// Called when the system is running low on memory.
     ///
@@ -677,6 +692,8 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
+  @protected
+  @override
   void didChangeAccessibilityFeatures() {
     /// Called when the system changes the set of currently active accessibility
     /// features.
@@ -700,8 +717,9 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
-  @mustCallSuper
+  @protected
   @override
+  @mustCallSuper
   void didChangeDependencies() {
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
@@ -718,6 +736,7 @@ abstract class StateMVC extends State<StatefulWidget>
     }
   }
 
+  @protected
   @mustCallSuper
   @override
   void reassemble() {
@@ -737,6 +756,7 @@ abstract class StateMVC extends State<StatefulWidget>
   }
 
   /// Allows 'external' routines can call this function.
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   void setState(VoidCallback fn) {
     if (_rebuildAllowed) {
       /// Call the State object's setState() function.
@@ -748,6 +768,7 @@ abstract class StateMVC extends State<StatefulWidget>
   }
 
   /// Allows the user to call setState() within the Controller.
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   void refresh() {
     /// Refresh the interface by 'rebuilding' the Widget Tree
     setState(() {});
@@ -757,6 +778,7 @@ abstract class StateMVC extends State<StatefulWidget>
   /// Allows the user to define their own with each Controller.
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
+  @protected
   void onError(FlutterErrorDetails details) =>
       FlutterError.dumpErrorToConsole(details);
 }
@@ -843,7 +865,8 @@ class _ControllerListing {
   List<ControllerMVC> listControllers(List<String> keys) {
     return controllers(keys).values.toList();
   }
-/// Never supply a public list of Controllers. User must know the key identifier(s).
+
+  /// Never supply a public list of Controllers. User must know the key identifier(s).
   List<ControllerMVC> get _controllerList => _controllers.asList;
 
   Map<String, ControllerMVC> controllers(List<String> keys) {
@@ -851,7 +874,8 @@ class _ControllerListing {
     keys.forEach((String key) => controllers[key] = _controllers.map[key]);
     return controllers;
   }
-/// Never supply a public list of Controllers. User must know the key identifier(s).
+
+  /// Never supply a public list of Controllers. User must know the key identifier(s).
   Map<String, ControllerMVC> get _cons => _controllers.map;
 
   void disposeControllerListing() => _controllers.dispose();
@@ -924,6 +948,7 @@ abstract class StatefulWidgetMVC extends StatefulWidget {
   /// Expose the state to access!
   final StateMVC state;
 
+  @protected
   State createState() => state;
 }
 
@@ -936,6 +961,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
   /// It's the View!
   build(BuildContext context);
 
+  @protected
   void initState() {
     /// The framework will call this method exactly once.
     /// Only when the [State] object is first created.
@@ -947,6 +973,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
   }
 
+  @protected
   void deactivate() {
     /// The framework calls this method whenever it removes this [State] object
     /// from the tree. It might reinsert it into another part of the tree.
@@ -955,6 +982,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// ancestor with a pointer to a descendant's [RenderObject]).
   }
 
+  @protected
   void dispose() {
     /// The framework calls this method when this [State] object will never
     /// build again. The [State] object's lifecycle is terminated.
@@ -962,6 +990,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// by this object (e.g., stop any active animations).
   }
 
+  @protected
   void didUpdateWidget(StatefulWidget oldWidget) {
     /// Override this method to respond when the [widget] changes (e.g., to start
     /// implicit animations).
@@ -969,10 +998,12 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
   }
 
+  @protected
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
   }
 
+  @protected
   void didChangeMetrics() {
     /// Called when the application's dimensions change. For example,
     /// when a phone is rotated.
@@ -989,6 +1020,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     ///   }
   }
 
+  @protected
   void didChangeTextScaleFactor() {
     /// Called when the platform's text scale factor changes.
     ///
@@ -1004,6 +1036,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     ///   }
   }
 
+  @protected
   void didChangeLocale(Locale locale) {
     /// Called when the system tells the app that the user's locale has
     /// changed. For example, if the user changes the system language
@@ -1012,6 +1045,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// This method exposes notifications from [Window.onLocaleChanged].
   }
 
+  @protected
   void didHaveMemoryPressure() {
     /// Called when the system is running low on memory.
     ///
@@ -1019,6 +1053,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// [SystemChannels.system].
   }
 
+  @protected
   void didChangeAccessibilityFeatures() {
     /// Called when the system changes the set of currently active accessibility
     /// features.
@@ -1026,6 +1061,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
   }
 
+  @protected
   void didChangeDependencies() {
     /// Called when a dependency of this [State] object changes.
     ///
@@ -1037,6 +1073,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
     /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
   }
 
+  @protected
   void reassemble() {
     /// Called whenever the application is reassembled during debugging, for
     /// example during hot reload.
@@ -1047,12 +1084,15 @@ abstract class StatedWidget extends StatefulWidgetMVC {
   }
 
   /// Allows the user to call setState() within the Controller.
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
+  @mustCallSuper
   void refresh() {
     /// Refresh the interface by 'rebuilding' the Widget Tree
     state.refresh();
   }
 
   /// The user is free to override with a custom error handler.
+  @protected
   void onError(FlutterErrorDetails details) {
     /// The default routine is to dump the error to the console.
     FlutterError.dumpErrorToConsole(details);
@@ -1062,27 +1102,31 @@ abstract class StatedWidget extends StatefulWidgetMVC {
 class _StatedState extends StateMVC {
   _StatedState(ControllerMVC con) : super(con);
 
+  @protected
   Widget build(BuildContext context) {
     return (widget as StatedWidget).build(context);
   }
 }
 
-/// If there's a new event in StateEvent, update this Class!
+/// IMPORTANT! If there's a new event in StateEvent, update this Class!
 class _StatedController extends ControllerMVC {
   StatedWidget _statedWidget;
 
+  @protected
   @override
   void initState() {
     _statedWidget = widget;
     _statedWidget.initState();
   }
 
+  @protected
   @override
   void deactivate() {
     _statedWidget.deactivate();
     super.deactivate();
   }
 
+  @protected
   @override
   @mustCallSuper
   void dispose() {
@@ -1090,60 +1134,70 @@ class _StatedController extends ControllerMVC {
     super.dispose();
   }
 
+  @protected
   @override
   void didUpdateWidget(StatefulWidget oldWidget) {
     _statedWidget.didUpdateWidget(oldWidget);
     super.didUpdateWidget(oldWidget);
   }
 
+  @protected
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _statedWidget.didChangeAppLifecycleState(state);
     super.didChangeAppLifecycleState(state);
   }
 
+  @protected
   @override
   void didChangeMetrics() {
     _statedWidget.didChangeMetrics();
     super.didChangeMetrics();
   }
 
+  @protected
   @override
   void didChangeTextScaleFactor() {
     _statedWidget.didChangeTextScaleFactor();
     super.didChangeTextScaleFactor();
   }
 
+  @protected
   @override
   void didChangeLocale(Locale locale) {
     _statedWidget.didChangeLocale(locale);
     super.didChangeLocale(locale);
   }
 
+  @protected
   @override
   void didHaveMemoryPressure() {
     _statedWidget.didHaveMemoryPressure();
     super.didHaveMemoryPressure();
   }
 
+  @protected
   @override
   void didChangeAccessibilityFeatures() {
     _statedWidget.didChangeAccessibilityFeatures();
     super.didChangeAccessibilityFeatures();
   }
 
+  @protected
   @override
   void didChangeDependencies() {
     _statedWidget.didChangeDependencies();
     super.didChangeDependencies();
   }
 
+  @protected
   @override
   void reassemble() {
     _statedWidget.reassemble();
     super.reassemble();
   }
 
+  @protected
   @override
   void onError(FlutterErrorDetails details) => _statedWidget.onError(details);
 }
@@ -1172,6 +1226,7 @@ abstract class StatelessWidgetMVC extends StatelessWidget {
   ///  set con(ControllerMVC c) => conListing.con = c;
   set controller(ControllerMVC c) => add(c);
 
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   String add(ControllerMVC c) {
     String keyId = conListing.add(c);
 
@@ -1204,6 +1259,7 @@ abstract class AppMVC extends StatedWidget {
   get states => _states;
   static List<Map<String, StateMVC>> _states = [];
 
+  @protected
   void initApp() {
     /// Initialize any immediate 'none time-consuming' operations at the very beginning.
   }
@@ -1211,12 +1267,14 @@ abstract class AppMVC extends StatedWidget {
   /// Initialize any 'time-consuming' operations at the beginning.
   /// Initialize items essential to the Mobile Applications.
   /// Called by the MVCApp.init() function.
+  @protected
   @mustCallSuper
-  static Future<bool> init() async {
+  Future<bool> init() async {
     return Future.value(true);
   }
 
-  static addState(StateMVC state) {
+  /// This is 'privatized' as it is an critical method and not for public access.
+  static _addState(StateMVC state) {
     if (_appStatus == 'not running') return;
     if (_appStatus.isEmpty) _appStatus = _running ? 'running' : 'not running';
     var map = Map<String, StateMVC>();
@@ -1224,6 +1282,7 @@ abstract class AppMVC extends StatedWidget {
     _states.add(map);
   }
 
+  @protected
   @mustCallSuper
   void dispose() {
     _running = false;
