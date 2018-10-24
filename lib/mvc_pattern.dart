@@ -133,29 +133,35 @@ class _StateView extends StateEvents {
       _stateMVC.listControllers(keys);
 
   /// Provide the setState() function to the build() function.
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   setState(fn) {
     _stateMVC?.setState(fn);
   }
 
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   refresh() {
     _stateMVC?.refresh();
   }
 
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   bool addBeforeListener(StateEvents obj) {
     /// Add a listener fired 'before' the main controller runs.
     return _stateMVC?.addBeforeListener(obj);
   }
 
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   bool addAfterListener(StateEvents obj) {
     /// Add a listener fired 'after' the main controller runs.
     return _stateMVC?.addAfterListener(obj);
   }
 
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   bool addListener(StateEvents obj) {
     /// Add a listener fired 'after' the main controller runs.
     return _stateMVC?.addAfterListener(obj);
   }
 
+  /// Note not 'protected' and so can be called by 'anyone.' -gp
   bool removeListener(Object obj) {
     return _stateMVC?.removeListener(obj);
   }
@@ -480,6 +486,7 @@ abstract class StateMVC extends State<StatefulWidget>
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
+
       /// Perform a 'rebuild' if requested.
       refresh();
     }
