@@ -12,5 +12,6 @@
 ###### [0.0.12] - Oct. 23, 2018. class ViewMVC with _ControllerListing
 ###### [0.0.13] - Oct. 23, 2018. fix on _ControllerListing
 ###### [0.0.14] - Oct. 24, 2018. fix on StateViewMVC & AppMVC & @protected
+###### [1.0.0] - Oct. 24, 2018. Official Production Release
 
 
