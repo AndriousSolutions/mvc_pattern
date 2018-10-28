@@ -7,14 +7,14 @@ mvc_pattern
 In keeping with the ["KISS
 Principle"](https://en.wikipedia.org/wiki/KISS_principle), this is an attempt to
 offer the MVC design pattern to Flutter in an intrinsic fashion incorporating
-much of the Flutter framework itself. All in a standalone Flutter Plugin. It is
-expected the user of this plugin to be knowledgeable with such framework
+much of the Flutter framework itself. All in a standalone Flutter Package. It is
+expected the user of this package to be knowledgeable with such framework
 architectures.
 
 **Usage**
 
 Let’s demonstrate its usage with the ol’ ‘Counter app’ created every time you
-start a new Flutter project. In the example below, to utilize the plugin, three
+start a new Flutter project. In the example below, to utilize the package, three
 things are changed in the Counter app. The Class, \_MyHomePageState, is extended
 with the Class StateMVC, a ‘Controller’ Class is introduced that extends the
 Class, ControllerMVC, and a static instance of that Class is made available to
@@ -47,7 +47,7 @@ interface and only determine when to rebuild or not. It’s a simple change.
 ![myhomepage](https://user-images.githubusercontent.com/32497443/47261691-e4031d80-d4a2-11e8-8d57-edf48a7949ae.jpg)
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
-to rebuild, no? Regardless, with this plugin, such things are left to the
+to rebuild, no? Regardless, with this package, such things are left to the
 developer. Also, notice what I did with the app’s title? I created a static
 String field in the MyApp class called, title. It’s named ‘MyApp’ after all—It
 should know its own title.
