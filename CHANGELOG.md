@@ -14,6 +14,8 @@
 ###### [0.0.14] - Oct. 24, 2018. fix on StateViewMVC & AppMVC & @protected
 ###### [1.0.0] - Oct. 24, 2018. Official Production Release
 ###### [1.1.0] - Oct. 25, 2018. keyId in StateEvents
+###### [1.1.1] - Oct. 27, 2018. StatefulWidgetMVC deemed deprecated
+
 
 
 

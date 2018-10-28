@@ -1059,8 +1059,10 @@ String _addKeyId(_StateView sv) {
 }
 
 /// The StatefulWidget that exposes the State object.
+/// Deprecated has 'saving' the state object errors in the Flutter framework.
 /// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
 /// whether defined directly or inherited, must be `final`.
+@deprecated
 abstract class StatefulWidgetMVC extends StatefulWidget {
   /// Takes in the StateView.
   StatefulWidgetMVC(this.state, {Key key}) : super(key: key);
@@ -1068,8 +1070,11 @@ abstract class StatefulWidgetMVC extends StatefulWidget {
   /// Expose the state to external access!
   final StateMVC state;
 
+  @override
   @protected
-  State createState() => state;
+  State createState(){
+    return state;
+  }
 }
 
 /// Combines the StatefulWidget & State class into one.
@@ -1132,7 +1137,7 @@ abstract class StatedWidget extends StatefulWidgetMVC {
   @protected
   void didChangeMetrics() {
     ///
-    /// In general, this is not overriden often as the layout system takes care of
+    /// In general, this is not overridden often as the layout system takes care of
     /// automatically recomputing the application geometry when the application
     /// size changes
     ///
