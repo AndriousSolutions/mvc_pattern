@@ -1350,49 +1350,6 @@ class _StatedController extends ControllerMVC {
   void onError(FlutterErrorDetails details) => _statedWidget.onError(details);
 }
 
-/// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
-/// whether defined directly or inherited, must be `final`.
-abstract class StatelessWidgetMVC extends StatelessWidget {
-  /// Override this function to produce 'the View!'
-  Widget build(BuildContext context);
-
-  final _ConInfo _conInfo = _ConInfo();
-
-  final _ControllerListing _conListing = _ControllerListing();
-
-  /// ControllerMVC get con => conListing.con;
-  ControllerMVC get controller => _conInfo.con;
-
-  /// List<ControllerMVC> get consList => conListing.controllerList;
-  List<ControllerMVC> get controllerList => _conListing._controllerList;
-
-  /// Map<String, ControllerMVC> get cons => conListing.cons;
-  Map<String, ControllerMVC> get controllers => _conListing._cons;
-
-  /// Add a Controller to this StatelessWidget.
-  set controller(ControllerMVC c) => add(c);
-
-  /// Add a Controller to this StatelessWidget.
-  // Note not 'protected' and so can be called by 'anyone.' -gp
-  String add(ControllerMVC c) {
-    String keyId = _conListing.add(c);
-
-    /// The first controller is assumed this Widget's controller.
-    if (_conInfo.con == null) _conInfo.con = c;
-    return keyId;
-  }
-
-  /// Add a list of Controllers to this StatelessWidget.
-  addList(List<ControllerMVC> list) => _conListing.addList(list);
-
-  /// Removes a Controller from this StatelessWidget by a unique String identifier.
-  bool remove(String keyId) => _conListing.remove(keyId);
-}
-
-class _ConInfo {
-  ControllerMVC con;
-}
-
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 ///    Example:  void main() => runApp(MyApp());
 abstract class AppMVC extends StatedWidget {
@@ -1474,6 +1431,49 @@ abstract class AppMVC extends StatedWidget {
     assert(inDebugMode = true);
     return inDebugMode;
   }
+}
+
+/// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
+/// whether defined directly or inherited, must be `final`.
+abstract class StatelessWidgetMVC extends StatelessWidget {
+  /// Override this function to produce 'the View!'
+  Widget build(BuildContext context);
+
+  final _ConInfo _conInfo = _ConInfo();
+
+  final _ControllerListing _conListing = _ControllerListing();
+
+  /// ControllerMVC get con => conListing.con;
+  ControllerMVC get controller => _conInfo.con;
+
+  /// List<ControllerMVC> get consList => conListing.controllerList;
+  List<ControllerMVC> get controllerList => _conListing._controllerList;
+
+  /// Map<String, ControllerMVC> get cons => conListing.cons;
+  Map<String, ControllerMVC> get controllers => _conListing._cons;
+
+  /// Add a Controller to this StatelessWidget.
+  set controller(ControllerMVC c) => add(c);
+
+  /// Add a Controller to this StatelessWidget.
+  // Note not 'protected' and so can be called by 'anyone.' -gp
+  String add(ControllerMVC c) {
+    String keyId = _conListing.add(c);
+
+    /// The first controller is assumed this Widget's controller.
+    if (_conInfo.con == null) _conInfo.con = c;
+    return keyId;
+  }
+
+  /// Add a list of Controllers to this StatelessWidget.
+  addList(List<ControllerMVC> list) => _conListing.addList(list);
+
+  /// Removes a Controller from this StatelessWidget by a unique String identifier.
+  bool remove(String keyId) => _conListing.remove(keyId);
+}
+
+class _ConInfo {
+  ControllerMVC con;
 }
 
 
