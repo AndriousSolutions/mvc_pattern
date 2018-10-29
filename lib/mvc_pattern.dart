@@ -1095,7 +1095,9 @@ abstract class _OldStatefulWidgetMVC extends StatefulWidget {
 /// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
 /// whether defined directly or inherited, must be `final`.
 abstract class StatedWidget extends _OldStatefulWidgetMVC {
-  StatedWidget({Key key}) : super(_StatedState(_StatedController()), key: key);
+  StatedWidget({this.con, Key key}) : super(_StatedState(con ?? _StatedController()), key: key);
+
+  final ControllerMVC con;
 
   /// The build() function you must implement.
   /// It's the View!
@@ -1354,7 +1356,7 @@ class _StatedController extends ControllerMVC {
 ///    Example:  void main() => runApp(MyApp());
 abstract class AppMVC extends StatedWidget {
   /// Simple constructor. Calls the initApp() function.
-  AppMVC() {
+  AppMVC([ControllerMVC con]):super(con: con) {
     _running = true;
     initApp();
   }
