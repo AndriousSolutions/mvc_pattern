@@ -1077,10 +1077,24 @@ abstract class StatefulWidgetMVC extends StatefulWidget {
   }
 }
 
+abstract class _OldStatefulWidgetMVC extends StatefulWidget {
+  /// Takes in the StateView.
+  _OldStatefulWidgetMVC(this.state, {Key key}) : super(key: key);
+
+  /// Expose the state to external access!
+  final StateMVC state;
+
+  @override
+  @protected
+  State createState(){
+    return state;
+  }
+}
+
 /// Combines the StatefulWidget & State class into one.
 /// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
 /// whether defined directly or inherited, must be `final`.
-abstract class StatedWidget extends StatefulWidgetMVC {
+abstract class StatedWidget extends _OldStatefulWidgetMVC {
   StatedWidget({Key key}) : super(_StatedState(_StatedController()), key: key);
 
   /// The build() function you must implement.
