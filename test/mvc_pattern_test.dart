@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-//import 'package:test/test.dart'; // Not acceptable to pub package.
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
@@ -14,26 +13,16 @@ void main() {
     Key key = UniqueKey();
 
     // Tells the tester to build a UI based on the widget tree passed to it
-    await tester.pumpWidget(
-        MaterialApp(
-          title: 'MVC Testing',
-          home: MyHomePage(key: key),
-        ));
+    await tester.pumpWidget(MyApp(key: key));
 
     /// You can directly access the 'internal workings' of the app!
-    StatefulWidgetMVC _sw = tester.widget(find.byKey(key));
+    MyApp _app = tester.widget(find.byKey(key));
 
-    /// Look! You've got a reference a state.
-    StateViewMVC _sv = _sw.state;
+    /// You've a reference to the Controller.
+    Controller _con = _app.con;
 
-    /// Look! You've got a reference the view.
-    ViewMVC _view = _sv.view;
-
-    /// Look! You've got a reference the controller.
-    Controller _con = _view.controller;
-
-    /// Look! You can even get a reference to the build() function's returning widget.
-    Widget _widget = _sv.buildWidget;
+    /// You've a reference to the StateView.
+    StateMVC _state = _con.stateView;
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

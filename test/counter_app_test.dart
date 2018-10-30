@@ -30,9 +30,10 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
-  // This widget is the root of your application.
-
+  /// Supply 'the Controller' for this application.
+  MyApp({Key key}):super(con: Controller(), key: key);
   @override
+  /// This is 'the View' for this application.
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
@@ -45,104 +46,73 @@ class MyApp extends AppMVC {
 }
 
 
-class MyHomePage extends StatefulWidgetMVC {
-  MyHomePage({Key key}) : super(_MyHomePageState(), key: key);
-
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key}) : super(key: key);
   // Fields in a Widget subclass are always marked "final".
-
-  static final String title = 'Flutter Demo Home Page';
+  final String title = 'Flutter Demo Home Page';
+  @protected
+  @override
+  createState() => _MyHomePageState();
 }
 
-
-class View extends ViewMVC{
-   View():super(Controller()){
-     _con = controller;
-   }
-   Controller _con;
-
-   @override
-   Widget build(BuildContext context) {
-     // This method is rerun every time setState is called.
-     //
-     // The Flutter framework has been optimized to make rerunning build methods
-     // fast, so that you can just rebuild anything that needs updating rather
-     // than having to individually change instances of widgets.
-     return Scaffold(
-       appBar: AppBar(
-         // Here we take the value from the MyHomePage object that was created by
-         // the App.build method, and use it to set our appbar title.
-         title: Text(MyHomePage.title),
-       ),
-       body: Center(
-         // Center is a layout widget. It takes a single child and positions it
-         // in the middle of the parent.
-         child: Column(
-           // Column is also layout widget. It takes a list of children and
-           // arranges them vertically. By default, it sizes itself to fit its
-           // children horizontally, and tries to be as tall as its parent.
-           mainAxisAlignment: MainAxisAlignment.center,
-           children: <Widget>[
-             Text(MyHomePage.title,
-             ),
-             Text(
-               '${_con.displayThis}',
-               style: Theme.of(context).textTheme.display1,
-             ),
-           ],
-         ),
-       ),
-       floatingActionButton: FloatingActionButton(
-         onPressed: (){
-           setState(
-               _con.whatever
-           );
-         },
-         tooltip: 'Increment',
-         child: Icon(Icons.add),
-       ), // This trailing comma makes auto-formatting nicer for build methods.
-     );
-   }
-}
-
-
-class _MyHomePageState extends StateViewMVC {
-
-  _MyHomePageState():super(View()){
-
-    _con = Controller.con;
+class _MyHomePageState extends State<MyHomePage>{
+  @override
+  Widget build(BuildContext context) {
+    final Controller _con = Controller.con;
+    return Scaffold(
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(widget.title,
+            ),
+            Text(
+              '${_con.displayThis}',
+              style: Theme.of(context).textTheme.display1,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          setState(
+              _con.whatever
+          );
+        },
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
+      ),
+    );
   }
-  Controller _con;
 }
-
 
 class Controller extends ControllerMVC{
-
   Controller(){
     con = this;
   }
   static Controller con;
-
   @override
   initState(){
     /// Demonstrating how the 'initState()' is easily implemented.
     _counter = Model.counter;
   }
-
   int get displayThis => _counter;
   int _counter;
-
   void whatever(){
     /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
     _counter = Model._incrementCounter();
   }
 }
-class Model{
 
+class Model{
   static int get counter => _counter;
   static int _counter = 0;
-
   static int _incrementCounter(){
     return ++_counter;
   }
 }
-
