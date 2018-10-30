@@ -1356,10 +1356,11 @@ class _StatedController extends ControllerMVC {
 ///    Example:  void main() => runApp(MyApp());
 abstract class AppMVC extends StatedWidget {
   /// Simple constructor. Calls the initApp() function.
-  AppMVC([ControllerMVC con]):super(con: con) {
+  AppMVC({this.con, Key key}):super(con: con, key: key) {
     _running = true;
     initApp();
   }
+  final ControllerMVC con;
 
   /// If this class is running, indicate it so.
   static bool _running = false;
