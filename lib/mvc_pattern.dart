@@ -145,6 +145,7 @@ class _StateView extends StateEvents {
     _stateMVC = stateView;
     _state = stateView;
   }
+
   StateMVC _stateMVC;
 
   List<ControllerMVC> listControllers(List<String> keys) =>
@@ -203,7 +204,6 @@ class _StateView extends StateEvents {
 /// Responsible for the event handling in all the
 /// Controllers, Listeners and Views.
 class StateEvents {
-
   /// Records the current error handler and supplies its own.
   StateEvents() : _oldOnError = _recOnError() {
     /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
@@ -866,25 +866,23 @@ Function(FlutterErrorDetails details) _recOnError() {
 }
 
 class _StateEventList {
-
-
   List<StateEvents> get _beforeList => _listenersBefore.toList();
   List<StateEvents> beforeList(List<String> keys) {
     return _getList(keys, _listenersBefore);
   }
-  final Set<StateEvents> _listenersBefore = Set();
 
+  final Set<StateEvents> _listenersBefore = Set();
 
   List<StateEvents> get _afterList => _listenersAfter.toList();
   List<StateEvents> afterList(List<String> keys) {
     return _getList(keys, _listenersAfter);
   }
+
   final Set<StateEvents> _listenersAfter = Set();
 
-
-  List<StateEvents> _getList(List<String> keys, Set<StateEvents> set){
+  List<StateEvents> _getList(List<String> keys, Set<StateEvents> set) {
     List<StateEvents> list = List();
-    if(keys == null || keys.isEmpty) return list;
+    if (keys == null || keys.isEmpty) return list;
     set.map((StateEvents evt) {
       for (String key in keys) {
         if (evt._keyId == key) {
@@ -896,7 +894,6 @@ class _StateEventList {
     });
     return list;
   }
-
 
   bool addBeforeListener(StateEvents obj) {
     /// Add a listener fired 'before' the main controller runs.
@@ -924,22 +921,22 @@ class _StateEventList {
 
   bool afterContains(StateEvents obj) => _listenersAfter.contains(obj);
 
-  StateEvents beforeListener(String key){
+  StateEvents beforeListener(String key) {
     return _getStateEvents(key, _listenersBefore);
   }
 
-  StateEvents afterListener(String key){
+  StateEvents afterListener(String key) {
     return _getStateEvents(key, _listenersAfter);
   }
 
-  StateEvents _getStateEvents(String key, Set<StateEvents> set){
+  StateEvents _getStateEvents(String key, Set<StateEvents> set) {
     StateEvents se;
-    if(key == null || key.isEmpty) return se;
+    if (key == null || key.isEmpty) return se;
     set.map((StateEvents evt) {
-        if (evt._keyId == key) {
-          se = evt;
-          return;
-        }
+      if (evt._keyId == key) {
+        se = evt;
+        return;
+      }
     });
     return se;
   }
@@ -1072,7 +1069,7 @@ abstract class StatefulWidgetMVC extends StatefulWidget {
 
   @override
   @protected
-  State createState(){
+  State createState() {
     return state;
   }
 }
@@ -1086,7 +1083,7 @@ abstract class _OldStatefulWidgetMVC extends StatefulWidget {
 
   @override
   @protected
-  State createState(){
+  State createState() {
     return state;
   }
 }
@@ -1095,7 +1092,8 @@ abstract class _OldStatefulWidgetMVC extends StatefulWidget {
 /// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
 /// whether defined directly or inherited, must be `final`.
 abstract class StatedWidget extends _OldStatefulWidgetMVC {
-  StatedWidget({this.con, Key key}) : super(_StatedState(con ?? _StatedController()), key: key);
+  StatedWidget({this.con, Key key})
+      : super(_StatedState(con ?? _StatedController()), key: key);
 
   final ControllerMVC con;
 
@@ -1356,7 +1354,7 @@ class _StatedController extends ControllerMVC {
 ///    Example:  void main() => runApp(MyApp());
 abstract class AppMVC extends StatedWidget {
   /// Simple constructor. Calls the initApp() function.
-  AppMVC({this.con, Key key}):super(con: con, key: key) {
+  AppMVC({this.con, Key key}) : super(con: con, key: key) {
     _running = true;
     initApp();
   }
@@ -1478,7 +1476,6 @@ abstract class StatelessWidgetMVC extends StatelessWidget {
 class _ConInfo {
   ControllerMVC con;
 }
-
 
 // Uuid
 // Copyright 2018 The Flutter Architecture Sample Authors. All rights reserved.

@@ -31,8 +31,9 @@ void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
   /// Supply 'the Controller' for this application.
-  MyApp({Key key}):super(con: Controller(), key: key);
+  MyApp({Key key}) : super(con: Controller(), key: key);
   @override
+
   /// This is 'the View' for this application.
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,7 +46,6 @@ class MyApp extends AppMVC {
   }
 }
 
-
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
   // Fields in a Widget subclass are always marked "final".
@@ -55,7 +55,7 @@ class MyHomePage extends StatefulWidget {
   createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>{
+class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final Controller _con = Controller.con;
@@ -69,7 +69,8 @@ class _MyHomePageState extends State<MyHomePage>{
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(widget.title,
+            Text(
+              widget.title,
             ),
             Text(
               '${_con.displayThis}',
@@ -79,10 +80,8 @@ class _MyHomePageState extends State<MyHomePage>{
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          setState(
-              _con.whatever
-          );
+        onPressed: () {
+          setState(_con.whatever);
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -91,28 +90,29 @@ class _MyHomePageState extends State<MyHomePage>{
   }
 }
 
-class Controller extends ControllerMVC{
-  Controller(){
+class Controller extends ControllerMVC {
+  Controller() {
     con = this;
   }
   static Controller con;
   @override
-  initState(){
+  initState() {
     /// Demonstrating how the 'initState()' is easily implemented.
     _counter = Model.counter;
   }
+
   int get displayThis => _counter;
   int _counter;
-  void whatever(){
+  void whatever() {
     /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
     _counter = Model._incrementCounter();
   }
 }
 
-class Model{
+class Model {
   static int get counter => _counter;
   static int _counter = 0;
-  static int _incrementCounter(){
+  static int _incrementCounter() {
     return ++_counter;
   }
 }

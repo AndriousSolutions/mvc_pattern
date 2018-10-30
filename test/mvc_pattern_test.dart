@@ -7,7 +7,6 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 import 'counter_app_test.dart';
 
 void main() {
-
   testWidgets('Header adds todo', (WidgetTester tester) async {
     // Use a key to locate the widget you need to test
     Key key = UniqueKey();
