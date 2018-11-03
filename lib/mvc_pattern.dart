@@ -398,6 +398,7 @@ abstract class StateViewMVC extends StateMVC {
 
     /// IMPORTANT! Add the View's controllers first before calling setter. -gp
     addList(view._controllerList);
+    /// TODO What is this function called here?
     view.disposeControllerListing();
 
     /// IMPORTNANT! This setter connects the State Object!
@@ -446,6 +447,22 @@ abstract class StateViewMVC extends StateMVC {
     return _widget;
   }
 
+  @protected
+  @override
+  @mustCallSuper
+  void initState() {
+    super.initState();
+    view.initState();
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void deactivate() {
+    view.deactivate();
+    super.deactivate();
+  }
+
   /// Dispose any View and its Controllers
   @protected
   @override
@@ -453,6 +470,78 @@ abstract class StateViewMVC extends StateMVC {
   void dispose() {
     view.dispose();
     super.dispose();
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didUpdateWidget(StatefulWidget oldWidget) {
+    view.didUpdateWidget(oldWidget);
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    view.didChangeAppLifecycleState(state);
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didChangeMetrics() {
+    view.didChangeMetrics();
+    super.didChangeMetrics();
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didChangeTextScaleFactor() {
+    view.didChangeTextScaleFactor();
+    super.didChangeTextScaleFactor();
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didChangeLocale(Locale locale) {
+    view.didChangeLocale(locale);
+    super.didChangeLocale(locale);
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didHaveMemoryPressure() {
+    view.didHaveMemoryPressure();
+    super.didHaveMemoryPressure();
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didChangeAccessibilityFeatures() {
+    view.didChangeAccessibilityFeatures();
+    super.didChangeAccessibilityFeatures();
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void didChangeDependencies() {
+    view.didChangeDependencies();
+    super.didChangeDependencies();
+  }
+
+  @protected
+  @override
+  @mustCallSuper
+  void reassemble() {
+    view.reassemble();
+    super.reassemble();
   }
 }
 
@@ -504,13 +593,9 @@ abstract class StateMVC extends State<StatefulWidget>
   }
 
   /// The Unique key identifier for this State object.
-  String get keyId {
-    if (_keyId.isEmpty) _keyId = Uuid().generateV4();
-    return _keyId;
-  }
-
+  String get keyId => _keyId;
   /// Contains the unique String identifier.
-  String _keyId = '';
+  String _keyId = Uuid().generateV4();
 
   /// May be set false to prevent unnecessary 'rebuilds'.
   bool _rebuildAllowed = true;
@@ -983,7 +1068,7 @@ class _ControllerListing {
   List<ControllerMVC> get _controllerList => _controllers.asList;
 
   Map<String, ControllerMVC> controllers(List<String> keys) {
-    Map controllers = Map<String, ControllerMVC>();
+    Map<String, ControllerMVC> controllers = {};
     keys.forEach((String key) => controllers[key] = _controllers.map[key]);
     return controllers;
   }
