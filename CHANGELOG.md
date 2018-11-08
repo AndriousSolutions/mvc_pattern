@@ -17,6 +17,8 @@
 ###### [1.1.1] - Oct. 27, 2018. StatefulWidgetMVC deemed deprecated
 ###### [1.2.0] - Oct. 29, 2018. enhance AppMVC 
 ###### [1.2.1] - Nov. 02, 2018. fix on StateViewMVC
+###### [1.2.2] - Nov. 02, 2018. fix on StatedWidget
+
 
 
 
