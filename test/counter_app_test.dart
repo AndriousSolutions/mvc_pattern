@@ -91,10 +91,17 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  Controller() {
-    con = this;
+  factory Controller() {
+    if (_this == null) _this = Controller._();
+    return _this;
   }
-  static Controller con;
+  static Controller _this;
+
+  Controller._();
+
+  /// Allow for easy access to 'the Controller' throughout the application.
+  static Controller get con => _this;
+
   @override
   initState() {
     /// Demonstrating how the 'initState()' is easily implemented.
