@@ -398,6 +398,7 @@ abstract class StateViewMVC extends StateMVC {
 
     /// IMPORTANT! Add the View's controllers first before calling setter. -gp
     addList(view._controllerList);
+
     /// TODO What is this function called here?
     view.disposeControllerListing();
 
@@ -594,6 +595,7 @@ abstract class StateMVC extends State<StatefulWidget>
 
   /// The Unique key identifier for this State object.
   String get keyId => _keyId;
+
   /// Contains the unique String identifier.
   String _keyId = Uuid().generateV4();
 
@@ -1184,7 +1186,8 @@ abstract class StatedWidget extends _OldStatefulWidgetMVC {
 
   /// The build() function you must implement.
   /// It's the View!
-  build(BuildContext context);
+  @protected
+  Widget build(BuildContext context);
 
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
