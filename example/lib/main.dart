@@ -159,7 +159,6 @@ class RandomWordsState extends StateMVC {
       );
 }
 
-
 class Con extends ControllerMVC {
   static int get length => Model.length;
 
@@ -173,7 +172,6 @@ class Con extends ControllerMVC {
 
   static Iterable<ListTile> mapHappens<ListTile>(Function f) => Model.saved(f);
 }
-
 
 class Model {
   static final List<String> _suggestions = [];
