@@ -7,7 +7,7 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 import 'counter_app_test.dart';
 
 void main() {
-  testWidgets('Header adds todo', (WidgetTester tester) async {
+  testWidgets('Counter App Test', (WidgetTester tester) async {
     // Use a key to locate the widget you need to test
     Key key = UniqueKey();
 
@@ -17,11 +17,38 @@ void main() {
     /// You can directly access the 'internal workings' of the app!
     MyApp _app = tester.widget(find.byKey(key));
 
-    /// You've a reference to the Controller.
+    /// Reference to the Controller.
     Controller _con = _app.con;
 
-    /// You've a reference to the StateView.
-    StateMVC _state = _con.stateView;
+    /// Reference to the StateView.
+    StateMVC _sv = _con.stateView;
+
+    /// The State object.
+    State _state = _con.state;
+
+    /// Current context.
+    BuildContext context = _con.context;
+
+    /// Controller's unique identifier.
+    String id = _con.keyId;
+
+    /// Is the widget mounted?
+    bool mounted = _con.mounted;
+
+    /// The StatefulWidget.
+    StatefulWidget widget = _con.widget;
+
+    /// The StateView's unique identifier.
+    String svId = _sv.keyId;
+
+    /// Current context.
+    BuildContext context2 = _sv.context;
+
+    /// Is the widget mounted?
+    bool mounted2 = _sv.mounted;
+
+    /// The StatefulWidget.
+    StatefulWidget widget2 = _sv.widget;
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
