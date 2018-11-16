@@ -18,7 +18,7 @@
 ###### [1.2.0] - Oct. 29, 2018. enhance AppMVC 
 ###### [1.2.1] - Nov. 02, 2018. fix on StateViewMVC
 ###### [1.2.2] - Nov. 02, 2018. fix on StatedWidget
-
+###### [1.2.3] - Nov. 13, 2018. test for TestWidgetsFlutterBinding
 
 
 
