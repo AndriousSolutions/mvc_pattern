@@ -33,8 +33,9 @@ library mvc_pattern;
 
 import 'dart:math';
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+
+import 'package:flutter_test/flutter_test.dart';
 
 /// Controller Class
 /// Your 'working' class most concerned with the app's functionality.
@@ -153,13 +154,13 @@ class _StateView extends StateEvents {
 
   /// Provide the setState() function to external actors
   // Note not 'protected' and so can be called by 'anyone.' -gp
-  setState(fn) {
+  void setState(fn) {
     _stateMVC?.setState(fn);
   }
 
   /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
   // Note not 'protected' and so can be called by 'anyone.' -gp
-  refresh() {
+  void refresh() {
     _stateMVC?.refresh();
   }
 
@@ -206,18 +207,21 @@ class _StateView extends StateEvents {
 class StateEvents {
   /// Records the current error handler and supplies its own.
   StateEvents() : _oldOnError = _recOnError() {
-    /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
-    FlutterError.onError = (FlutterErrorDetails details) {
-      var thisOnError = onError;
+    /// If a tester is running. Don't switch out its error handler.
+    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
+      /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
+      FlutterError.onError = (FlutterErrorDetails details) {
+        var thisOnError = onError;
 
-      /// Always favour a custom error handler.
-      if (thisOnError == StateMVC._defaultError &&
-          _oldOnError != StateMVC._defaultError) {
-        _oldOnError(details);
-      } else {
-        onError(details);
-      }
-    };
+        /// Always favour a custom error handler.
+        if (thisOnError == StateMVC._defaultError &&
+            _oldOnError != StateMVC._defaultError) {
+          _oldOnError(details);
+        } else {
+          onError(details);
+        }
+      };
+    }
   }
 
   /// Save the current Error Handler.
@@ -421,24 +425,28 @@ abstract class StateViewMVC extends StateMVC {
   Widget build(BuildContext context) {
     /// Save the current Error Handler if any.
     _currentOnError = FlutterError.onError;
-    FlutterError.onError = (FlutterErrorDetails details) {
-      /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
-      var thisOnError = onError;
 
-      /// Always favour a custom error handler.
-      if (thisOnError != StateMVC._defaultError) {
-        onError(details);
-      } else if (_currentOnError != StateMVC._defaultError) {
-        /// Likely a Controller Error Handler.
-        _currentOnError(details);
-      } else if (_oldOnError != StateMVC._defaultError) {
-        /// An even older routine is available? App level routine?
-        _oldOnError(details);
-      } else {
-        /// You've not choice. Run the ol' 'red screen of death'
-        onError(details);
-      }
-    };
+    /// If a tester is running. Don't switch out its error handler.
+    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
+      FlutterError.onError = (FlutterErrorDetails details) {
+        /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
+        var thisOnError = onError;
+
+        /// Always favour a custom error handler.
+        if (thisOnError != StateMVC._defaultError) {
+          onError(details);
+        } else if (_currentOnError != StateMVC._defaultError) {
+          /// Likely a Controller Error Handler.
+          _currentOnError(details);
+        } else if (_oldOnError != StateMVC._defaultError) {
+          /// An even older routine is available? App level routine?
+          _oldOnError(details);
+        } else {
+          /// You've not choice. Run the ol' 'red screen of death'
+          onError(details);
+        }
+      };
+    }
 
     /// Where the magic happens!
     _widget = view.build(context);
@@ -557,17 +565,20 @@ abstract class StateMVC extends State<StatefulWidget>
 
   /// With an optional Controller parameter, this constructor imposes its own Errror Handler.
   StateMVC([ControllerMVC _con]) : _oldOnError = _recOnError() {
-    /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
-    FlutterError.onError = (FlutterErrorDetails details) {
-      var thisOnError = onError;
+    /// If a tester is running. Don't switch out its error handler.
+    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
+      /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
+      FlutterError.onError = (FlutterErrorDetails details) {
+        var thisOnError = onError;
 
-      /// Always favour a custom error handler.
-      if (thisOnError == _defaultError && _oldOnError != _defaultError) {
-        _oldOnError(details);
-      } else {
-        onError(details);
-      }
-    };
+        /// Always favour a custom error handler.
+        if (thisOnError == _defaultError && _oldOnError != _defaultError) {
+          _oldOnError(details);
+        } else {
+          onError(details);
+        }
+      };
+    }
 
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
     stateMVC = this;
