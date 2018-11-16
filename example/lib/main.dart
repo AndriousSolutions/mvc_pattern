@@ -25,7 +25,9 @@
 
 import 'package:flutter/material.dart';
 
-/// Uncomment at 'get packages' to try out this example.
+/// To try this example,
+/// Uncomment the import statement the line in the function, makeWordPairs(), below.
+/// Of course, that means you'll have to modify your pubspec.yaml file.
 //import 'package:english_words/english_words.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
@@ -45,12 +47,13 @@ class MyApp extends AppMVC {
   }
 }
 
-class RandomWords extends StatefulWidgetMVC {
-  RandomWords() : super(RandomWordsState(Con()));
+class RandomWords extends StatefulWidget {
+  @override
+  State createState() => _RandomWordsState();
 }
 
-class RandomWordsState extends StateMVC {
-  RandomWordsState(Con con) : super(con);
+class _RandomWordsState extends StateMVC {
+  _RandomWordsState() : super(Con());
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18.0);
 
@@ -209,6 +212,7 @@ class Model {
 }
 
 Iterable<String> makeWordPairs(int count) {
-  /// Uncomment to try this example.
+  /// Uncomment the import statement above and the line below to try this example.
+  /// Of course, that means you'll have to modify your pubspec.yaml
 //  return generateWordPairs().take(count).map((pair){return pair.asPascalCase;});
 }
