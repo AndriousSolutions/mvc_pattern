@@ -36,9 +36,11 @@ pressed, the View again ‘talks to’ the Controller to address the event
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
 View’s function, **setState()**, to tell it to rebuild.
 ![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
+
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
 interface and only determine when to rebuild or not. It’s a simple change.
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676526-13ef2080-eb36-11e8-8c7a-d1dc5886b39f.jpg)
+The View knows how to 'talk to' the Controller, but the Controller doesn't need to know how to 'talk to' the View.
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676256-3717d100-eb32-11e8-9bab-4f573966e64e.jpg)
