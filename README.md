@@ -33,16 +33,16 @@ pressed, the View again ‘talks to’ the Controller to address the event
 ![myhomepage](https://user-images.githubusercontent.com/32497443/48676501-dab6b080-eb35-11e8-93ab-8bbfc6f8bc6b.jpg)
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
 View’s function, **setState()**, telling it to rebuild the widget tree.
+
 ![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
 
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
 interface and only determine when to rebuild or not. It’s a simple change.
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676526-13ef2080-eb36-11e8-8c7a-d1dc5886b39f.jpg)
 The View knows how to 'talk to' the Controller, but the Controller doesn't need to know how to 'talk to' the View.
-Also, notice what I did to the Controller? Makes it a little clearer, and I didn't have to change anything in the View to do it.
+Notice what I did to the Controller? Makes the API between the View and the Controller a little clearer.
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
-![myhomepage2](https://user-images.githubusercontent.com/32497443/48676256-3717d100-eb32-11e8-9bab-4f573966e64e.jpg)
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this package, such things are left to the
