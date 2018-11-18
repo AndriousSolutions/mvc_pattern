@@ -196,19 +196,19 @@ class Controller extends ControllerMVC {
   }
 }
 ```
+```dart
+class Model {
+  static int get counter => _counter;
+  static int _counter = 0;
+  static int _incrementCounter() => ++_counter;
+}
+```
 Of course, you're free to 'switch out' variations of the Controller over time. In this case, you no longer need to assign a
 local variable, ```_con```, but instead use a static reference: ```Controller.incrementCounter;```
 ```dart
 class Controller extends ControllerMVC {
   static int get counter => Model.counter;
   static void incrementCounter() => Model._incrementCounter();
-}
-```
-```dart
-class Model {
-  static int get counter => _counter;
-  static int _counter = 0;
-  static int _incrementCounter() => ++_counter;
 }
 ```
 # Your First Flutter App: startup_namer
