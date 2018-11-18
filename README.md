@@ -16,13 +16,11 @@ start a new Flutter project. In the example below, to utilize the package, three
 things are changed in the Counter app. The Class, \_MyHomePageState, is extended
 with the Class StateMVC, a ‘Controller’ Class is introduced. It extends the
 Class, ControllerMVC, and a static instance of that Class is made available to
-the **build()** function. Done!
-
-Note, you will find the 'source code' for this example in this package's [test](https://github.com/AndriousSolutions/mvc_pattern/tree/master/test)
- folder:
+the **build()** function. Done! (Note, you will find the 'source code' for this example in this package's [test](https://github.com/AndriousSolutions/mvc_pattern/tree/master/test)
+ folder.)
 
 With that, there's now a separation of ‘the Interface’ and ‘the data’ as it’s
-intended with the MVC architecture. The **build()** function serves as the View.
+intended with the MVC architecture. The **build()** function serves as 'the View.'
 It is concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things
 are displayed. While it is the Controller that determines 'what’ is displayed. 
 The Controller is also concerned with 'how' the app interacts with the user.
@@ -40,7 +38,7 @@ View’s function, **setState()**, telling it to rebuild the widget tree.
 ![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
 
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
-interface and only determine when to rebuild or not. It’s a simple change.
+interface and determine solely when to rebuild or not. It’s a simple change.
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676526-13ef2080-eb36-11e8-8c7a-d1dc5886b39f.jpg)
 The View knows how to 'talk to' the Controller, but the Controller doesn't need to know how to 'talk to' the View.
 Notice what I did to the Controller? Makes the API between the View and the Controller a little clearer.
@@ -52,6 +50,12 @@ all, it is the View that’s concerned with the interface. It would know best wh
 to rebuild, no? Regardless, with this package, such things are left to the
 developer. Notice also how I created a static String field in the MyApp class called, title.
 It’s named ‘MyApp’ after all—It should know its own title.
+
+![myapp](https://user-images.githubusercontent.com/32497443/48676941-e4431700-eb3b-11e8-8d3a-8010a0bb0bcf.jpg)
+
+You see in the 'App' class above, that the Controller is instantiated in the parent class.
+Doing so allows your Controller to now access the many ['events'](https://medium.com/flutter-community/flutter-mvc-at-last-275a0dc1e730#7ebe) 
+fired in a typical Flutter app:
 
 **How about Model?**
 
