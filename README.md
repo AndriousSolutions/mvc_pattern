@@ -68,6 +68,14 @@ members. As you can deduce, the changes were just made in the Controller. The
 View doesn’t even know the Model exists. It doesn’t need to. It still ‘talks to’
 the Controller, but it is now the Model that has all the ‘brains.’
 
+Note it's a full screenshot of the counter app example, and there's further 
+variations than the previous examples. Note, the State object extends ```StateMVC.```
+Again, the Controller is passed its parent class to 'plug it into' the 
+event handling of a typical Flutter Widget. Finally, note the Controller's 
+property and function names have been changed. This merely demonstrating that
+there's no 'hard cold rules' about the what API you use between the View,
+the Controller, and the Model. You merely need to be consistent.
+
 ![pac pattern](https://camo.githubusercontent.com/a5b152ecc2f2b96b8019941a7382f47f4ac4c2b6/68747470733a2f2f692e696d6775722e636f6d2f723443317932382e706e67)
 
 However, what if you want the View to talk to the Model? Maybe because the Model
