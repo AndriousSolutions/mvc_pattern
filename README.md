@@ -32,8 +32,7 @@ the View displays. In this case, it’s a title and a counter. When a button is
 pressed, the View again ‘talks to’ the Controller to address the event
 (i.e. It calls one of the Controller’s public functions,
 **incrementCounter()**).
-![myhomepage](https://user-images.githubusercontent.com/32497443/48676026-bdcaaf00-eb2e-11e8-823f-766d7d2f96b7.jpg)
-
+![myhomepage](https://user-images.githubusercontent.com/32497443/48676475-785db000-eb35-11e8-9d27-880db765989e.jpg)
 ![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
 
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
@@ -48,7 +47,8 @@ interface and only determine when to rebuild or not. It’s a simple change.
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this package, such things are left to the
-developer. Also, notice what I did with the app’s title? I created a static
+developer. Also, notice what I did to the Controller? Makes it a little clearer.
+Note, I didn't have to change anything in the View to do it. Finally, I created a static
 String field in the MyApp class called, title. It’s named ‘MyApp’ after all—It
 should know its own title.
 
