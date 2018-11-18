@@ -86,9 +86,14 @@ functions directly.
 
 ![mvc pattern classic](https://user-images.githubusercontent.com/32497443/47087797-ef2c2400-d1ea-11e8-8a90-41bbb6b07bf0.jpg)
 
-![viewtomodel](https://user-images.githubusercontent.com/32497443/48677434-01c7af00-eb43-11e8-885c-9cd1bdfa7e9a.jpg)
-Not particularly pretty, but it merely demonstrates the possibilities.
+![viewtomodel](https://user-images.githubusercontent.com/32497443/48677706-d34bd300-eb46-11e8-931e-c0fb96f40522.jpg)
+Not particularly pretty. I mean, at this point, you don't even need 'the Controller', 
+but it merely demonstrates the possibilities.
 With this MVC implementation, you have options, and developers love options.
+
+Below, I've changed it a little bit. The View still has access to the Model, but the Controller is still
+responsible for any 'event handling' and responds to the user pressing that lone button in the app.
+![viewtomodel2](https://user-images.githubusercontent.com/32497443/48677674-60daf300-eb46-11e8-8bd9-fdf3f6ba9a6d.jpg)
 
 # The Counter App
 Below is the full Counter App with the MVC implementation. 
