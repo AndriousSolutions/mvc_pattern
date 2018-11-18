@@ -98,7 +98,7 @@ responsible for any 'event handling' and responds to the user pressing that lone
 ![viewtomodel2](https://user-images.githubusercontent.com/32497443/48677674-60daf300-eb46-11e8-8bd9-fdf3f6ba9a6d.jpg)
 
 # The Counter App
-Below is the full Counter App with the MVC implementation. 
+Below is the Counter App you can copy n' paste to quickly try out: 
 ```dart
 import 'package:flutter/material.dart';
 
