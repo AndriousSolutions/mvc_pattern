@@ -44,7 +44,7 @@ interface and only determine when to rebuild or not. It’s a simple change.
 
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
-![myhomepage](https://user-images.githubusercontent.com/32497443/47261691-e4031d80-d4a2-11e8-8d57-edf48a7949ae.jpg)
+![myhomepage2](https://user-images.githubusercontent.com/32497443/48676256-3717d100-eb32-11e8-9bab-4f573966e64e.jpg)
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this package, such things are left to the
