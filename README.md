@@ -204,14 +204,10 @@ class Controller extends ControllerMVC {
 }
 ```
 ```dart
-class Model{
-
+class Model {
   static int get counter => _counter;
   static int _counter = 0;
-
-  static int _incrementCounter(){
-    return ++_counter;
-  }
+  static int _incrementCounter() => ++_counter;
 }
 ```
 # Your First Flutter App: startup_namer
