@@ -90,6 +90,7 @@ functions as well the Model’s.
 Not particularly pretty. I mean, at this point, you don't even need 'the Controller', 
 but it merely demonstrates the possibilities.
 With this MVC implementation, you have options, and developers love options.
+![viewcontrollermodel](https://user-images.githubusercontent.com/32497443/48679035-22026880-eb59-11e8-96aa-f689f1f8898f.jpeg)
 
 Below, I've changed it a little bit. The View still has access to the Model, but the Controller is still
 responsible for any 'event handling' and responds to the user pressing that lone button in the app.
@@ -439,6 +440,7 @@ Iterable<String> makeWordPairs(int count) {
 
 Further information on the MVC package can be found in the article, [‘Flutter + MVC at Last!’](https://medium.com/p/275a0dc1e730/)
 [![online article](https://user-images.githubusercontent.com/32497443/47087365-c9524f80-d1e9-11e8-85e5-6c8bbabb18cc.png)](https://medium.com/flutter-community/flutter-mvc-at-last-275a0dc1e730)
+
 [Repository (GitHub)](https://github.com/AndriousSolutions/mvc_pattern)
 
 [API Docs](https://pub.dartlang.org/documentation/mvc_pattern/latest/mvc_pattern/mvc_pattern-library.html)
