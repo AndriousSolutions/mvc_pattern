@@ -34,7 +34,7 @@ pressed, the View again ‘talks to’ the Controller to address the event
 **incrementCounter()**).
 ![myhomepage](https://user-images.githubusercontent.com/32497443/48676026-bdcaaf00-eb2e-11e8-823f-766d7d2f96b7.jpg)
 
-![mvc pattern](https://user-images.githubusercontent.com/32497443/47087587-6614ed00-d1ea-11e8-8fc3-ced0ac6af12a.jpg)
+![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
 
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
 View’s function, **setState()**, to tell it to rebuild.
