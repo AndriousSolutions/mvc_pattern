@@ -196,7 +196,8 @@ class Controller extends ControllerMVC {
   }
 }
 ```
-Of course, you're free to 'switch out' variations of the Controller over time:
+Of course, you're free to 'switch out' variations of the Controller over time. In this case, you no longer need to assign a
+local variable, ```dart _con```, but instead use a static reference: ```dart Conroller.incrementCounter;```
 ```dart
 class Controller extends ControllerMVC {
   static int get counter => Model.counter;
