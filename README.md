@@ -32,7 +32,7 @@ the View displays. In this case, it’s a title and a counter. When a button is
 pressed, the View again ‘talks to’ the Controller to address the event
 (i.e. It calls one of the Controller’s public functions,
 **incrementCounter()**).
-![myhomepage](https://user-images.githubusercontent.com/32497443/48669371-3c90ff00-ead1-11e8-810b-3372482750b1.jpg)
+![myhomepage](https://user-images.githubusercontent.com/32497443/48676026-bdcaaf00-eb2e-11e8-823f-766d7d2f96b7.jpg)
 
 ![mvc pattern](https://user-images.githubusercontent.com/32497443/47087587-6614ed00-d1ea-11e8-8fc3-ced0ac6af12a.jpg)
 
