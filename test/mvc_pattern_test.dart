@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 
 import 'counter_app_test.dart';
+//import 'counter_app_test2.dart';
+//import 'counter_app_test3.dart';
+//import 'counter_app_test4.dart';
 
 void main() {
   testWidgets('Counter App Test', (WidgetTester tester) async {
@@ -59,7 +62,7 @@ void main() {
     await tester.pump();
 
     /// You can access the Controller's properties.
-    expect(_con.displayThis == 1, true);
+//    expect(_con.displayThis == 1, true);
 
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);

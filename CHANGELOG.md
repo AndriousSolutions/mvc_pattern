@@ -20,6 +20,7 @@
 ###### [1.2.2] - Nov. 02, 2018. fix on StatedWidget
 ###### [1.2.3] - Nov. 13, 2018. test for TestWidgetsFlutterBinding
 ###### [1.2.4] - Nov. 17, 2018. fix on StateEvents assign on keyId
+###### [1.3.0] - Nov. 18, 2018. add some further examples under test folder
 
 
 

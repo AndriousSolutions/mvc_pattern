@@ -29,13 +29,10 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends AppMVC {
-  /// Supply 'the Controller' for this application.
-  MyApp({Key key}) : super(con: Controller(), key: key);
+class MyApp extends StatelessWidget {
+  MyApp({Key key}) : super(key: key);
 
   static final String title = 'Flutter Demo Home Page';
-
-  @override
 
   /// This is 'the View' for this application.
   Widget build(BuildContext context) {
@@ -57,9 +54,8 @@ class MyHomePage extends StatefulWidget {
   createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final Controller _con = Controller.con;
-
+class _MyHomePageState extends StateMVC {
+  _MyHomePageState() : super(Controller());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
               MyApp.title,
             ),
             Text(
-              '${_con.counter}',
+              '${Controller.displayThis}',
               style: Theme.of(context).textTheme.display1,
             ),
           ],
@@ -84,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _con.incrementCounter();
+          setState(Controller.whatever);
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -94,21 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  /// Singleton Factory
-  factory Controller() {
-    if (_this == null) _this = Controller._();
-    return _this;
-  }
-  static Controller _this;
+  /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
+  static int get displayThis => Model.counter;
+  static void whatever() => Model._incrementCounter();
+}
 
-  Controller._();
-
-  /// Allow for easy access to 'the Controller' throughout the application.
-  static Controller get con => _this;
-
-  int get counter => _counter;
-  int _counter = 0;
-  void incrementCounter() => setState(() {
-        _counter++;
-      });
+class Model {
+  static int get counter => _counter;
+  static int _counter = 0;
+  static int _incrementCounter() => ++_counter;
 }

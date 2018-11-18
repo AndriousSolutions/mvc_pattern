@@ -90,6 +90,7 @@ functions as well the Model’s.
 Not particularly pretty. I mean, at this point, you don't even need 'the Controller', 
 but it merely demonstrates the possibilities.
 With this MVC implementation, you have options, and developers love options.
+
 ![viewcontrollermodel](https://user-images.githubusercontent.com/32497443/48679035-22026880-eb59-11e8-96aa-f689f1f8898f.jpeg)
 
 Below, I've changed it a little bit. The View still has access to the Model, but the Controller is still
