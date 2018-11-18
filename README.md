@@ -125,68 +125,65 @@ class MyHomePage extends StatefulWidget {
 }
 ```
 ```dart
-class _MyHomePageState extends StateMVC {
+class _MyHomePageState extends State<MyHomePage> {
 
-  _MyHomePageState():super(Controller()){
-
-    _con = Controller.con;
-  }
-  Controller _con;
+  final Controller _con = Controller.con;
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return new Scaffold(
-      appBar: new AppBar(
+    return Scaffold(
+      appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: new Text(MyHomePage.title),
+        title: Text(widget.title),
       ),
-      body: new Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: new Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug paint" (press "p" in the console where you ran
-          // "flutter run", or select "Toggle Debug Paint" from the Flutter tool
-          // window in IntelliJ) to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
+      body: Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Text(MyHomePage.title,
+            Text(
+              widget.title,
             ),
-            new Text(
-              '${_con.displayThis}',
+            Text(
+              '${_con.counter}',
               style: Theme.of(context).textTheme.display1,
             ),
           ],
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: (){
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
           setState(
-            _con.whatever
+              _con.incrementCounter
           );
         },
         tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        child: Icon(Icons.add),
+      ),
     );
   }
 }
 ```
+```dart
+class Controller extends ControllerMVC {
+  /// Singleton Factory
+  factory Controller() {
+    if (_this == null) _this = Controller._();
+    return _this;
+  }
+  static Controller _this;
+
+  Controller._();
+
+  /// Allow for easy access to 'the Controller' throughout the application.
+  static Controller get con => _this;
+
+  int get counter => _counter;
+  int _counter = 0;
+  void incrementCounter() => _counter++;
+}
+```
+We can easily introduce a Model: 
 ```dart
 class Controller extends ControllerMVC {
   factory Controller() {
@@ -200,18 +197,19 @@ class Controller extends ControllerMVC {
   /// Allow for easy access to 'the Controller' throughout the application.
   static Controller get con => _this;
 
-  @override
-  initState() {
-    /// Demonstrating how the 'initState()' is easily implemented.
-    _counter = Model.counter;
-  }
-
-  int get displayThis => _counter;
-  int _counter;
-  void whatever() {
+  int get counter => Model.counter;
+  void incrementCounter() {
     /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
-    _counter = Model._incrementCounter();
+    Model._incrementCounter();
   }
+}
+```
+Of course, you're free to 'switch out' variations of the Controller over time:
+```dart
+class Controller extends ControllerMVC {
+  static int get counter => Model.counter;
+  /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
+  static void incrementCounter() => Model._incrementCounter();
 }
 ```
 ```dart
