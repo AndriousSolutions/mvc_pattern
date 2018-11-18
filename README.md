@@ -175,7 +175,7 @@ class Controller extends ControllerMVC {
   void incrementCounter() => _counter++;
 }
 ```
-You can easily introduce a Model: 
+Now you can easily introduce a Model: 
 ```dart
 class Controller extends ControllerMVC {
   factory Controller() {
