@@ -18,6 +18,9 @@ with the Class StateMVC, a ‘Controller’ Class is introduced. It extends the
 Class, ControllerMVC, and a static instance of that Class is made available to
 the **build()** function. Done!
 
+Note, you will find the 'source code' for this example in this package's [test](https://github.com/AndriousSolutions/mvc_pattern/tree/master/test)
+ folder:
+
 With that, there's now a separation of ‘the Interface’ and ‘the data’ as it’s
 intended with the MVC architecture. The **build()** function serves as the View.
 It is concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things
@@ -41,12 +44,13 @@ interface and only determine when to rebuild or not. It’s a simple change.
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676526-13ef2080-eb36-11e8-8c7a-d1dc5886b39f.jpg)
 The View knows how to 'talk to' the Controller, but the Controller doesn't need to know how to 'talk to' the View.
 Notice what I did to the Controller? Makes the API between the View and the Controller a little clearer.
+
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this package, such things are left to the
-developer. Notice I created a static String field in the MyApp class called, title.
+developer. Notice also how I created a static String field in the MyApp class called, title.
 It’s named ‘MyApp’ after all—It should know its own title.
 
 **How about Model?**
