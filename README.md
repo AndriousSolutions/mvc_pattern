@@ -69,11 +69,11 @@ View doesn’t even know the Model exists. It doesn’t need to. It still ‘tal
 the Controller, but it is now the Model that has all the ‘brains.’
 
 Note it's a full screenshot of the counter app example, and there's further 
-variations than the previous examples. Note, the State object extends ```StateMVC.```
-Again, the Controller is passed its parent class to 'plug it into' the 
+changes compared to the previous examples. Note, the State object extends ```StateMVC```
+, and the Controller is passed to its parent class to 'plug it into' the 
 event handling of a typical Flutter Widget. Finally, note the Controller's 
-property and function names have been changed. This merely demonstrating that
-there's no 'hard cold rules' about the what API you use between the View,
+property and function names have been changed. This merely demonstrates that
+there's no 'hard cold rules' about what the API is between the View,
 the Controller, and the Model. You merely need to be consistent.
 
 ![pac pattern](https://camo.githubusercontent.com/a5b152ecc2f2b96b8019941a7382f47f4ac4c2b6/68747470733a2f2f692e696d6775722e636f6d2f723443317932382e706e67)
@@ -86,11 +86,9 @@ functions directly.
 
 ![mvc pattern classic](https://user-images.githubusercontent.com/32497443/47087797-ef2c2400-d1ea-11e8-8a90-41bbb6b07bf0.jpg)
 
-![myhomepagestate](https://user-images.githubusercontent.com/32497443/47087832-0b2fc580-d1eb-11e8-8977-0c2bc206e8be.jpg)
-Not particularly pretty. I would have just kept the Static members in the Model,
-and have the View call them instead (or not do that at all frankly), but I’m
-merely demonstrating the possibilities. With this MVC implementation, you have
-options, and developers love options.
+![viewtomodel](https://user-images.githubusercontent.com/32497443/48677434-01c7af00-eb43-11e8-885c-9cd1bdfa7e9a.jpg)
+Not particularly pretty, but it merely demonstrates the possibilities.
+With this MVC implementation, you have options, and developers love options.
 
 # The Counter App
 Below is the full Counter App with the MVC implementation. 
