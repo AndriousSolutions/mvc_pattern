@@ -52,7 +52,6 @@ developer. Notice also how I created a static String field in the MyApp class ca
 It’s named ‘MyApp’ after all—It should know its own title.
 
 ![myapp](https://user-images.githubusercontent.com/32497443/48676941-e4431700-eb3b-11e8-8d3a-8010a0bb0bcf.jpg)
-
 You see in the 'App' class above, that the Controller is instantiated in the parent class.
 Doing so allows your Controller to now access the many ['events'](https://medium.com/flutter-community/flutter-mvc-at-last-275a0dc1e730#7ebe) 
 fired in a typical Flutter app:
@@ -63,8 +62,8 @@ Currently, in this example, it’s the Controller that’s containing all the
 ‘business logic’ for the application. In some MVC implementations, it’s the
 Model that contains the business rules for the application. So how would that
 look? Well, it maybe could look like this:
-![controller](https://user-images.githubusercontent.com/32497443/47087743-ca37b100-d1ea-11e8-9e38-92acea125668.jpg)
-I decided to make the Model’s API a little cleaner with the use of a static
+![howaboutmodel](https://user-images.githubusercontent.com/32497443/48677268-36863700-eb40-11e8-8fb3-29e2605b5dc1.jpg)
+The Model’s API is also a little cleaner with the use of a static
 members. As you can deduce, the changes were just made in the Controller. The
 View doesn’t even know the Model exists. It doesn’t need to. It still ‘talks to’
 the Controller, but it is now the Model that has all the ‘brains.’
