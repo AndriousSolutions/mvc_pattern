@@ -7,50 +7,47 @@ mvc_pattern
 In keeping with the ["KISS
 Principle"](https://en.wikipedia.org/wiki/KISS_principle), this is an attempt to
 offer the MVC design pattern to Flutter in an intrinsic fashion incorporating
-much of the Flutter framework itself. All in a standalone Flutter Package. It is
-expected the user of this package to be knowledgeable with such framework
-architectures.
+much of the Flutter framework itself. All in a standalone Flutter Package.
 
 **Usage**
 
 Let’s demonstrate its usage with the ol’ ‘Counter app’ created every time you
 start a new Flutter project. In the example below, to utilize the package, three
 things are changed in the Counter app. The Class, \_MyHomePageState, is extended
-with the Class StateMVC, a ‘Controller’ Class is introduced that extends the
+with the Class StateMVC, a ‘Controller’ Class is introduced. It extends the
 Class, ControllerMVC, and a static instance of that Class is made available to
 the **build()** function. Done!
 
-With that, there is now a separation of ‘the Interface’ and ‘the data’ as it’s
-intended with the MVC architecture. The **build()** function (the View) is
-concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things
-are displayed. While, in this case, it is the Controller that’s concerned with
-‘what’ is displayed.
+With that, there's now a separation of ‘the Interface’ and ‘the data’ as it’s
+intended with the MVC architecture. The **build()** function serves as the View.
+It is concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things
+are displayed. While it is the Controller that determines 'what’ is displayed. 
+The Controller is also concerned with 'how' the app interacts with the user.
 
 What data does the View display? It doesn’t know nor does it care! It ‘talks to’
 the Controller instead. Again, it is the Controller that determines ‘what’ data
-the View displays. In this case, it’s a title and a counter. When a button is
+the View displays. In this example, it’s a title and a counter. And when a button is
 pressed, the View again ‘talks to’ the Controller to address the event
-(i.e. It calls one of the Controller’s public functions,
+(i.e. calls one of the Controller’s public functions,
 **incrementCounter()**).
 ![myhomepage](https://user-images.githubusercontent.com/32497443/48676501-dab6b080-eb35-11e8-93ab-8bbfc6f8bc6b.jpg)
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
-View’s function, **setState()**, to tell it to rebuild.
+View’s function, **setState()**, telling it to rebuild the widget tree.
 ![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
 
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
 interface and only determine when to rebuild or not. It’s a simple change.
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676526-13ef2080-eb36-11e8-8c7a-d1dc5886b39f.jpg)
 The View knows how to 'talk to' the Controller, but the Controller doesn't need to know how to 'talk to' the View.
+Also, notice what I did to the Controller? Makes it a little clearer, and I didn't have to change anything in the View to do it.
 ![view talks to contoller only](https://user-images.githubusercontent.com/32497443/47087650-88a70600-d1ea-11e8-8212-b785485a3dee.jpg)
 
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676256-3717d100-eb32-11e8-9bab-4f573966e64e.jpg)
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this package, such things are left to the
-developer. Also, notice what I did to the Controller? Makes it a little clearer.
-Note, I didn't have to change anything in the View to do it. Finally, I created a static
-String field in the MyApp class called, title. It’s named ‘MyApp’ after all—It
-should know its own title.
+developer. Notice I created a static String field in the MyApp class called, title.
+It’s named ‘MyApp’ after all—It should know its own title.
 
 **How about Model?**
 
