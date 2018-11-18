@@ -33,10 +33,9 @@ pressed, the View again ‘talks to’ the Controller to address the event
 (i.e. It calls one of the Controller’s public functions,
 **incrementCounter()**).
 ![myhomepage](https://user-images.githubusercontent.com/32497443/48676475-785db000-eb35-11e8-9d27-880db765989e.jpg)
-![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
-
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
 View’s function, **setState()**, to tell it to rebuild.
+![myhomepage](https://user-images.githubusercontent.com/32497443/48676501-dab6b080-eb35-11e8-93ab-8bbfc6f8bc6b.jpg)
 
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
 interface and only determine when to rebuild or not. It’s a simple change.
