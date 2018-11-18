@@ -242,7 +242,7 @@ class StateEvents {
 
   // Assigned an unique key.
   String get keyId => _keyId;
-  String _keyId = '';
+  String _keyId = Uuid().generateV4();
 
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
@@ -588,11 +588,13 @@ abstract class StateMVC extends State<StatefulWidget>
   /// Save the original Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
 
-  /// Contains a listing of all the Controllers assigned to this View.
-  List<ControllerMVC> get _controllerList => super._controllerList;
+// // Already being done in superclass, _ControllerListing
+//  /// Contains a listing of all the Controllers assigned to this View.
+//  List<ControllerMVC> get _controllerList => super._controllerList;
 
   /// Assign a specified controller to this View.
   set controller(ControllerMVC c) {
+    // Must remove a possibly listener. -gp
     add(c);
   }
 
@@ -755,7 +757,7 @@ abstract class StateMVC extends State<StatefulWidget>
   @protected
   @override
   void didChangeMetrics() {
-    /// In general, this is not overriden often as the layout system takes care of
+    /// In general, this is not overridden often as the layout system takes care of
     /// automatically recomputing the application geometry when the application
     /// size changes
     ///
@@ -815,7 +817,7 @@ abstract class StateMVC extends State<StatefulWidget>
   /// changed. For example, if the user changes the system language
   /// settings.
   @protected
-  @override
+  //@override
   void didChangeLocale(Locale locale) {
     ///
     /// This method exposes notifications from [Window.onLocaleChanged].
