@@ -97,14 +97,6 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: new MyHomePage(),
@@ -183,7 +175,7 @@ class Controller extends ControllerMVC {
   void incrementCounter() => _counter++;
 }
 ```
-We can easily introduce a Model: 
+You can easily introduce a Model: 
 ```dart
 class Controller extends ControllerMVC {
   factory Controller() {
@@ -208,7 +200,6 @@ Of course, you're free to 'switch out' variations of the Controller over time:
 ```dart
 class Controller extends ControllerMVC {
   static int get counter => Model.counter;
-  /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
   static void incrementCounter() => Model._incrementCounter();
 }
 ```
