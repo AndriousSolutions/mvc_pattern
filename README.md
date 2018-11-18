@@ -32,7 +32,7 @@ the View displays. In this case, it’s a title and a counter. When a button is
 pressed, the View again ‘talks to’ the Controller to address the event
 (i.e. It calls one of the Controller’s public functions,
 **incrementCounter()**).
-![myhomepage](https://user-images.githubusercontent.com/32497443/47261683-b6b66f80-d4a2-11e8-9db3-66e17b3b838f.jpg)
+![myhomepage](https://user-images.githubusercontent.com/32497443/48669371-3c90ff00-ead1-11e8-810b-3372482750b1.jpg)
 
 ![mvc pattern](https://user-images.githubusercontent.com/32497443/47087587-6614ed00-d1ea-11e8-8fc3-ced0ac6af12a.jpg)
 
@@ -188,23 +188,27 @@ class _MyHomePageState extends StateMVC {
 }
 ```
 ```dart
-class Controller extends ControllerMVC{
-
-  Controller(){
-    con = this;
+class Controller extends ControllerMVC {
+  factory Controller() {
+    if (_this == null) _this = Controller._();
+    return _this;
   }
-  static Controller con;
+  static Controller _this;
+
+  Controller._();
+
+  /// Allow for easy access to 'the Controller' throughout the application.
+  static Controller get con => _this;
 
   @override
-  initState(){
+  initState() {
     /// Demonstrating how the 'initState()' is easily implemented.
     _counter = Model.counter;
   }
 
   int get displayThis => _counter;
   int _counter;
-
-  void whatever(){
+  void whatever() {
     /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
     _counter = Model._incrementCounter();
   }
