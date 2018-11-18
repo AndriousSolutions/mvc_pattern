@@ -19,11 +19,12 @@ Class, ControllerMVC, and a static instance of that Class is made available to
 the **build()** function. Done! (Note, you will find the 'source code' for this example in this package's [test](https://github.com/AndriousSolutions/mvc_pattern/tree/master/test)
  folder.)
 
-With that, there's now a separation of ‘the Interface’ and ‘the data’ as it’s
+With that, there's now a separation of ‘the Interface’ and ‘the data’ as 
 intended with the MVC architecture. The **build()** function serves as 'the View.'
-It is concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things
+It's concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things
 are displayed. While it is the Controller that determines 'what’ is displayed. 
-The Controller is also concerned with 'how' the app interacts with the user.
+The Controller is also concerned with 'how' the app interacts with the user,
+and so it's involved in the app's event handling.
 
 What data does the View display? It doesn’t know nor does it care! It ‘talks to’
 the Controller instead. Again, it is the Controller that determines ‘what’ data
@@ -38,7 +39,7 @@ View’s function, **setState()**, telling it to rebuild the widget tree.
 ![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
 
 Maybe we don’t want that. Maybe we want the View to be solely concern with the
-interface and determine solely when to rebuild or not. It’s a simple change.
+interface and solely determine when to rebuild the widget tree or not. It’s a simple change.
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676526-13ef2080-eb36-11e8-8c7a-d1dc5886b39f.jpg)
 The View knows how to 'talk to' the Controller, but the Controller doesn't need to know how to 'talk to' the View.
 Notice what I did to the Controller? Makes the API between the View and the Controller a little clearer.
@@ -48,13 +49,13 @@ Notice what I did to the Controller? Makes the API between the View and the Cont
 It does separate the ‘roles of responsibility’ a little more, doesn’t it? After
 all, it is the View that’s concerned with the interface. It would know best when
 to rebuild, no? Regardless, with this package, such things are left to the
-developer. Notice also how I created a static String field in the MyApp class called, title.
+developer. Lastly, notice how I created a static String field in the MyApp class called, title.
 It’s named ‘MyApp’ after all—It should know its own title.
 
 ![myapp](https://user-images.githubusercontent.com/32497443/48676941-e4431700-eb3b-11e8-8d3a-8010a0bb0bcf.jpg)
 You see in the 'App' class above, that the Controller is instantiated in the parent class.
 Doing so allows your Controller to now access the many ['events'](https://medium.com/flutter-community/flutter-mvc-at-last-275a0dc1e730#7ebe) 
-fired in a typical Flutter app:
+fired in a typical Flutter app.
 
 **How about Model?**
 
@@ -64,28 +65,27 @@ Model that contains the business rules for the application. So how would that
 look? Well, it maybe could look like this:
 ![howaboutmodel](https://user-images.githubusercontent.com/32497443/48677268-36863700-eb40-11e8-8fb3-29e2605b5dc1.jpg)
 The Model’s API is also a little cleaner with the use of a static
-members. As you can deduce, the changes were just made in the Controller. The
-View doesn’t even know the Model exists. It doesn’t need to. It still ‘talks to’
-the Controller, but it is now the Model that has all the ‘brains.’
+members. The View doesn’t even know the Model exists. It doesn’t need to.
+It still ‘talks to’ the Controller, but it is now the Model that has all the ‘brains.’
 
-Note it's a full screenshot of the counter app example, and there's further 
-changes compared to the previous examples. Note, the State object extends ```StateMVC```
-, and the Controller is passed to its parent class to 'plug it into' the 
+Note above, it's a full screenshot of the counter app example, and there's further 
+changes made compared to the previous examples. Note, the State object again extends ```StateMVC```
+and the 'MyApp' class is returned to StatelessWidget. Allows the State object to
+address events instead. Here, the Controller is passed to its parent class to 'plug it into' the 
 event handling of a typical Flutter Widget. Finally, note the Controller's 
 property and function names have been changed. This merely demonstrates that
 there's no 'hard cold rules' about what the API is between the View,
-the Controller, and the Model. You merely need to be consistent.
+the Controller, and the Model. You merely need to be consistent so they can 'talk to' each other.
 
 ![pac pattern](https://camo.githubusercontent.com/a5b152ecc2f2b96b8019941a7382f47f4ac4c2b6/68747470733a2f2f692e696d6775722e636f6d2f723443317932382e706e67)
 
 However, what if you want the View to talk to the Model? Maybe because the Model
 has zillions of functions, and you don’t want the Controller there merely ‘to
 relay’ the Model’s functions and properties over to the View. You could simply
-provide the Model to the View. The View then calls the Model’s properties and
-functions directly.
+provide the Model to the View. The View can then call the Controller's properties and
+functions as well the Model’s.
 
-![mvc pattern classic](https://user-images.githubusercontent.com/32497443/47087797-ef2c2400-d1ea-11e8-8a90-41bbb6b07bf0.jpg)
-
+![viewcantalk](https://user-images.githubusercontent.com/32497443/48677829-c29c5c80-eb48-11e8-831a-42912fe44a10.jpg)
 ![viewtomodel](https://user-images.githubusercontent.com/32497443/48677706-d34bd300-eb46-11e8-931e-c0fb96f40522.jpg)
 Not particularly pretty. I mean, at this point, you don't even need 'the Controller', 
 but it merely demonstrates the possibilities.
