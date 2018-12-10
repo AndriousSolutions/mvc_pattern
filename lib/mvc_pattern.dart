@@ -4,6 +4,9 @@
 /// Code samples can be found in the following links:
 /// https://github.com/AndriousSolutions/mvc_pattern/tree/master/test
 /// https://github.com/AndriousSolutions/mvc_pattern/blob/master/example/lib/main.dart
+///
+/// https://github.com/AndriousSolutions/mvc_pattern
+///
 library mvc_pattern;
 
 /// Note: This license has also been called the "Simplified BSD License" and the "FreeBSD License".
@@ -293,7 +296,11 @@ class StateEvents {
   /// Called when the system puts the app in the background or returns the app to the foreground.
   @protected
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
+    /// Passing these possible values:
+    /// AppLifecycleState.paused (may enter the suspending state at any time)
+    /// AppLifecycleState.resumed
+    /// AppLifecycleState.inactive (may be paused at any time)
+    /// AppLifecycleState.suspending (Android only)
   }
 
   /// Called when the application's dimensions change. For example,
@@ -1156,7 +1163,8 @@ String _addKeyId(_StateView sv) {
 }
 
 /// The StatefulWidget that exposes the State object.
-/// Deprecated has 'saving' the state object errors in the Flutter framework.
+/// Deprecated because 'saving' the state object errors in the Flutter framework.
+/// WILL BE REMOVED WITH THE NEXT MAJOR VERSION.
 /// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
 /// whether defined directly or inherited, must be `final`.
 @deprecated
