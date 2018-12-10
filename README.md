@@ -428,6 +428,7 @@ Further information on the MVC package can be found in the article, [‘Flutter 
 ##### Live Streaming every week. Everything to do about Flutter. 
 [![twitch](https://user-images.githubusercontent.com/32497443/49753449-7349d780-fc81-11e8-9d08-89146a6731c8.png)
 ](https://medium.com/@greg.perry/decode-flutter-6b60a3199e83)
+
 [Repository (GitHub)](https://github.com/AndriousSolutions/mvc_pattern)
 
 [API Docs](https://pub.dartlang.org/documentation/mvc_pattern/latest/mvc_pattern/mvc_pattern-library.html)
