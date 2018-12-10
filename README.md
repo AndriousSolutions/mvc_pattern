@@ -3,35 +3,18 @@ mvc_pattern
 [![Build Status](https://travis-ci.org/AndriousSolutions/mvc_pattern.svg?branch=master)](https://travis-ci.org/AndriousSolutions/mvc_pattern)
 ![flutter and mvc](https://user-images.githubusercontent.com/32497443/47087365-c9524f80-d1e9-11e8-85e5-6c8bbabb18cc.png)
 ###### The "Kiss" of Flutter Frameworks
-
-In keeping with the ["KISS
-Principle"](https://en.wikipedia.org/wiki/KISS_principle), this is an attempt to
-offer the MVC design pattern to Flutter in an intrinsic fashion incorporating
-much of the Flutter framework itself. All in a standalone Flutter Package.
+In keeping with the ["KISS Principle"](https://en.wikipedia.org/wiki/KISS_principle), this is an attempt to offer the MVC design pattern to Flutter in an intrinsic fashion incorporating much of the Flutter framework itself. All in a standalone Flutter Package.
 
 **Usage**
-
-Let’s demonstrate its usage with the ol’ ‘Counter app’ created every time you
-start a new Flutter project. In the example below, to utilize the package, three
-things are changed in the Counter app. The Class, \_MyHomePageState, is extended
-with the Class StateMVC, a ‘Controller’ Class is introduced. It extends the
-Class, ControllerMVC, and a static instance of that Class is made available to
-the **build()** function. Done! (Note, you will find the 'source code' for this example in this package's [test](https://github.com/AndriousSolutions/mvc_pattern/tree/master/test)
- folder.)
+Let’s demonstrate its usage with the ol’ ‘Counter app’ created every time you start a new Flutter project. In the example below, to utilize the package, three things are changed in the Counter app. The Class, \_MyHomePageState, is extended with the Class StateMVC, a ‘Controller’ Class is introduced. It extends the Class, ControllerMVC, and a static instance of that Class is made available to the **build()** function. Done! (Note, you will find the 'source code' for this example in this package's [test](https://github.com/AndriousSolutions/mvc_pattern/tree/master/test)  folder.
 
 With that, there's now a separation of ‘the Interface’ and ‘the data’ as 
-intended with the MVC architecture. The **build()** function serves as 'the View.'
-It's concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things
-are displayed. While it is the Controller that determines 'what’ is displayed. 
-The Controller is also concerned with 'how' the app interacts with the user,
-and so it's involved in the app's event handling.
+intended with the MVC architecture. The **build()** function serves as 'the View.' It's concerned solely with the ‘look and feel’ of the app’s interface—‘how’ things are displayed. While it is the Controller that determines 'what’ is displayed. The Controller is also concerned with 'how' the app interacts with the user, and so it's involved in the app's event handling.
 
 What data does the View display? It doesn’t know nor does it care! It ‘talks to’
 the Controller instead. Again, it is the Controller that determines ‘what’ data
-the View displays. In this example, it’s a title and a counter. And when a button is
-pressed, the View again ‘talks to’ the Controller to address the event
-(i.e. calls one of the Controller’s public functions,
-**incrementCounter()**).
+the View displays. In this example, it’s a title and a counter. And when a button is pressed, the View again ‘talks to’ the Controller to address the event
+(i.e. calls one of the Controller’s public functions, **incrementCounter()**).
 ![myhomepage](https://user-images.githubusercontent.com/32497443/48676501-dab6b080-eb35-11e8-93ab-8bbfc6f8bc6b.jpg)
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
 View’s function, **setState()**, telling it to rebuild the widget tree.
@@ -441,7 +424,10 @@ Iterable<String> makeWordPairs(int count) {
 
 Further information on the MVC package can be found in the article, [‘Flutter + MVC at Last!’](https://medium.com/p/275a0dc1e730/)
 [![online article](https://user-images.githubusercontent.com/32497443/47087365-c9524f80-d1e9-11e8-85e5-6c8bbabb18cc.png)](https://medium.com/flutter-community/flutter-mvc-at-last-275a0dc1e730)
-
+# DECODE Flutter
+##### Live Streaming every week. Everything to do about Flutter. 
+[![twitch](https://user-images.githubusercontent.com/32497443/49753449-7349d780-fc81-11e8-9d08-89146a6731c8.png)
+](https://medium.com/@greg.perry/decode-flutter-6b60a3199e83)
 [Repository (GitHub)](https://github.com/AndriousSolutions/mvc_pattern)
 
 [API Docs](https://pub.dartlang.org/documentation/mvc_pattern/latest/mvc_pattern/mvc_pattern-library.html)
