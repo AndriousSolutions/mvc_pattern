@@ -21,6 +21,9 @@
 ###### [1.2.3] - Nov. 13, 2018. test for TestWidgetsFlutterBinding
 ###### [1.2.4] - Nov. 17, 2018. fix on StateEvents assign on keyId
 ###### [1.3.0] - Nov. 18, 2018. add some further examples under test folder
+###### [1.3.0] - Dec. 03, 2018. Updated README.md
+###### [1.3.1] - Dec. 10, 2018. sdk: ">=2.0.0 <5.0.0"
+
 
 
 
