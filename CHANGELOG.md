@@ -23,6 +23,8 @@
 ###### [1.3.0] - Nov. 18, 2018. add some further examples under test folder
 ###### [1.3.0] - Dec. 03, 2018. Updated README.md
 ###### [1.3.1] - Dec. 10, 2018. sdk: ">=2.0.0 <5.0.0"
+###### [1.3.2] - Dec. 28, 2018. if(mounted) in refresh()
+
 
 
 

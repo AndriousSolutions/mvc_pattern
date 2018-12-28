@@ -946,8 +946,10 @@ abstract class StateMVC extends State<StatefulWidget>
   /// Allows the user to call setState() within the Controller.
   // Note not 'protected' and so can be called by 'anyone.' -gp
   void refresh() {
-    /// Refresh the interface by 'rebuilding' the Widget Tree
-    setState(() {});
+    if (mounted) {
+      /// Refresh the interface by 'rebuilding' the Widget Tree
+      setState(() {});
+    }
   }
 
   /// Supply an 'error handler' routine to fire when an error occurs.
