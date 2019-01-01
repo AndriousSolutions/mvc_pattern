@@ -48,8 +48,7 @@ abstract class ControllerMVC extends _StateView {}
 /// Extend and implement its build() function to compose its interface.
 abstract class ViewMVC extends _StateView with _ControllerListing {
   /// Implement this build() function to compose the View's interface.
-  @protected
-  build(BuildContext context);
+  Widget build(BuildContext context);
 
   /// Must take in one Controller when this Class instantiates.
   ViewMVC(this.controller) {
@@ -67,9 +66,9 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
   /// Retrieved by using a unique String identifier.
   ControllerMVC con(String keyId) {
     if (_stateMVC == null) {
-      return super.con(keyId);
+      return super._con(keyId);
     } else {
-      return _stateMVC.con(keyId);
+      return _stateMVC._con(keyId);
     }
   }
 
@@ -1065,11 +1064,13 @@ class _ControllerListing {
     if (unassigned) _controllers.mvcState = stateMVC;
   }
 
-  set controller(ControllerMVC c) {
-    add(c);
-  }
+  // Don't use this one so subclasses to use 'con.'
+//  set controller(ControllerMVC c) {
+//    add(c);
+//  }
 
-  ControllerMVC con(String keyId) {
+  // Keep it private to allow subclasses to use 'con.'
+  ControllerMVC _con(String keyId) {
     return _controllers.controller(keyId);
   }
 
