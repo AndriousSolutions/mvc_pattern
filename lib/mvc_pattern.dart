@@ -136,9 +136,11 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
 
 class _StateView extends StateEvents {
   // The View is a State object after all.
-  State get state => _state;
+//  State get state => _state;
 
   StateMVC get stateView => _stateMVC;
+
+//  set state(StateMVC state) => _state = state;
 
   // VERY IMPORTANT! This setter connects the State Object!
   // Protect this method for now, but maybe later expose it to public classes? -gp
@@ -206,7 +208,7 @@ class _StateView extends StateEvents {
 // TODO If there's a new event, update StatedWidget &  _StatedController! -gp
 /// Responsible for the event handling in all the
 /// Controllers, Listeners and Views.
-class StateEvents {
+class StateEvents with StateListener {
   /// Records the current error handler and supplies its own.
   StateEvents() : _oldOnError = _recOnError() {
     /// If a tester is running. Don't switch out its error handler.
@@ -229,8 +231,23 @@ class StateEvents {
   /// Save the current Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
 
+  @override
+  void dispose() {
+    /// Return to the original error routine.
+    FlutterError.onError = _oldOnError;
+  }
+}
+
+
+
+class StateListener {
+
   /// Allow for a reference to the State object.
   State _state;
+
+  State get state => _state;
+
+  set state(StateMVC state) => _state = state;
 
   /// Allow access to the 'StatefulWidget' object.
   StatefulWidget get widget => _widget ?? _state?.widget;
@@ -277,9 +294,6 @@ class StateEvents {
     /// build again. The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
-
-    /// Return to the original error routine.
-    FlutterError.onError = _oldOnError;
   }
 
   /// Override this method to respond when the [widget] changes (e.g., to start
