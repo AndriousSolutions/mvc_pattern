@@ -26,6 +26,8 @@
 ###### [1.3.2] - Dec. 28, 2018. if(mounted) in refresh()
 ###### [1.3.3] - Jan. 01, 2019. Removed @protected from ViewMVC.build()  Private _ControllerListing._con(String keyId)
 ###### [1.3.4] - Jan. 11, 2019. StateListener as a mixin for StateEvents
+###### [1.3.5] - Jan. 11, 2019. Remove StateListener
+###### [1.3.6] - Jan. 12, 2019. StateListener to replace StateEvents. addState() disposedState()
 
 
 

@@ -134,13 +134,8 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
   }
 }
 
-class _StateView extends StateEvents {
-  // The View is a State object after all.
-//  State get state => _state;
-
+class _StateView extends StateListener {
   StateMVC get stateView => _stateMVC;
-
-//  set state(StateMVC state) => _state = state;
 
   // VERY IMPORTANT! This setter connects the State Object!
   // Protect this method for now, but maybe later expose it to public classes? -gp
@@ -148,7 +143,7 @@ class _StateView extends StateEvents {
   set stateView(StateMVC stateView) {
     assert(_stateMVC == null, "A View is already assigned!");
     _stateMVC = stateView;
-    _state = stateView;
+    addState(stateView);
   }
 
   StateMVC _stateMVC;
@@ -170,20 +165,20 @@ class _StateView extends StateEvents {
 
   /// Add a listener fired 'before' the main controller runs.
   // Note not 'protected' and so can be called by 'anyone.' -gp
-  bool addBeforeListener(StateEvents obj) {
+  bool addBeforeListener(StateListener obj) {
     return _stateMVC?.addBeforeListener(obj);
   }
 
   /// Add a listener fired 'after' the main controller runs.
   // Note not 'protected' and so can be called by 'anyone.' -gp
-  bool addAfterListener(StateEvents obj) {
+  bool addAfterListener(StateListener obj) {
     /// Add a listener fired 'after' the main controller runs.
     return _stateMVC?.addAfterListener(obj);
   }
 
   /// Add a listener fired 'after' the main controller runs.
   // Note not 'protected' and so can be called by 'anyone.' -gp
-  bool addListener(StateEvents obj) {
+  bool addListener(StateListener obj) {
     /// Add a listener fired 'after' the main controller runs.
     return _stateMVC?.addAfterListener(obj);
   }
@@ -199,16 +194,19 @@ class _StateView extends StateEvents {
   @mustCallSuper
   void dispose() {
     /// The view association is severed.
-    _state = null;
     _stateMVC = null;
     super.dispose();
   }
 }
 
+/// Moving away from the word, StateEvents.
+class StateListener extends StateEvents {}
+
 // TODO If there's a new event, update StatedWidget &  _StatedController! -gp
 /// Responsible for the event handling in all the
 /// Controllers, Listeners and Views.
-class StateEvents with StateListener {
+@deprecated
+class StateEvents {
   /// Records the current error handler and supplies its own.
   StateEvents() : _oldOnError = _recOnError() {
     /// If a tester is running. Don't switch out its error handler.
@@ -231,23 +229,34 @@ class StateEvents with StateListener {
   /// Save the current Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
 
-  @override
-  void dispose() {
-    /// Return to the original error routine.
-    FlutterError.onError = _oldOnError;
-  }
-}
-
-
-
-class StateListener {
-
-  /// Allow for a reference to the State object.
   State _state;
+  final Set<State> _stateSet = Set();
 
-  State get state => _state;
+  void addState(State state) {
+    if (state == null) return;
+    _state = state;
+    _stateSet.add(state);
+  }
 
-  set state(StateMVC state) => _state = state;
+  bool removeState(State state){
+    if (state == null) return false;
+    if (state == _state) return disposeState();
+    return _stateSet.remove(state);
+  }
+
+  bool disposeState() {
+    // Don't continue if null.
+    if (_state == null) return false;
+    // Remove the 'current' state
+    bool removed = _stateSet.remove(_state);
+    // Reassign the last state object.
+    if (_stateSet.isEmpty) {
+      _state = null;
+    } else {
+      _state = _stateSet.last;
+    }
+    return removed;
+  }
 
   /// Allow access to the 'StatefulWidget' object.
   StatefulWidget get widget => _widget ?? _state?.widget;
@@ -259,13 +268,26 @@ class StateListener {
   /// Test to ensure the State Object is 'mounted' and not being terminated.
   bool get mounted => _state?.mounted ?? false;
 
+  /// Provide the setState() function to external actors
+  // @protected  Note not 'protected' and so can be called by 'anyone.' -gp
+  void setState(fn) {
+    /// _state IS a subclass of 'Sate.' Ignore the warning. -gp
+    _state?.setState(fn);
+  }
+
+  /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
+  // @protected  Note not 'protected' and so can be called by 'anyone.' -gp
+  void refresh() {
+    setState((){});
+  }
+
   // Assigned an unique key.
   String get keyId => _keyId;
   String _keyId = Uuid().generateV4();
 
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
-  @protected
+  // @protected Note not 'protected' and so can be called by 'anyone.' -gp
   void initState() {
     /// Override this method to perform initialization that depends on the
     /// location at which this object was inserted into the tree.
@@ -276,7 +298,7 @@ class StateListener {
 
   /// The framework calls this method whenever it removes this [State] object
   /// from the tree.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void deactivate() {
     /// The framework calls this method whenever it removes this [State] object
     /// from the tree. It might reinsert it into another part of the tree.
@@ -287,18 +309,24 @@ class StateListener {
 
   /// The framework calls this method when this [State] object will never
   /// build again. The [State] object's lifecycle is terminated.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   @mustCallSuper
   void dispose() {
     /// The framework calls this method when this [State] object will never
     /// build again. The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
+
+    /// Return to the original error routine.
+    FlutterError.onError = _oldOnError;
+
+    /// The state reference is removed.
+    disposeState();
   }
 
   /// Override this method to respond when the [widget] changes (e.g., to start
   /// implicit animations).
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didUpdateWidget(StatefulWidget oldWidget) {
     /// Override this method to respond when the [widget] changes (e.g., to start
     /// implicit animations).
@@ -307,7 +335,7 @@ class StateListener {
   }
 
   /// Called when the system puts the app in the background or returns the app to the foreground.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing these possible values:
     /// AppLifecycleState.paused (may enter the suspending state at any time)
@@ -318,7 +346,7 @@ class StateListener {
 
   /// Called when the application's dimensions change. For example,
   /// when a phone is rotated.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didChangeMetrics() {
     /// Called when the application's dimensions change. For example,
     /// when a phone is rotated.
@@ -336,7 +364,7 @@ class StateListener {
   }
 
   /// Called when the platform's text scale factor changes.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didChangeTextScaleFactor() {
     /// Called when the platform's text scale factor changes.
     ///
@@ -353,7 +381,7 @@ class StateListener {
   }
 
   /// Called when the system tells the app that the user's locale has changed.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didChangeLocale(Locale locale) {
     /// Called when the system tells the app that the user's locale has
     /// changed. For example, if the user changes the system language
@@ -363,7 +391,7 @@ class StateListener {
   }
 
   /// Called when the system is running low on memory.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didHaveMemoryPressure() {
     /// Called when the system is running low on memory.
     ///
@@ -372,7 +400,7 @@ class StateListener {
   }
 
   /// Called when the system changes the set of active accessibility features.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didChangeAccessibilityFeatures() {
     /// Called when the system changes the set of currently active accessibility
     /// features.
@@ -381,7 +409,7 @@ class StateListener {
   }
 
   /// Called when a dependency of this [State] object changes.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void didChangeDependencies() {
     /// Called when a dependency of this [State] object changes.
     ///
@@ -395,7 +423,7 @@ class StateListener {
 
   /// Called whenever the application is reassembled during debugging, for
   /// example during hot reload.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void reassemble() {
     /// Called whenever the application is reassembled during debugging, for
     /// example during hot reload.
@@ -409,7 +437,7 @@ class StateListener {
   /// Allows the user to define their own with each Controller.
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   void onError(FlutterErrorDetails details) =>
       FlutterError.dumpErrorToConsole(details);
 }
@@ -576,7 +604,7 @@ abstract class StateViewMVC extends StateMVC {
 
 /// Main State Object seen as the 'StateView.'
 abstract class StateMVC extends State<StatefulWidget>
-    with WidgetsBindingObserver, _ControllerListing, _StateEventList {
+    with WidgetsBindingObserver, _ControllerListing, _StateListener {
   /// The View!
   Widget build(BuildContext context);
 
@@ -656,9 +684,9 @@ abstract class StateMVC extends State<StatefulWidget>
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
     _controllerList.forEach((ControllerMVC con) => con._widget = widget);
-    _beforeList.forEach((StateEvents obj) => obj.initState());
+    _beforeList.forEach((StateListener obj) => obj.initState());
     _controllerList.forEach((ControllerMVC con) => con.initState());
-    _afterList.forEach((StateEvents obj) => obj.initState());
+    _afterList.forEach((StateListener obj) => obj.initState());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -682,9 +710,9 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.deactivate());
+    _beforeList.forEach((StateListener obj) => obj.deactivate());
     _controllerList.forEach((ControllerMVC con) => con.deactivate());
-    _afterList.forEach((StateEvents obj) => obj.deactivate());
+    _afterList.forEach((StateListener obj) => obj.deactivate());
     super.deactivate();
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -707,10 +735,10 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.dispose());
+    _beforeList.forEach((StateListener obj) => obj.dispose());
     _controllerList.forEach((ControllerMVC con) => con.dispose());
     disposeControllerListing();
-    _afterList.forEach((StateEvents obj) => obj.dispose());
+    _afterList.forEach((StateListener obj) => obj.dispose());
     disposeStateEventList();
 
     /// Should not be 'rebuilding' anyway. This Widget is going away.
@@ -734,10 +762,10 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
+    _beforeList.forEach((StateListener obj) => obj.didUpdateWidget(oldWidget));
     _controllerList
         .forEach((ControllerMVC con) => con.didUpdateWidget(oldWidget));
-    _afterList.forEach((StateEvents obj) => obj.didUpdateWidget(oldWidget));
+    _afterList.forEach((StateListener obj) => obj.didUpdateWidget(oldWidget));
     super.didUpdateWidget(oldWidget);
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -758,11 +786,11 @@ abstract class StateMVC extends State<StatefulWidget>
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
     _beforeList
-        .forEach((StateEvents obj) => obj.didChangeAppLifecycleState(state));
+        .forEach((StateListener obj) => obj.didChangeAppLifecycleState(state));
     _controllerList
         .forEach((ControllerMVC con) => con.didChangeAppLifecycleState(state));
     _afterList
-        .forEach((StateEvents obj) => obj.didChangeAppLifecycleState(state));
+        .forEach((StateListener obj) => obj.didChangeAppLifecycleState(state));
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -790,9 +818,9 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.didChangeMetrics());
+    _beforeList.forEach((StateListener obj) => obj.didChangeMetrics());
     _controllerList.forEach((ControllerMVC con) => con.didChangeMetrics());
-    _afterList.forEach((StateEvents obj) => obj.didChangeMetrics());
+    _afterList.forEach((StateListener obj) => obj.didChangeMetrics());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -820,10 +848,10 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.didChangeTextScaleFactor());
+    _beforeList.forEach((StateListener obj) => obj.didChangeTextScaleFactor());
     _controllerList
         .forEach((ControllerMVC con) => con.didChangeTextScaleFactor());
-    _afterList.forEach((StateEvents obj) => obj.didChangeTextScaleFactor());
+    _afterList.forEach((StateListener obj) => obj.didChangeTextScaleFactor());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -844,9 +872,9 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.didChangeLocale(locale));
+    _beforeList.forEach((StateListener obj) => obj.didChangeLocale(locale));
     _controllerList.forEach((ControllerMVC con) => con.didChangeLocale(locale));
-    _afterList.forEach((StateEvents obj) => obj.didChangeLocale(locale));
+    _afterList.forEach((StateListener obj) => obj.didChangeLocale(locale));
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -866,9 +894,9 @@ abstract class StateMVC extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.didHaveMemoryPressure());
+    _beforeList.forEach((StateListener obj) => obj.didHaveMemoryPressure());
     _controllerList.forEach((ControllerMVC con) => con.didHaveMemoryPressure());
-    _afterList.forEach((StateEvents obj) => obj.didHaveMemoryPressure());
+    _afterList.forEach((StateListener obj) => obj.didHaveMemoryPressure());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -889,11 +917,11 @@ abstract class StateMVC extends State<StatefulWidget>
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
     _beforeList
-        .forEach((StateEvents obj) => obj.didChangeAccessibilityFeatures());
+        .forEach((StateListener obj) => obj.didChangeAccessibilityFeatures());
     _controllerList
         .forEach((ControllerMVC con) => con.didChangeAccessibilityFeatures());
     _afterList
-        .forEach((StateEvents obj) => obj.didChangeAccessibilityFeatures());
+        .forEach((StateListener obj) => obj.didChangeAccessibilityFeatures());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -910,9 +938,9 @@ abstract class StateMVC extends State<StatefulWidget>
   void didChangeDependencies() {
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.didChangeDependencies());
+    _beforeList.forEach((StateListener obj) => obj.didChangeDependencies());
     _controllerList.forEach((ControllerMVC con) => con.didChangeDependencies());
-    _afterList.forEach((StateEvents obj) => obj.didChangeDependencies());
+    _afterList.forEach((StateListener obj) => obj.didChangeDependencies());
     super.didChangeDependencies();
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -931,9 +959,9 @@ abstract class StateMVC extends State<StatefulWidget>
   void reassemble() {
     /// No 'setState()' functions are allowed to fully function at the point.
     _rebuildAllowed = false;
-    _beforeList.forEach((StateEvents obj) => obj.reassemble());
+    _beforeList.forEach((StateListener obj) => obj.reassemble());
     _controllerList.forEach((ControllerMVC con) => con.reassemble());
-    _afterList.forEach((StateEvents obj) => obj.reassemble());
+    _afterList.forEach((StateListener obj) => obj.reassemble());
     super.reassemble();
     _rebuildAllowed = true;
     if (_rebuildRequested) {
@@ -987,25 +1015,25 @@ Function(FlutterErrorDetails details) _recOnError() {
   return func;
 }
 
-class _StateEventList {
-  List<StateEvents> get _beforeList => _listenersBefore.toList();
-  List<StateEvents> beforeList(List<String> keys) {
+class _StateListener {
+  List<StateListener> get _beforeList => _listenersBefore.toList();
+  List<StateListener> beforeList(List<String> keys) {
     return _getList(keys, _listenersBefore);
   }
 
-  final Set<StateEvents> _listenersBefore = Set();
+  final Set<StateListener> _listenersBefore = Set();
 
-  List<StateEvents> get _afterList => _listenersAfter.toList();
-  List<StateEvents> afterList(List<String> keys) {
+  List<StateListener> get _afterList => _listenersAfter.toList();
+  List<StateListener> afterList(List<String> keys) {
     return _getList(keys, _listenersAfter);
   }
 
-  final Set<StateEvents> _listenersAfter = Set();
+  final Set<StateListener> _listenersAfter = Set();
 
-  List<StateEvents> _getList(List<String> keys, Set<StateEvents> set) {
-    List<StateEvents> list = List();
+  List<StateListener> _getList(List<String> keys, Set<StateListener> set) {
+    List<StateListener> list = List();
     if (keys == null || keys.isEmpty) return list;
-    set.map((StateEvents evt) {
+    set.map((StateListener evt) {
       for (String key in keys) {
         if (evt._keyId == key) {
           list.add(evt);
@@ -1017,44 +1045,44 @@ class _StateEventList {
     return list;
   }
 
-  bool addBeforeListener(StateEvents obj) {
+  bool addBeforeListener(StateListener obj) {
     /// Add a listener fired 'before' the main controller runs.
     return _listenersBefore.add(obj);
   }
 
-  bool addAfterListener(StateEvents obj) {
+  bool addAfterListener(StateListener obj) {
     /// Add a listener fired 'after' the main controller runs.
     return _listenersAfter.add(obj);
   }
 
-  bool addListener(StateEvents obj) {
+  bool addListener(StateListener obj) {
     /// Add a listener fired 'after' the main controller runs.
     return addAfterListener(obj);
   }
 
-  bool removeListener(StateEvents obj) {
+  bool removeListener(StateListener obj) {
     bool removed;
     removed = _listenersBefore.remove(obj);
     if (_listenersAfter.remove(obj)) removed = true;
     return removed;
   }
 
-  bool beforeContains(StateEvents obj) => _listenersBefore.contains(obj);
+  bool beforeContains(StateListener obj) => _listenersBefore.contains(obj);
 
-  bool afterContains(StateEvents obj) => _listenersAfter.contains(obj);
+  bool afterContains(StateListener obj) => _listenersAfter.contains(obj);
 
-  StateEvents beforeListener(String key) {
+  StateListener beforeListener(String key) {
     return _getStateEvents(key, _listenersBefore);
   }
 
-  StateEvents afterListener(String key) {
+  StateListener afterListener(String key) {
     return _getStateEvents(key, _listenersAfter);
   }
 
-  StateEvents _getStateEvents(String key, Set<StateEvents> set) {
-    StateEvents se;
+  StateListener _getStateEvents(String key, Set<StateListener> set) {
+    StateListener se;
     if (key == null || key.isEmpty) return se;
-    set.map((StateEvents evt) {
+    set.map((StateListener evt) {
       if (evt._keyId == key) {
         se = evt;
         return;
