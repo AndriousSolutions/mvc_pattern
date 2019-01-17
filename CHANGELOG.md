@@ -28,6 +28,17 @@
 ###### [1.3.4] - Jan. 11, 2019. StateListener as a mixin for StateEvents
 ###### [1.3.5] - Jan. 11, 2019. Remove StateListener
 ###### [1.3.6] - Jan. 12, 2019. StateListener to replace StateEvents. addState() disposedState()
+###### [2.0.0] - Jan. 16, 2019. ControllerMVC([State state])
+######                          class _StateView with StateListener
+######                          _StateView() : _oldOnError = _recOnError() {
+######                          abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
+######                          remove setter, controller
+######                          _StateListener.disposeStateEventList() use clear();
+######                          Removed StatefulWidgetMVC
+######                          Removed StatedWidget
+######                          abstract class AppMVC extends StatefulWidget {
+######                          Removed StatelessWidgetMVC
+
 
 
 
