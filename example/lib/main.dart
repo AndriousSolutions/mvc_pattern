@@ -52,7 +52,7 @@ class RandomWords extends StatefulWidget {
   State createState() => _RandomWordsState();
 }
 
-class _RandomWordsState extends StateMVC {
+class _RandomWordsState extends StateMVC<RandomWords> {
   _RandomWordsState() : super(Con());
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18.0);

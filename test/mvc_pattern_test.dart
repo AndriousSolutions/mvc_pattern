@@ -27,7 +27,7 @@ void main() {
     StateMVC _sv = _con.stateView;
 
     /// The State object.
-    State _state = _con.state;
+    State _state = _con.stateView;
 
     /// Current context.
     BuildContext context = _con.context;

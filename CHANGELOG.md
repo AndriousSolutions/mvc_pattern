@@ -38,6 +38,7 @@
 ######                          Removed StatedWidget
 ######                          abstract class AppMVC extends StatefulWidget {
 ######                          Removed StatelessWidgetMVC
+###### [2.0.1] - Jan. 16, 2019. AppMVC({this.con, Key key}) : super(key: key);
 
 
 

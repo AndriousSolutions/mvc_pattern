@@ -1238,7 +1238,7 @@ String _addKeyId(_StateView sv) {
 ///    Example:  void main() => runApp(MyApp());
 abstract class AppMVC extends StatefulWidget {
   /// Simple constructor. Calls the initApp() function.
-  AppMVC(this.con, {Key key}) : super(key: key);
+  AppMVC({this.con, Key key}) : super(key: key);
   final ControllerMVC con;
 
   /// Create the View!
