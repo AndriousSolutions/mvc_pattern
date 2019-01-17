@@ -42,7 +42,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Controller Class
 /// Your 'working' class most concerned with the app's functionality.
-abstract class ControllerMVC extends _StateView {}
+abstract class ControllerMVC extends _StateView {
+  ControllerMVC([State state]) : super() {
+    addState(state);
+  }
+}
 
 /// View Class
 /// Extend and implement its build() function to compose its interface.
@@ -134,7 +138,29 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
   }
 }
 
-class _StateView extends StateListener {
+class _StateView with StateListener {
+  /// Records the current error handler and supplies its own.
+  _StateView() : _oldOnError = _recOnError() {
+    /// If a tester is running. Don't switch out its error handler.
+    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
+      /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
+      FlutterError.onError = (FlutterErrorDetails details) {
+        var thisOnError = onError;
+
+        /// Always favour a custom error handler.
+        if (thisOnError == StateMVC._defaultError &&
+            _oldOnError != StateMVC._defaultError) {
+          _oldOnError(details);
+        } else {
+          onError(details);
+        }
+      };
+    }
+  }
+
+  /// Save the current Error Handler.
+  final Function(FlutterErrorDetails details) _oldOnError;
+
   StateMVC get stateView => _stateMVC;
 
   // VERY IMPORTANT! This setter connects the State Object!
@@ -190,45 +216,22 @@ class _StateView extends StateListener {
   }
 
   /// Dispose the State Object and Controller references.
-  @protected
+  // @protected   Note not 'protected' and so can be called by 'anyone.' -gp
   @mustCallSuper
   void dispose() {
+    /// Return to the original error routine.
+    FlutterError.onError = _oldOnError;
+
     /// The view association is severed.
     _stateMVC = null;
     super.dispose();
   }
 }
 
-/// Moving away from the word, StateEvents.
-class StateListener extends StateEvents {}
-
 // TODO If there's a new event, update StatedWidget &  _StatedController! -gp
-/// Responsible for the event handling in all the
-/// Controllers, Listeners and Views.
-@deprecated
-class StateEvents {
-  /// Records the current error handler and supplies its own.
-  StateEvents() : _oldOnError = _recOnError() {
-    /// If a tester is running. Don't switch out its error handler.
-    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
-      /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
-      FlutterError.onError = (FlutterErrorDetails details) {
-        var thisOnError = onError;
-
-        /// Always favour a custom error handler.
-        if (thisOnError == StateMVC._defaultError &&
-            _oldOnError != StateMVC._defaultError) {
-          _oldOnError(details);
-        } else {
-          onError(details);
-        }
-      };
-    }
-  }
-
-  /// Save the current Error Handler.
-  final Function(FlutterErrorDetails details) _oldOnError;
-
+/// Responsible for the event handling in all the Controllers, Listeners and Views.
+/// Could be used as a Mixin.
+class StateListener {
   State _state;
   final Set<State> _stateSet = Set();
 
@@ -238,7 +241,7 @@ class StateEvents {
     _stateSet.add(state);
   }
 
-  bool removeState(State state){
+  bool removeState(State state) {
     if (state == null) return false;
     if (state == _state) return disposeState();
     return _stateSet.remove(state);
@@ -278,7 +281,7 @@ class StateEvents {
   /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
   // @protected  Note not 'protected' and so can be called by 'anyone.' -gp
   void refresh() {
-    setState((){});
+    setState(() {});
   }
 
   // Assigned an unique key.
@@ -316,9 +319,6 @@ class StateEvents {
     /// build again. The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
-
-    /// Return to the original error routine.
-    FlutterError.onError = _oldOnError;
 
     /// The state reference is removed.
     disposeState();
@@ -603,10 +603,13 @@ abstract class StateViewMVC extends StateMVC {
 }
 
 /// Main State Object seen as the 'StateView.'
-abstract class StateMVC extends State<StatefulWidget>
+abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     with WidgetsBindingObserver, _ControllerListing, _StateListener {
   /// The View!
   Widget build(BuildContext context);
+
+  /// You need to be able access the widget.
+  T get widget => super.widget;
 
   /// Record the 'default' error handler for Flutter.
   static final _defaultError = FlutterError.onError;
@@ -636,22 +639,45 @@ abstract class StateMVC extends State<StatefulWidget>
   /// Save the original Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
 
-// // Already being done in superclass, _ControllerListing
-//  /// Contains a listing of all the Controllers assigned to this View.
-//  List<ControllerMVC> get _controllerList => super._controllerList;
-
-  /// Assign a specified controller to this View.
-  set controller(ControllerMVC c) {
-    // Must remove a possibly listener. -gp
-    add(c);
-  }
+//  /// Assign a specified controller to this View.
+//  set controller(ControllerMVC c) {
+//    // Must remove a possibly listener. -gp
+//    add(c);
+//  }
 
   /// Add a specific Controller to this View.
   /// Returns the Controller's unique String identifier.
   String add(ControllerMVC c) {
+    if (c == null) return '';
+
     /// It may have been a listener. Can't be both.
     removeListener(c);
     return super.add(c);
+  }
+
+  void addList(List<ControllerMVC> list) {
+    if (list == null) return;
+
+    /// It may have been a listener. Can't be both.
+    list.forEach((ControllerMVC con) => removeListener(con));
+    return super.addList(list);
+  }
+
+  bool addBeforeListener(StateListener obj) {
+    /// Assign this state.
+    obj.addState(this);
+    return super.addBeforeListener(obj);
+  }
+
+  bool addAfterListener(StateListener obj) {
+    /// Assign this state.
+    obj.addState(this);
+    return super.addAfterListener(obj);
+  }
+
+  bool removeListener(StateListener obj) {
+    obj.removeState(this);
+    return super.removeListener(obj);
   }
 
   /// The Unique key identifier for this State object.
@@ -1015,6 +1041,7 @@ Function(FlutterErrorDetails details) _recOnError() {
   return func;
 }
 
+/// Add, List, and Remove Listeners.
 class _StateListener {
   List<StateListener> get _beforeList => _listenersBefore.toList();
   List<StateListener> beforeList(List<String> keys) {
@@ -1061,8 +1088,7 @@ class _StateListener {
   }
 
   bool removeListener(StateListener obj) {
-    bool removed;
-    removed = _listenersBefore.remove(obj);
+    bool removed = _listenersBefore.remove(obj);
     if (_listenersAfter.remove(obj)) removed = true;
     return removed;
   }
@@ -1092,8 +1118,8 @@ class _StateListener {
   }
 
   void disposeStateEventList() {
-    _listenersBefore.removeAll(_listenersBefore);
-    _listenersAfter.removeAll(_listenersAfter);
+    _listenersBefore.clear();
+    _listenersAfter.clear();
   }
 }
 
@@ -1140,8 +1166,9 @@ class _ControllerListing {
     return controllers;
   }
 
-  /// Never supply a public list of Controllers. User must know the key identifier(s).
-  Map<String, ControllerMVC> get _cons => _controllers.map;
+// Not being used. I think. Deprecated
+//  /// Never supply a public list of Controllers. User must know the key identifier(s).
+//  Map<String, ControllerMVC> get _cons => _controllers.map;
 
   void disposeControllerListing() => _controllers.dispose();
 }
@@ -1207,324 +1234,29 @@ String _addKeyId(_StateView sv) {
   return keyId;
 }
 
-/// The StatefulWidget that exposes the State object.
-/// Deprecated because 'saving' the state object errors in the Flutter framework.
-/// WILL BE REMOVED WITH THE NEXT MAJOR VERSION.
-/// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
-/// whether defined directly or inherited, must be `final`.
-@deprecated
-abstract class StatefulWidgetMVC extends StatefulWidget {
-  /// Takes in the StateView.
-  StatefulWidgetMVC(this.state, {Key key}) : super(key: key);
-
-  /// Expose the state to external access!
-  final StateMVC state;
-
-  @override
-  @protected
-  State createState() {
-    return state;
-  }
-}
-
-abstract class _OldStatefulWidgetMVC extends StatefulWidget {
-  /// Takes in the StateView.
-  _OldStatefulWidgetMVC(this.state, {Key key}) : super(key: key);
-
-  /// Expose the state to external access!
-  final StateMVC state;
-
-  @override
-  @protected
-  State createState() {
-    return state;
-  }
-}
-
-/// Combines the StatefulWidget & State class into one.
-/// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
-/// whether defined directly or inherited, must be `final`.
-abstract class StatedWidget extends _OldStatefulWidgetMVC {
-  StatedWidget({this.con, Key key})
-      : super(_StatedState(con ?? _StatedController()), key: key);
-
-  final ControllerMVC con;
-
-  /// The build() function you must implement.
-  /// It's the View!
-  @protected
-  Widget build(BuildContext context);
-
-  /// The framework will call this method exactly once.
-  /// Only when the [State] object is first created.
-  @protected
-  void initState() {
-    ///
-    /// Override this method to perform initialization that depends on the
-    /// location at which this object was inserted into the tree.
-    /// (i.e. Subscribe to another object it depends on during [initState],
-    /// unsubscribe object and subscribe to a new object when it changes in
-    /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
-  }
-
-  /// The framework calls this method whenever it removes this [State] object
-  /// from the tree.
-  @protected
-  void deactivate() {
-    /// It might reinsert it into another part of the tree.
-    /// Subclasses should override this method to clean up any links between
-    /// this object and other elements in the tree (e.g. if you have provided an
-    /// ancestor with a pointer to a descendant's [RenderObject]).
-  }
-
-  /// The framework calls this method when this [State] object will never
-  /// build again.
-  @protected
-  void dispose() {
-    /// The [State] object's lifecycle is terminated.
-    /// Subclasses should override this method to release any resources retained
-    /// by this object (e.g., stop any active animations).
-  }
-
-  /// Override this method to respond when the [widget] changes (e.g., to start
-  /// implicit animations).
-  @protected
-  void didUpdateWidget(StatefulWidget oldWidget) {
-    /// The framework always calls [build] after calling [didUpdateWidget], which
-    /// means any calls to [setState] in [didUpdateWidget] are redundant.
-  }
-
-  /// Called when the system puts the app in the background or returns the app to the foreground.
-  @protected
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
-  }
-
-  /// Called when the application's dimensions change. For example,
-  /// when a phone is rotated.
-  @protected
-  void didChangeMetrics() {
-    ///
-    /// In general, this is not overridden often as the layout system takes care of
-    /// automatically recomputing the application geometry when the application
-    /// size changes
-    ///
-    /// This method exposes notifications from [Window.onMetricsChanged].
-    /// See sample code below. No need to call super if you override.
-    ///   @override
-    ///   void didChangeMetrics() {
-    ///     setState(() { _lastSize = ui.window.physicalSize; });
-    ///   }
-  }
-
-  /// Called when the platform's text scale factor changes.
-  @protected
-  void didChangeTextScaleFactor() {
-    ///
-    /// This typically happens as the result of the user changing system
-    /// preferences, and it should affect all of the text sizes in the
-    /// application.
-    ///
-    /// This method exposes notifications from [Window.onTextScaleFactorChanged].
-    /// See sample code below. No need to call super if you override.
-    ///   @override
-    ///   void didChangeTextScaleFactor() {
-    ///     setState(() { _lastTextScaleFactor = ui.window.textScaleFactor; });
-    ///   }
-  }
-
-  /// Called when the system tells the app that the user's locale has
-  /// changed.
-  @protected
-  void didChangeLocale(Locale locale) {
-    /// Called when the system tells the app that the user's locale has
-    /// changed. For example, if the user changes the system language
-    /// settings.
-    ///
-    /// This method exposes notifications from [Window.onLocaleChanged].
-  }
-
-  /// Called when the system is running low on memory.
-  @protected
-  void didHaveMemoryPressure() {
-    ///
-    /// This method exposes the `memoryPressure` notification from
-    /// [SystemChannels.system].
-  }
-
-  /// Called when the system changes the set of active accessibility features.
-  @protected
-  void didChangeAccessibilityFeatures() {
-    ///
-    /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
-  }
-
-  /// Called when a dependency of this [State] object changes.
-  @protected
-  void didChangeDependencies() {
-    ///
-    /// For example, if the previous call to [build] referenced an
-    /// [InheritedWidget] that later changed, the framework would call this
-    /// method to notify this object about the change.
-    ///
-    /// This method is also called immediately after [initState]. It is safe to
-    /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
-  }
-
-  /// Called whenever the application is reassembled during debugging, for
-  /// example during hot reload.
-  @protected
-  void reassemble() {
-    /// Called whenever the application is reassembled during debugging, for
-    /// example during hot reload.
-    ///
-    /// This method should rerun any initialization logic that depends on global
-    /// state, for example, image loading from asset bundles (since the asset
-    /// bundle may have changed).
-  }
-
-  /// Allows the user to call setState() within the Controller.
-  // Note not 'protected' and so can be called by 'anyone.' -gp
-  @mustCallSuper
-  void refresh() {
-    /// Refresh the interface by 'rebuilding' the Widget Tree
-    state.refresh();
-  }
-
-  /// Supply an 'error handler' routine to fire when an error occurs.
-  /// Allows the user to define their own with each Controller.
-  /// The default routine is to dump the error to the console.
-  @protected
-  void onError(FlutterErrorDetails details) {
-    /// The default routine is to dump the error to the console.
-    FlutterError.dumpErrorToConsole(details);
-  }
-}
-
-class _StatedState extends StateMVC {
-  _StatedState(ControllerMVC con) : super(con);
-
-  @protected
-  Widget build(BuildContext context) {
-    return (widget as StatedWidget).build(context);
-  }
-}
-
-/// IMPORTANT! If there's a new event in StateEvent, update this Class!
-class _StatedController extends ControllerMVC {
-  StatedWidget _statedWidget;
-
-  @protected
-  @override
-  void initState() {
-    _statedWidget = widget;
-    _statedWidget.initState();
-  }
-
-  @protected
-  @override
-  void deactivate() {
-    _statedWidget.deactivate();
-    super.deactivate();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void dispose() {
-    _statedWidget.dispose();
-    super.dispose();
-  }
-
-  @protected
-  @override
-  void didUpdateWidget(StatefulWidget oldWidget) {
-    _statedWidget.didUpdateWidget(oldWidget);
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @protected
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    _statedWidget.didChangeAppLifecycleState(state);
-    super.didChangeAppLifecycleState(state);
-  }
-
-  @protected
-  @override
-  void didChangeMetrics() {
-    _statedWidget.didChangeMetrics();
-    super.didChangeMetrics();
-  }
-
-  @protected
-  @override
-  void didChangeTextScaleFactor() {
-    _statedWidget.didChangeTextScaleFactor();
-    super.didChangeTextScaleFactor();
-  }
-
-  @protected
-  @override
-  void didChangeLocale(Locale locale) {
-    _statedWidget.didChangeLocale(locale);
-    super.didChangeLocale(locale);
-  }
-
-  @protected
-  @override
-  void didHaveMemoryPressure() {
-    _statedWidget.didHaveMemoryPressure();
-    super.didHaveMemoryPressure();
-  }
-
-  @protected
-  @override
-  void didChangeAccessibilityFeatures() {
-    _statedWidget.didChangeAccessibilityFeatures();
-    super.didChangeAccessibilityFeatures();
-  }
-
-  @protected
-  @override
-  void didChangeDependencies() {
-    _statedWidget.didChangeDependencies();
-    super.didChangeDependencies();
-  }
-
-  @protected
-  @override
-  void reassemble() {
-    _statedWidget.reassemble();
-    super.reassemble();
-  }
-
-  @protected
-  @override
-  void onError(FlutterErrorDetails details) => _statedWidget.onError(details);
-}
-
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 ///    Example:  void main() => runApp(MyApp());
-abstract class AppMVC extends StatedWidget {
+abstract class AppMVC extends StatefulWidget {
   /// Simple constructor. Calls the initApp() function.
-  AppMVC({this.con, Key key}) : super(con: con, key: key) {
-    _running = true;
-    initApp();
-  }
+  AppMVC(this.con, {Key key}) : super(key: key);
   final ControllerMVC con;
 
-  /// If this class is running, indicate it so.
-  static bool _running = false;
+  /// Create the View!
+  Widget build(BuildContext context);
+
+  @override
+  State createState() => _AppState(con);
 
   /// Determine if the 'MVCApp' is being used.
   static String _appStatus = '';
+
+  static List<Map<String, StateMVC>> states = [];
 
   /// Returns a StateView object using a unique String identifier.
   // There's a better way. Just too tired now.
   StateMVC getState(String keyId) {
     StateMVC sv;
-    for (Map map in _states) {
+    for (Map map in states) {
       if (map.containsKey(keyId)) {
         sv = map[keyId];
         break;
@@ -1548,16 +1280,12 @@ abstract class AppMVC extends StatedWidget {
     return getStates(keys).values.toList();
   }
 
-  static List<Map<String, StateMVC>> _states = [];
-
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.
-  @protected
   void initApp() {}
 
   /// Initialize any 'time-consuming' operations at the beginning.
   /// Initialize items essential to the Mobile Applications.
   /// Called by the MVCApp.init() function.
-  @protected
   @mustCallSuper
   Future<bool> init() async {
     return Future.value(true);
@@ -1566,18 +1294,11 @@ abstract class AppMVC extends StatedWidget {
   /// This is 'privatized' as it is an critical method and not for public access.
   static _addState(StateMVC state) {
     if (_appStatus == 'not running') return;
-    if (_appStatus.isEmpty) _appStatus = _running ? 'running' : 'not running';
+    if (_appStatus.isEmpty)
+      _appStatus = _AppState.running ? 'running' : 'not running';
     var map = Map<String, StateMVC>();
     map[state._keyId] = state;
-    _states.add(map);
-  }
-
-  /// Dispose the 'StateView(s)' that may be running.
-  @protected
-  @mustCallSuper
-  void dispose() {
-    _running = false;
-    _states.clear();
+    states.add(map);
   }
 
   /// Determines if running in an IDE or in production.
@@ -1588,47 +1309,29 @@ abstract class AppMVC extends StatedWidget {
   }
 }
 
-/// Note: A Widget is marked as [@immutable] so all of the instance fields of this class,
-/// whether defined directly or inherited, must be `final`.
-abstract class StatelessWidgetMVC extends StatelessWidget {
-  /// Override this function to produce 'the View!'
-  Widget build(BuildContext context);
+class _AppState extends StateMVC<AppMVC>{
+  _AppState(ControllerMVC con): super(con);
 
-  final _ConInfo _conInfo = _ConInfo();
-
-  final _ControllerListing _conListing = _ControllerListing();
-
-  /// ControllerMVC get con => conListing.con;
-  ControllerMVC get controller => _conInfo.con;
-
-  /// List<ControllerMVC> get consList => conListing.controllerList;
-  List<ControllerMVC> get controllerList => _conListing._controllerList;
-
-  /// Map<String, ControllerMVC> get cons => conListing.cons;
-  Map<String, ControllerMVC> get controllers => _conListing._cons;
-
-  /// Add a Controller to this StatelessWidget.
-  set controller(ControllerMVC c) => add(c);
-
-  /// Add a Controller to this StatelessWidget.
-  // Note not 'protected' and so can be called by 'anyone.' -gp
-  String add(ControllerMVC c) {
-    String keyId = _conListing.add(c);
-
-    /// The first controller is assumed this Widget's controller.
-    if (_conInfo.con == null) _conInfo.con = c;
-    return keyId;
+  void initState() {
+    running = true;
+    widget.initApp();
+    // Preform the init first.
+//    add(widget.con);
+    super.initState();
   }
+  /// If this class is running, indicate it so.
+  static bool running = false;
 
-  /// Add a list of Controllers to this StatelessWidget.
-  addList(List<ControllerMVC> list) => _conListing.addList(list);
+  Widget build(BuildContext context) => widget.build(context);
 
-  /// Removes a Controller from this StatelessWidget by a unique String identifier.
-  bool remove(String keyId) => _conListing.remove(keyId);
-}
-
-class _ConInfo {
-  ControllerMVC con;
+  /// Dispose the 'StateView(s)' that may be running.
+  @protected
+  @mustCallSuper
+  void dispose() {
+    running = false;
+    AppMVC.states.clear();
+    super.dispose();
+  }
 }
 
 // Uuid
