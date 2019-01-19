@@ -228,54 +228,53 @@ class _StateView with StateListener {
   }
 }
 
-// TODO If there's a new event, update StatedWidget &  _StatedController! -gp
 /// Responsible for the event handling in all the Controllers, Listeners and Views.
 /// Could be used as a Mixin.
 class StateListener {
-  State _state;
-  final Set<State> _stateSet = Set();
+  StateMVC _stateMVC;
+  final Set<StateMVC> _stateMVCSet = Set();
 
-  void addState(State state) {
+  void addState(StateMVC state) {
     if (state == null) return;
-    _state = state;
-    _stateSet.add(state);
+    _stateMVC = state;
+    _stateMVCSet.add(state);
   }
 
-  bool removeState(State state) {
+  bool removeState(StateMVC state) {
     if (state == null) return false;
-    if (state == _state) return disposeState();
-    return _stateSet.remove(state);
+    if (state == _stateMVC) return disposeState();
+    return _stateMVCSet.remove(state);
   }
 
   bool disposeState() {
     // Don't continue if null.
-    if (_state == null) return false;
+    if (_stateMVC == null) return false;
     // Remove the 'current' state
-    bool removed = _stateSet.remove(_state);
+    bool removed = _stateMVCSet.remove(_stateMVC);
     // Reassign the last state object.
-    if (_stateSet.isEmpty) {
-      _state = null;
+    if (_stateMVCSet.isEmpty) {
+      _stateMVC = null;
     } else {
-      _state = _stateSet.last;
+      _stateMVC = _stateMVCSet.last;
     }
     return removed;
   }
 
   /// Allow access to the 'StatefulWidget' object.
-  StatefulWidget get widget => _widget ?? _state?.widget;
+  StatefulWidget get widget => _widget ?? _stateMVC?.widget;
   StatefulWidget _widget;
 
   /// BuildContext is always useful in the build() function.
-  BuildContext get context => _state?.context;
+  BuildContext get context => _stateMVC?.context;
 
   /// Test to ensure the State Object is 'mounted' and not being terminated.
-  bool get mounted => _state?.mounted ?? false;
+  bool get mounted => _stateMVC?.mounted ?? false;
 
   /// Provide the setState() function to external actors
   // @protected  Note not 'protected' and so can be called by 'anyone.' -gp
   void setState(fn) {
-    /// _state IS a subclass of 'Sate.' Ignore the warning. -gp
-    _state?.setState(fn);
+    /// _stateMVC IS a subclass of 'Sate.' Ignore the warning. -gp
+    _stateMVC?.setState(fn);
   }
 
   /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
@@ -441,6 +440,7 @@ class StateListener {
   void onError(FlutterErrorDetails details) =>
       FlutterError.dumpErrorToConsole(details);
 }
+
 
 /// The State Object with an Error Handler in its build() function.
 abstract class StateViewMVC extends StateMVC {
