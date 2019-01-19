@@ -53,7 +53,7 @@ class MyHomePage extends StatefulWidget {
   createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends StateMVC {
+class _MyHomePageState extends StateMVC<MyHomePage> {
   _MyHomePageState() : super(Controller());
   @override
   Widget build(BuildContext context) {
