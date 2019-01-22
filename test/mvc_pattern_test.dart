@@ -23,23 +23,14 @@ void main() {
     /// Reference to the Controller.
     Controller _con = _app.con;
 
-    /// Reference to the StateView.
-    StateMVC _sv = _con.stateView;
+    /// Reference to the StateMVC.
+    StateMVC _sv = _con.stateMVC;
 
     /// The State object.
-    State _state = _con.stateView;
-
-    /// Current context.
-    BuildContext context = _con.context;
+    State _state = _con.stateMVC;
 
     /// Controller's unique identifier.
     String id = _con.keyId;
-
-    /// Is the widget mounted?
-    bool mounted = _con.mounted;
-
-    /// The StatefulWidget.
-    StatefulWidget widget = _con.widget;
 
     /// The StateView's unique identifier.
     String svId = _sv.keyId;

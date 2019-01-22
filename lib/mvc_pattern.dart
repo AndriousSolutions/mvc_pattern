@@ -42,15 +42,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Controller Class
 /// Your 'working' class most concerned with the app's functionality.
-abstract class ControllerMVC extends _StateView {
-  ControllerMVC([State state]) : super() {
+abstract class ControllerMVC extends _StateObserver {
+  ControllerMVC([StateMVC state]) : super() {
     addState(state);
+  }
+
+  String addState(StateMVC state) {
+    if (state == null) return '';
+    return state.add(this);
   }
 }
 
 /// View Class
 /// Extend and implement its build() function to compose its interface.
-abstract class ViewMVC extends _StateView with _ControllerListing {
+abstract class ViewMVC extends _StateObserver with _ControllerListing {
   /// Implement this build() function to compose the View's interface.
   Widget build(BuildContext context);
 
@@ -138,9 +143,9 @@ abstract class ViewMVC extends _StateView with _ControllerListing {
   }
 }
 
-class _StateView with StateListener {
+class _StateObserver with _StateSetter, StateListener {
   /// Records the current error handler and supplies its own.
-  _StateView() : _oldOnError = _recOnError() {
+  _StateObserver() : _oldOnError = _recOnError() {
     /// If a tester is running. Don't switch out its error handler.
     if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
       /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
@@ -161,17 +166,13 @@ class _StateView with StateListener {
   /// Save the current Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
 
+  StateMVC get stateMVC => _stateMVC;
+
+  /// Start using the getter, stateMVC
+  @deprecated
   StateMVC get stateView => _stateMVC;
 
-  // VERY IMPORTANT! This setter connects the State Object!
-  // Protect this method for now, but maybe later expose it to public classes? -gp
-  @protected
-  set stateView(StateMVC stateView) {
-    assert(_stateMVC == null, "A View is already assigned!");
-    _stateMVC = stateView;
-    addState(stateView);
-  }
-
+  /// Overriden by mixin, StateSetter.
   StateMVC _stateMVC;
 
   List<ControllerMVC> listControllers(List<String> keys) =>
@@ -223,30 +224,28 @@ class _StateView with StateListener {
     FlutterError.onError = _oldOnError;
 
     /// The view association is severed.
-    _stateMVC = null;
+    _disposeState();
     super.dispose();
   }
 }
 
-/// Responsible for the event handling in all the Controllers, Listeners and Views.
-/// Could be used as a Mixin.
-class StateListener {
+mixin _StateSetter {
   StateMVC _stateMVC;
   final Set<StateMVC> _stateMVCSet = Set();
 
-  void addState(StateMVC state) {
+  void _addState(StateMVC state) {
     if (state == null) return;
     _stateMVC = state;
     _stateMVCSet.add(state);
   }
 
-  bool removeState(StateMVC state) {
-    if (state == null) return false;
-    if (state == _stateMVC) return disposeState();
-    return _stateMVCSet.remove(state);
-  }
+//  bool _removeState(StateMVC state) {
+//    if (state == null) return false;
+//    if (state == _stateMVC) return _disposeState();
+//    return _stateMVCSet.remove(state);
+//  }
 
-  bool disposeState() {
+  bool _disposeState() {
     // Don't continue if null.
     if (_stateMVC == null) return false;
     // Remove the 'current' state
@@ -259,30 +258,11 @@ class StateListener {
     }
     return removed;
   }
+}
 
-  /// Allow access to the 'StatefulWidget' object.
-  StatefulWidget get widget => _widget ?? _stateMVC?.widget;
-  StatefulWidget _widget;
-
-  /// BuildContext is always useful in the build() function.
-  BuildContext get context => _stateMVC?.context;
-
-  /// Test to ensure the State Object is 'mounted' and not being terminated.
-  bool get mounted => _stateMVC?.mounted ?? false;
-
-  /// Provide the setState() function to external actors
-  // @protected  Note not 'protected' and so can be called by 'anyone.' -gp
-  void setState(fn) {
-    /// _stateMVC IS a subclass of 'Sate.' Ignore the warning. -gp
-    _stateMVC?.setState(fn);
-  }
-
-  /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
-  // @protected  Note not 'protected' and so can be called by 'anyone.' -gp
-  void refresh() {
-    setState(() {});
-  }
-
+/// Responsible for the event handling in all the Controllers, Listeners and Views.
+/// Could be used as a Mixin.
+mixin StateListener {
   // Assigned an unique key.
   String get keyId => _keyId;
   String _keyId = Uuid().generateV4();
@@ -318,9 +298,6 @@ class StateListener {
     /// build again. The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
-
-    /// The state reference is removed.
-    disposeState();
   }
 
   /// Override this method to respond when the [widget] changes (e.g., to start
@@ -441,9 +418,8 @@ class StateListener {
       FlutterError.dumpErrorToConsole(details);
 }
 
-
 /// The State Object with an Error Handler in its build() function.
-abstract class StateViewMVC extends StateMVC {
+abstract class StateViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   /// Takes in a View and passes the View's Controller to the parent class.
   StateViewMVC(this.view) : super(view.controller) {
     assert(view != null, "View can't be null! Pass a view to StateViewMVC.");
@@ -455,8 +431,8 @@ abstract class StateViewMVC extends StateMVC {
     view.disposeControllerListing();
 
     /// IMPORTNANT! This setter connects the State Object!
-    view.stateMVC = this; // _ControllerListing
-    view.stateView = this; // _StateView
+    view._stateMVC = this;
+    view._addState(this);
   }
   final ViewMVC view;
 
@@ -604,7 +580,7 @@ abstract class StateViewMVC extends StateMVC {
 
 /// Main State Object seen as the 'StateView.'
 abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
-    with WidgetsBindingObserver, _ControllerListing, _StateListener {
+    with WidgetsBindingObserver, _ControllerListing, _StateListeners {
   /// The View!
   Widget build(BuildContext context);
 
@@ -632,18 +608,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     }
 
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
-    stateMVC = this;
+    /// Any subsequent calls to add() will be assigned, stateMVC.
+    _stateMVC = this;
     add(_con);
   }
 
   /// Save the original Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
-
-//  /// Assign a specified controller to this View.
-//  set controller(ControllerMVC c) {
-//    // Must remove a possibly listener. -gp
-//    add(c);
-//  }
 
   /// Add a specific Controller to this View.
   /// Returns the Controller's unique String identifier.
@@ -661,23 +632,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// It may have been a listener. Can't be both.
     list.forEach((ControllerMVC con) => removeListener(con));
     return super.addList(list);
-  }
-
-  bool addBeforeListener(StateListener obj) {
-    /// Assign this state.
-    obj.addState(this);
-    return super.addBeforeListener(obj);
-  }
-
-  bool addAfterListener(StateListener obj) {
-    /// Assign this state.
-    obj.addState(this);
-    return super.addAfterListener(obj);
-  }
-
-  bool removeListener(StateListener obj) {
-    obj.removeState(this);
-    return super.removeListener(obj);
   }
 
   /// The Unique key identifier for this State object.
@@ -707,9 +661,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     WidgetsBinding.instance.addObserver(this);
     AppMVC._addState(this);
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-    _controllerList.forEach((ControllerMVC con) => con._widget = widget);
+//    _controllerList.forEach((ControllerMVC con) => con._widget = widget);
     _beforeList.forEach((StateListener obj) => obj.initState());
     _controllerList.forEach((ControllerMVC con) => con.initState());
     _afterList.forEach((StateListener obj) => obj.initState());
@@ -734,7 +688,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// this object and other elements in the tree (e.g. if you have provided an
     /// ancestor with a pointer to a descendant's [RenderObject]).
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.deactivate());
     _controllerList.forEach((ControllerMVC con) => con.deactivate());
@@ -759,7 +713,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.dispose());
     _controllerList.forEach((ControllerMVC con) => con.dispose());
@@ -786,7 +740,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// The framework always calls [build] after calling [didUpdateWidget], which
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.didUpdateWidget(oldWidget));
     _controllerList
@@ -809,7 +763,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing either the values AppLifecycleState.paused or AppLifecycleState.resumed.
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList
         .forEach((StateListener obj) => obj.didChangeAppLifecycleState(state));
@@ -842,7 +796,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     ///     setState(() { _lastSize = ui.window.physicalSize; });
     ///   }
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.didChangeMetrics());
     _controllerList.forEach((ControllerMVC con) => con.didChangeMetrics());
@@ -872,7 +826,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     ///     setState(() { _lastTextScaleFactor = ui.window.textScaleFactor; });
     ///   }
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.didChangeTextScaleFactor());
     _controllerList
@@ -896,7 +850,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     ///
     /// This method exposes notifications from [Window.onLocaleChanged].
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.didChangeLocale(locale));
     _controllerList.forEach((ControllerMVC con) => con.didChangeLocale(locale));
@@ -918,7 +872,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// This method exposes the `memoryPressure` notification from
     /// [SystemChannels.system].
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.didHaveMemoryPressure());
     _controllerList.forEach((ControllerMVC con) => con.didHaveMemoryPressure());
@@ -940,7 +894,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     ///
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
 
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList
         .forEach((StateListener obj) => obj.didChangeAccessibilityFeatures());
@@ -957,24 +911,30 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     }
   }
 
+  /// A flag indicating this is the very first build.
+  bool _firstBuild = true;
+
   /// Called when a dependency of this [State] object changes.
   @protected
   @override
   @mustCallSuper
   void didChangeDependencies() {
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.didChangeDependencies());
     _controllerList.forEach((ControllerMVC con) => con.didChangeDependencies());
     _afterList.forEach((StateListener obj) => obj.didChangeDependencies());
     super.didChangeDependencies();
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested && !_firstBuild) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
       refresh();
     }
+
+    /// Not the first build now.
+    _firstBuild = false;
   }
 
   /// Called whenever the application is reassembled during debugging, for
@@ -983,7 +943,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   @mustCallSuper
   @override
   void reassemble() {
-    /// No 'setState()' functions are allowed to fully function at the point.
+    /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener obj) => obj.reassemble());
     _controllerList.forEach((ControllerMVC con) => con.reassemble());
@@ -1042,7 +1002,7 @@ Function(FlutterErrorDetails details) _recOnError() {
 }
 
 /// Add, List, and Remove Listeners.
-class _StateListener {
+class _StateListeners {
   List<StateListener> get _beforeList => _listenersBefore.toList();
   List<StateListener> beforeList(List<String> keys) {
     return _getList(keys, _listenersBefore);
@@ -1124,86 +1084,44 @@ class _StateListener {
 }
 
 class _ControllerListing {
-  _ControllerList _controllers = _ControllerList();
-
-  set stateMVC(StateMVC stateMVC) {
-    bool unassigned = _controllers.mvcState == null;
-    assert(unassigned, "Already assigned a 'StateView!'");
-    if (unassigned) _controllers.mvcState = stateMVC;
-  }
-
-  // Don't use this one so subclasses to use 'con.'
-//  set controller(ControllerMVC c) {
-//    add(c);
-//  }
+  StateMVC _stateMVC;
 
   // Keep it private to allow subclasses to use 'con.'
   ControllerMVC _con(String keyId) {
-    return _controllers.controller(keyId);
-  }
-
-  String add(ControllerMVC c) {
-    return _controllers.add(c);
+    if (keyId == null || keyId.isEmpty) return null;
+    return _map[keyId];
   }
 
   void addList(List<ControllerMVC> list) =>
       list.forEach((ControllerMVC con) => add(con));
 
-  bool contains(ControllerMVC c) => _controllers.contains(c);
-
-  bool remove(String keyId) => _controllers.remove(keyId);
-
-  List<ControllerMVC> listControllers(List<String> keys) {
-    return controllers(keys).values.toList();
-  }
+  List<ControllerMVC> listControllers(List<String> keys) =>
+      controllers(keys).values.toList();
 
   /// Never supply a public list of Controllers. User must know the key identifier(s).
-  List<ControllerMVC> get _controllerList => _controllers.asList;
+  List<ControllerMVC> get _controllerList => asList; //_controllers.asList;
 
   Map<String, ControllerMVC> controllers(List<String> keys) {
     Map<String, ControllerMVC> controllers = {};
-    keys.forEach((String key) => controllers[key] = _controllers.map[key]);
+    keys.forEach(
+        (String key) => controllers[key] = map[key]); //_controllers.map[key]);
     return controllers;
   }
 
-// Not being used. I think. Deprecated
-//  /// Never supply a public list of Controllers. User must know the key identifier(s).
-//  Map<String, ControllerMVC> get _cons => _controllers.map;
-
-  void disposeControllerListing() => _controllers.dispose();
-}
-
-class _ControllerList {
-  StateMVC mvcState;
-
   final Map<String, ControllerMVC> _map = Map();
+
   Map<String, ControllerMVC> get map => _map;
 
   List<ControllerMVC> get asList => _map.values.toList();
 
-  ControllerMVC controller(String keyId) {
-    if (keyId == null || keyId.isEmpty) return null;
-    return _map[keyId];
-  }
-
   String add(ControllerMVC con) {
     if (con == null) return '';
 
-    /// It's being passed in again. It happens. Simply return key id.
-    if (con.stateView != null && con.stateView == mvcState) return con._keyId;
-
-    bool unassigned = con.stateView == null;
-    assert(unassigned, "A Controller can only be assigned to one View!");
-
-    /// Return blank in production.
-    /// If already assigned to another view.
-    if (!unassigned) return '';
-
-    /// This setter connects the State Object! Associates to a View!
-    con.stateView = mvcState;
+    /// This connects the State Object! Associates to a View!
+    con._addState(_stateMVC);
 
     /// It's already there?! Return its key.
-    return (contains(con)) ? con._keyId : _addConId(con, _map);
+    return (contains(con)) ? con._keyId : addConId(con);
   }
 
   bool remove(String keyId) {
@@ -1214,16 +1132,16 @@ class _ControllerList {
 
   bool contains(ControllerMVC con) => _map.containsValue(con);
 
-  void dispose() => _map.clear();
+  void disposeControllerListing() => _map.clear();
+
+  String addConId(ControllerMVC con) {
+    String keyId = _addKeyId(con);
+    _map[keyId] = con;
+    return keyId;
+  }
 }
 
-String _addConId(ControllerMVC con, Map<String, ControllerMVC> map) {
-  String keyId = _addKeyId(con);
-  map[keyId] = con;
-  return keyId;
-}
-
-String _addKeyId(_StateView sv) {
+String _addKeyId(_StateObserver sv) {
   String keyId = sv._keyId;
 
   /// May already have been assigned a key.
@@ -1309,8 +1227,8 @@ abstract class AppMVC extends StatefulWidget {
   }
 }
 
-class _AppState extends StateMVC<AppMVC>{
-  _AppState(ControllerMVC con): super(con);
+class _AppState extends StateMVC<AppMVC> {
+  _AppState(ControllerMVC con) : super(con);
 
   void initState() {
     running = true;
@@ -1319,6 +1237,7 @@ class _AppState extends StateMVC<AppMVC>{
 //    add(widget.con);
     super.initState();
   }
+
   /// If this class is running, indicate it so.
   static bool running = false;
 
@@ -1336,7 +1255,7 @@ class _AppState extends StateMVC<AppMVC>{
 
 // Uuid
 // Copyright 2018 The Flutter Architecture Sample Authors. All rights reserved.
-// Use of this Uuid function is governed by the MIT license that can be found
+// Use of this Uuid function is governed by the M.I.T. license that can be found
 // in the LICENSE file under Uuid.
 //
 /// A UUID generator, useful for generating unique IDs for your Todos.
