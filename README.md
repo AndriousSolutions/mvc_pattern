@@ -247,7 +247,7 @@ class RandomWords extends StatefulWidgetMVC {
   RandomWords() : super(RandomWordsState(Con()));
 }
 
-class RandomWordsState extends StateMVC {
+class RandomWordsState extends StateMVC<RandomWords> {
   RandomWordsState(Con con) : super(con);
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18.0);
@@ -424,10 +424,6 @@ Iterable<String> makeWordPairs(int count) {
 
 Further information on the MVC package can be found in the article, [‘Flutter + MVC at Last!’](https://medium.com/p/275a0dc1e730/)
 [![online article](https://user-images.githubusercontent.com/32497443/47087365-c9524f80-d1e9-11e8-85e5-6c8bbabb18cc.png)](https://medium.com/flutter-community/flutter-mvc-at-last-275a0dc1e730)
-# DECODE Flutter
-##### Live Streaming every week. Everything to do about Flutter. 
-[![twitch](https://user-images.githubusercontent.com/32497443/49753449-7349d780-fc81-11e8-9d08-89146a6731c8.png)
-](https://medium.com/@greg.perry/decode-flutter-6b60a3199e83)
 
 [Repository (GitHub)](https://github.com/AndriousSolutions/mvc_pattern)
 
