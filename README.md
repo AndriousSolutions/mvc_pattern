@@ -15,7 +15,7 @@ What data does the View display? It doesn’t know nor does it care! It ‘talks
 the Controller instead. Again, it is the Controller that determines ‘what’ data
 the View displays. In this example, it’s a title and a counter. And when a button is pressed, the View again ‘talks to’ the Controller to address the event
 (i.e. calls one of the Controller’s public functions, **incrementCounter()**).
-![myhomepage](https://user-images.githubusercontent.com/32497443/48676501-dab6b080-eb35-11e8-93ab-8bbfc6f8bc6b.jpg)
+![myhomepage](https://user-images.githubusercontent.com/32497443/51762124-da3e1700-209c-11e9-9eca-9741f5c668a6.jpg)
 In this arrangement, the Controller is ‘talking back’ to the View by calling the
 View’s function, **setState()**, telling it to rebuild the widget tree.
 
