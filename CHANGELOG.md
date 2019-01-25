@@ -40,10 +40,13 @@
 ######                          Removed StatelessWidgetMVC
 ###### [2.0.1] - Jan. 16, 2019. AppMVC({this.con, Key key}) : super(key: key);
 ###### [2.0.2] - Jan. 19, 2019. void addState(StateMVC state) {
-###### [3.0.0] - Jan. 21, 2019. 
+###### [3.0.0] - Jan. 25, 2019. 
 ######                          Changed class StateListener to a mixin
 ######                          addState() in Controller and Listener adding any number of Views
 ######                          abstract class StateViewMVC<T extends StatefulWidget> extends StateMVC<T>
+######                          class ViewMVC extends _StateObserver with _ControllerListing 
 ######                          void didChangeDependencies() will not refresh() on first build
 ######                          Removed from Controllers the getters: widget, context, mounted
 ######                          stateView getter is deprecated. Replaced by stateMVC. Removed stateMVC setter.
+######                          Removed controller setter in class ViewMVC
+######                          if (con is AppConMVC) //bool addBeforeListener(StateListener listener)

@@ -23,18 +23,19 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/material.dart';
-
 /// To try this example,
 /// Uncomment the import statement the line in the function, makeWordPairs(), below.
 /// Of course, that means you'll have to modify your pubspec.yaml file.
 //import 'package:english_words/english_words.dart';
+
+import 'package:flutter/material.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
