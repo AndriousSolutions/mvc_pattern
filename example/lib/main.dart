@@ -35,7 +35,6 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
