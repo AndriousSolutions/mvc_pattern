@@ -71,7 +71,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
               MyApp.title,
             ),
             Text(
-              '${Model.counter}',
+              '${Controller.displayThis}',
               style: Theme.of(context).textTheme.display1,
             ),
           ],
@@ -79,7 +79,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(Controller.incrementCounter);
+          setState(Controller.whatever);
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -89,7 +89,9 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  static void incrementCounter() => Model._incrementCounter();
+  /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
+  static int get displayThis => Model.counter;
+  static void whatever() => Model._incrementCounter();
 }
 
 class Model {

@@ -162,11 +162,11 @@ mixin _StateSetter {
     _stateMVCSet.add(state);
   }
 
-//  bool _removeState(StateMVC state) {
-//    if (state == null) return false;
-//    if (state == _stateMVC) return _disposeState();
-//    return _stateMVCSet.remove(state);
-//  }
+  bool _removeState(StateMVC state) {
+    if (state == null) return false;
+    if (state == _stateMVC) return _disposeState();
+    return _stateMVCSet.remove(state);
+  }
 
   bool _disposeState() {
     // Don't continue if null.
@@ -322,7 +322,8 @@ mixin StateListener {
 
 /// Main State Object seen as the 'StateView.'
 abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
-    with WidgetsBindingObserver, _ControllerListing, _StateListeners {
+    with WidgetsBindingObserver, _ControllerListing, _StateListeners
+    implements StateListener {
   /// The View!
   Widget build(BuildContext context);
 
@@ -333,7 +334,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   static final FlutterExceptionHandler _defaultError = FlutterError.onError;
 
   /// With an optional Controller parameter, this constructor imposes its own Errror Handler.
-  StateMVC([ControllerMVC _con]) : _oldOnError = _recOnError() {
+  StateMVC([this._controller]) : _oldOnError = _recOnError() {
     /// If a tester is running. Don't switch out its error handler.
     if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
@@ -352,11 +353,22 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
     /// Any subsequent calls to add() will be assigned, stateMVC.
     _stateMVC = this;
-    add(_con);
+    add(_controller);
   }
+  ControllerMVC _controller;
 
   /// Save the original Error Handler.
   final Function(FlutterErrorDetails details) _oldOnError;
+
+  /// Provide the 'main' controller to this 'State View.'
+  /// If _controller == null, get the 'first assigned' controller.
+  ControllerMVC get controller {
+    if(_controller == null) _controller = firstCon;
+    return _controller;
+  }
+
+  /// Retrieve a Controller by its a unique String identifier.
+  ControllerMVC controllerById(String keyId) => super._con(keyId);
 
   /// Add a specific Controller to this View.
   /// Returns the Controller's unique String identifier.
@@ -468,6 +480,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _rebuildRequested = false;
     WidgetsBinding.instance.removeObserver(this);
 
+    /// Remove any 'Controller' reference
+    _controller = null;
     /// Return the original error routine.
     FlutterError.onError = _oldOnError;
     super.dispose();
@@ -848,7 +862,7 @@ class _ControllerListing {
       controllers(keys).values.toList();
 
   /// Never supply a public list of Controllers. User must know the key identifier(s).
-  List<ControllerMVC> get _controllerList => asList; //_controllers.asList;
+  List<ControllerMVC> get _controllerList => _asList; //_controllers.asList;
 
   Map<String, ControllerMVC> controllers(List<String> keys) {
     Map<String, ControllerMVC> controllers = {};
@@ -861,12 +875,12 @@ class _ControllerListing {
 
   Map<String, ControllerMVC> get map => _map;
 
-  List<ControllerMVC> get asList => _map.values.toList();
+  List<ControllerMVC> get _asList => _map.values.toList();
 
   String add(ControllerMVC con) {
     if (con == null) return '';
 
-    /// This connects the State Object! Associates to a View!
+    /// This connects the Controller to this View!
     con._addState(_stateMVC);
 
     /// It's already there?! Return its key.
@@ -874,10 +888,16 @@ class _ControllerListing {
   }
 
   bool remove(String keyId) {
-    var there = _map[keyId] != null;
-    if (there) _map.remove(keyId);
+    var con = _map[keyId];
+    var there = con != null;
+    if (there){
+      con._removeState(_stateMVC);
+      _map.remove(keyId);
+    }
     return there;
   }
+
+  ControllerMVC get firstCon => _asList.first;
 
   bool contains(ControllerMVC con) => _map.containsValue(con);
 

@@ -50,3 +50,5 @@
 ######                          stateView getter is deprecated. Replaced by stateMVC. Removed stateMVC setter.
 ######                          Removed controller setter in class ViewMVC
 ######                          if (con is AppConMVC) //bool addBeforeListener(StateListener listener)
+###### [3.1.0] - Jan. 26, 2019. StateViewMVC implements StateListener & get controller 
+       

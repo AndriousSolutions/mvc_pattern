@@ -27,53 +27,36 @@ import 'package:flutter/material.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends AppMVC {
-  /// Supply 'the Controller' for this application.
-  MyApp({Key key}) : super(con: Controller(), key: key);
-
-  static final String title = 'Flutter Demo Home Page';
-
-  @override
-
-  /// This is 'the View' for this application.
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-    );
-  }
-}
-
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
+
   // Fields in a Widget subclass are always marked "final".
-  @protected
+
+  final String title = 'Flutter Demo Home Page';
+
   @override
-  createState() => _MyHomePageState();
+  _MyHomePageState createState() => new _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final Controller _con = Controller.con;
+class _MyHomePageState extends StateMVC<MyHomePage> {
+  _MyHomePageState(): super(Controller()){
+    _con = controller;
+  }
+  Controller _con;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(MyApp.title),
+        // Here we take a property value from the MyHomePage Widget, and we use it to set our appbar title.
+        title: Text(widget.title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              MyApp.title,
+              widget.title,
             ),
             Text(
               '${_con.counter}',
@@ -84,7 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _con.incrementCounter();
+          setState(
+              _con.incrementCounter
+          );
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -94,21 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  /// Singleton Factory
-  factory Controller() {
-    if (_this == null) _this = Controller._();
-    return _this;
-  }
-  static Controller _this;
-
-  Controller._();
-
-  /// Allow for easy access to 'the Controller' throughout the application.
-  static Controller get con => _this;
-
   int get counter => _counter;
   int _counter = 0;
-  void incrementCounter() => setState(() {
-        _counter++;
-      });
+  void incrementCounter() => _counter++;
 }

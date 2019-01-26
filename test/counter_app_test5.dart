@@ -29,13 +29,10 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends AppMVC {
-  /// Supply 'the Controller' for this application.
-  MyApp({Key key}) : super(con: Controller(), key: key);
+class MyApp extends StatelessWidget {
+  MyApp({Key key}) : super(key: key);
 
   static final String title = 'Flutter Demo Home Page';
-
-  @override
 
   /// This is 'the View' for this application.
   Widget build(BuildContext context) {
@@ -51,25 +48,13 @@ class MyApp extends AppMVC {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
-  // Fields in a Widget subclass are always marked "final".
   @protected
   @override
   createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-
-  @override
-  void initState(){
-    super.initState();
-    /// Add to StateMVC to then access the State Object's lifecycle events.
-    String id = add(Controller.con);
-    /// More than one way to then access your Controller.
-    _con = controllerById(id);
-    _con = controller;
-  }
-  Controller _con;
-
+  _MyHomePageState() : super(Controller());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +71,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
               MyApp.title,
             ),
             Text(
-              '${_con.counter}',
+              '${Model.counter}',
               style: Theme.of(context).textTheme.display1,
             ),
           ],
@@ -94,7 +79,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _con.incrementCounter();
+          setState(Controller.incrementCounter);
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -104,21 +89,11 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  /// Singleton Factory
-  factory Controller() {
-    if (_this == null) _this = Controller._();
-    return _this;
-  }
-  static Controller _this;
+  static void incrementCounter() => Model._incrementCounter();
+}
 
-  Controller._();
-
-  /// Allow for easy access to 'the Controller' throughout the application.
-  static Controller get con => _this;
-
-  int get counter => _counter;
-  int _counter = 0;
-  void incrementCounter() => setState(() {
-        _counter++;
-      });
+class Model {
+  static int get counter => _counter;
+  static int _counter = 0;
+  static int _incrementCounter() => ++_counter;
 }

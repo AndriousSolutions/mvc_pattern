@@ -29,10 +29,12 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends AppMVC {
   MyApp({Key key}) : super(key: key);
 
   static final String title = 'Flutter Demo Home Page';
+
+  @override
 
   /// This is 'the View' for this application.
   Widget build(BuildContext context) {
@@ -55,7 +57,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-  _MyHomePageState() : super(Controller());
+
+  /// The Controller then has access the State Object's lifecycle events.
+  _MyHomePageState():super(Controller());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +77,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
               MyApp.title,
             ),
             Text(
-              '${Controller.displayThis}',
+              '${Controller.counter}',
               style: Theme.of(context).textTheme.display1,
             ),
           ],
@@ -80,7 +85,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(Controller.whatever);
+          setState(Controller.incrementCounter);
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -90,13 +95,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
-  static int get displayThis => Model.counter;
-  static void whatever() => Model._incrementCounter();
-}
-
-class Model {
   static int get counter => _counter;
   static int _counter = 0;
-  static int _incrementCounter() => ++_counter;
+  static void incrementCounter() => _counter++;
 }

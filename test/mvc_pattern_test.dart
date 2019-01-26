@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
-import 'counter_app_test.dart';
-//import 'counter_app_test2.dart';
+//import 'counter_app_test.dart';
+import 'counter_app_test2.dart';
 //import 'counter_app_test3.dart';
 //import 'counter_app_test4.dart';
 
