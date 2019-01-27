@@ -27,19 +27,42 @@ import 'package:flutter/material.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
+void main() => runApp(MyApp());
+
+class MyApp extends AppMVC {
+  MyApp({Key key}) : super(key: key);
+
+  static final String title = 'Flutter Demo Home Page';
+  final MyHomePage home = MyHomePage(title);
+
+  ControllerMVC get controller => home.controller;
+
+  /// This is 'the View' for this application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: title,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: home,
+    );
+  }
+}
+
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  MyHomePage(this.title, {Key key}) : super(key: key);
+  final String title;
+  final _MyHomePageState state = _MyHomePageState();
 
-  // Fields in a Widget subclass are always marked "final".
-
-  final String title = 'Flutter Demo Home Page';
+  Controller get controller => state.controller;
 
   @override
-  _MyHomePageState createState() => new _MyHomePageState();
+  State createState() => state;
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-  _MyHomePageState(): super(Controller()){
+  _MyHomePageState() : super(Controller()) {
     _con = controller;
   }
   Controller _con;
@@ -67,9 +90,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(
-              _con.incrementCounter
-          );
+          setState(_con.incrementCounter);
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),

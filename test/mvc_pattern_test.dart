@@ -21,7 +21,7 @@ void main() {
     MyApp _app = tester.widget(find.byKey(key));
 
     /// Reference to the Controller.
-    Controller _con = _app.con;
+    Controller _con = _app.controller;
 
     /// Reference to the StateMVC.
     StateMVC _sv = _con.stateMVC;

@@ -363,7 +363,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Provide the 'main' controller to this 'State View.'
   /// If _controller == null, get the 'first assigned' controller.
   ControllerMVC get controller {
-    if(_controller == null) _controller = firstCon;
+    if (_controller == null) _controller = firstCon;
     return _controller;
   }
 
@@ -482,6 +482,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// Remove any 'Controller' reference
     _controller = null;
+
     /// Return the original error routine.
     FlutterError.onError = _oldOnError;
     super.dispose();
@@ -890,7 +891,7 @@ class _ControllerListing {
   bool remove(String keyId) {
     var con = _map[keyId];
     var there = con != null;
-    if (there){
+    if (there) {
       con._removeState(_stateMVC);
       _map.remove(keyId);
     }
@@ -1124,6 +1125,9 @@ abstract class AppMVC extends StatefulWidget {
   /// Simple constructor. Calls the initApp() function.
   AppMVC({this.con, Key key}) : super(key: key);
   final ControllerMVC con;
+
+  /// Get the controller
+  ControllerMVC get controller => con;
 
   /// Create the View!
   Widget build(BuildContext context);

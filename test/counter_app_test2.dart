@@ -35,12 +35,11 @@ class MyApp extends AppMVC {
 
   static final String title = 'Flutter Demo Home Page';
 
-  @override
-
   /// This is 'the View' for this application.
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: title,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -58,16 +57,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-
   @override
-  void initState(){
+  void initState() {
     super.initState();
+
     /// Add to StateMVC to then access the State Object's lifecycle events.
     String id = add(Controller.con);
+
     /// More than one way to then access your Controller.
     _con = controllerById(id);
     _con = controller;
   }
+
   Controller _con;
 
   @override

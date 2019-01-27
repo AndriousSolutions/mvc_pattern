@@ -57,9 +57,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-
   /// The Controller then has access the State Object's lifecycle events.
-  _MyHomePageState():super(Controller());
+  _MyHomePageState() : super(Controller());
 
   @override
   Widget build(BuildContext context) {
