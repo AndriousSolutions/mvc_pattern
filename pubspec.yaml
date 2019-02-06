@@ -6,7 +6,7 @@ homepage: https://github.com/AndriousSolutions/mvc_pattern
 
 # SDK Version
 environment:
-  sdk: ">=2.0.0 <5.0.0"
+  sdk: ">=2.0.0 <3.0.0"
 
 dependencies:
   flutter:
