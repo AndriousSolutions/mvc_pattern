@@ -51,4 +51,4 @@
 ######                          Removed controller setter in class ViewMVC
 ######                          if (con is AppConMVC) //bool addBeforeListener(StateListener listener)
 ###### [3.1.0] - Jan. 26, 2019. StateViewMVC implements StateListener & get controller 
-       
+###### [3.2.0] - Jan. 30, 2019. Deprecated Error Handler from Controller. Removed refresh(); from initState() & deactiveate

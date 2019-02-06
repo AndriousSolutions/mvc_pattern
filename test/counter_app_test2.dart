@@ -50,7 +50,6 @@ class MyApp extends AppMVC {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
-  // Fields in a Widget subclass are always marked "final".
   @protected
   @override
   createState() => _MyHomePageState();
@@ -75,8 +74,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
+        // Using a static reference to set our appbar title.
         title: Text(MyApp.title),
       ),
       body: Center(

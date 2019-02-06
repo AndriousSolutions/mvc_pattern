@@ -71,27 +71,27 @@ abstract class ControllerMVC extends _StateObserver {
 }
 
 class _StateObserver with _StateSetter, StateListener {
-  /// Records the current error handler and supplies its own.
-  _StateObserver() : _oldOnError = _recOnError() {
-    /// If a tester is running. Don't switch out its error handler.
-    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
-      /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
-      FlutterError.onError = (FlutterErrorDetails details) {
-        var thisOnError = onError;
-
-        /// Always favour a custom error handler.
-        if (thisOnError == StateMVC._defaultError &&
-            _oldOnError != StateMVC._defaultError) {
-          _oldOnError(details);
-        } else {
-          onError(details);
-        }
-      };
-    }
-  }
-
-  /// Save the current Error Handler.
-  final Function(FlutterErrorDetails details) _oldOnError;
+//  /// Records the current error handler and supplies its own.
+//  _StateObserver() : _oldOnError = _recOnError() {
+//    /// If a tester is running. Don't switch out its error handler.
+//    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
+//      /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
+//      FlutterError.onError = (FlutterErrorDetails details) {
+//        var thisOnError = onError;
+//
+//        /// Always favour a custom error handler.
+//        if (thisOnError == StateMVC._defaultError &&
+//            _oldOnError != StateMVC._defaultError) {
+//          _oldOnError(details);
+//        } else {
+//          onError(details);
+//        }
+//      };
+//    }
+//  }
+//
+//  /// Save the current Error Handler.
+//  final Function(FlutterErrorDetails details) _oldOnError;
 
   StateMVC get stateMVC => _stateMVC;
 
@@ -136,9 +136,6 @@ class _StateObserver with _StateSetter, StateListener {
   /// Dispose the State Object and Controller references.
   @mustCallSuper
   void dispose() {
-    /// Return to the original error routine.
-    FlutterError.onError = _oldOnError;
-
     /// The view association is severed.
     _disposeState();
     super.dispose();
@@ -148,6 +145,7 @@ class _StateObserver with _StateSetter, StateListener {
   /// Allows the user to define their own with each Controller.
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
+  @deprecated
   void onError(FlutterErrorDetails details) =>
       FlutterError.dumpErrorToConsole(details);
 }
@@ -422,12 +420,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _controllerList.forEach((ControllerMVC con) => con.initState());
     _afterList.forEach((StateListener listener) => listener.initState());
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
-      _rebuildRequested = false;
-
-      /// Perform a 'rebuild' if requested.
-      refresh();
-    }
   }
 
   /// The framework calls this method whenever it removes this [State] object
@@ -449,12 +441,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _afterList.forEach((StateListener listener) => listener.deactivate());
     super.deactivate();
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
-      _rebuildRequested = false;
-
-      /// Perform a 'rebuild' if requested.
-      refresh();
-    }
   }
 
   /// The framework calls this method when this [State] object will never
@@ -739,7 +725,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   }
 
   /// Allows the user to call setState() within the Controller.
-  // Note not 'protected' and so can be called by 'anyone.' -gp
   void refresh() {
     if (mounted) {
       /// Refresh the interface by 'rebuilding' the Widget Tree
@@ -1126,7 +1111,7 @@ abstract class AppMVC extends StatefulWidget {
   AppMVC({this.con, Key key}) : super(key: key);
   final ControllerMVC con;
 
-  /// Get the controller
+  /// Get the controller if any
   ControllerMVC get controller => con;
 
   /// Create the View!
