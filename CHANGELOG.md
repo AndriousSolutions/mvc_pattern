@@ -53,3 +53,4 @@
 ###### [3.1.0] - Jan. 26, 2019. StateViewMVC implements StateListener & get controller 
 ###### [3.2.0] - Jan. 30, 2019. Deprecated Error Handler from Controller. Removed refresh(); from initState() & deactiveate
 ###### [3.2.1] - Feb. 06, 2019. Update the upper bound of the SDK constraint to <3.0.0
+###### [3.2.2] - Feb. 17, 2019. _oldOnError = _recOnError()
