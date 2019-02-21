@@ -1128,8 +1128,9 @@ abstract class AppMVC extends StatefulWidget {
   /// Called by the MVCApp.init() function.
   @mustCallSuper
   Future<bool> init() async {
-    if (con is AppConMVC) (con as AppConMVC)?.init();
-    return Future.value(true);
+    bool init = true;
+    if (con is AppConMVC) init = await (con as AppConMVC)?.init();
+    return Future.value(init);
   }
 
   /// Called in State object.
