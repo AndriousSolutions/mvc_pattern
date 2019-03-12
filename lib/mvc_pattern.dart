@@ -71,27 +71,6 @@ abstract class ControllerMVC extends _StateObserver {
 }
 
 class _StateObserver with _StateSetter, StateListener {
-//  /// Records the current error handler and supplies its own.
-//  _StateObserver() : _oldOnError = _recOnError() {
-//    /// If a tester is running. Don't switch out its error handler.
-//    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
-//      /// This allows you to place a breakpoint at 'onError(details)' to determine error location.
-//      FlutterError.onError = (FlutterErrorDetails details) {
-//        var thisOnError = onError;
-//
-//        /// Always favour a custom error handler.
-//        if (thisOnError == StateMVC._defaultError &&
-//            _oldOnError != StateMVC._defaultError) {
-//          _oldOnError(details);
-//        } else {
-//          onError(details);
-//        }
-//      };
-//    }
-//  }
-//
-//  /// Save the current Error Handler.
-//  final Function(FlutterErrorDetails details) _oldOnError;
 
   StateMVC get stateMVC => _stateMVC;
 
@@ -226,6 +205,14 @@ mixin StateListener {
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
   }
 
+  /// Called when the system changes the set of active accessibility features.
+  void didChangeAccessibilityFeatures() {
+    /// Called when the system changes the set of currently active accessibility
+    /// features.
+    ///
+    /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
+  }
+
   /// Called when the system puts the app in the background or returns the app to the foreground.
   void didChangeAppLifecycleState(AppLifecycleState state) {
     /// Passing these possible values:
@@ -233,6 +220,15 @@ mixin StateListener {
     /// AppLifecycleState.resumed
     /// AppLifecycleState.inactive (may be paused at any time)
     /// AppLifecycleState.suspending (Android only)
+  }
+
+  /// Called when the system tells the app that the user's locale has changed.
+  void didChangeLocale(Locale locale) {
+    /// Called when the system tells the app that the user's locale has
+    /// changed. For example, if the user changes the system language
+    /// settings.
+    ///
+    /// This method exposes notifications from [Window.onLocaleChanged].
   }
 
   /// Called when the application's dimensions change. For example,
@@ -269,29 +265,12 @@ mixin StateListener {
     ///   }
   }
 
-  /// Called when the system tells the app that the user's locale has changed.
-  void didChangeLocale(Locale locale) {
-    /// Called when the system tells the app that the user's locale has
-    /// changed. For example, if the user changes the system language
-    /// settings.
-    ///
-    /// This method exposes notifications from [Window.onLocaleChanged].
-  }
-
   /// Called when the system is running low on memory.
   void didHaveMemoryPressure() {
     /// Called when the system is running low on memory.
     ///
     /// This method exposes the `memoryPressure` notification from
     /// [SystemChannels.system].
-  }
-
-  /// Called when the system changes the set of active accessibility features.
-  void didChangeAccessibilityFeatures() {
-    /// Called when the system changes the set of currently active accessibility
-    /// features.
-    ///
-    /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
   }
 
   /// Called when a dependency of this [State] object changes.
@@ -440,7 +419,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _controllerList.forEach((ControllerMVC con) => con.deactivate());
     _afterList.forEach((StateListener listener) => listener.deactivate());
     super.deactivate();
-    _rebuildAllowed = true;
+    /// In some cases, if then reinserted back in another part of the tree
+    /// the build is called, and so setState() is not necessary.
+    _rebuildRequested = false;
   }
 
   /// The framework calls this method when this [State] object will never
@@ -460,9 +441,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _disposeControllerListing();
     _afterList.forEach((StateListener listener) => listener.dispose());
     _disposeStateEventList();
-
     /// Should not be 'rebuilding' anyway. This Widget is going away.
-    _rebuildAllowed = true;
     _rebuildRequested = false;
     WidgetsBinding.instance.removeObserver(this);
 
@@ -483,7 +462,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// The framework always calls [build] after calling [didUpdateWidget], which
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
 
-    /// No 'setState()' functions are allowed to fully function at this point.
+    /// No 'setState()' functions are allowed
+    /// The framework always calls build after calling didUpdateWidget,
+    /// which means any calls to setState in didUpdateWidget are redundant.
     _rebuildAllowed = false;
     _beforeList.forEach(
         (StateListener listener) => listener.didUpdateWidget(oldWidget));
@@ -492,13 +473,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _afterList.forEach(
         (StateListener listener) => listener.didUpdateWidget(oldWidget));
     super.didUpdateWidget(oldWidget);
-    _rebuildAllowed = true;
-    if (_rebuildRequested) {
-      _rebuildRequested = false;
-
-      /// Perform a 'rebuild' if requested.
-      refresh();
-    }
+    /// No 'setState()' functions are necessary
+    _rebuildRequested = false;
+    /// The framework always calls build after calling didUpdateWidget,
+    /// which means any calls to setState in didUpdateWidget are redundant.
   }
 
   /// Called when the system puts the app in the background or returns the app to the foreground.
@@ -691,8 +669,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _firstBuild = false;
   }
 
-  /// Called whenever the application is reassembled during debugging, for
-  /// example during hot reload.
+  /// During development, if a hot reload occurs, the reassemble method is called.
+  /// This provides an opportunity to reinitialize any data that was prepared
+  /// in the initState method.
   @protected
   @mustCallSuper
   @override
@@ -703,13 +682,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _controllerList.forEach((ControllerMVC con) => con.reassemble());
     _afterList.forEach((StateListener listener) => listener.reassemble());
     super.reassemble();
-    _rebuildAllowed = true;
-    if (_rebuildRequested) {
-      _rebuildRequested = false;
-
-      /// Perform a 'rebuild' if requested.
-      refresh();
-    }
+    /// No 'setState()' function is necessary
+    _rebuildRequested = false;
+    /// The framework always calls build with a hot reload.
   }
 
   /// Allows 'external' routines can call this function.
