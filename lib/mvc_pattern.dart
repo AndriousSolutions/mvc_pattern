@@ -59,7 +59,7 @@ import 'package:flutter_test/flutter_test.dart'
 
 /// Controller Class
 /// Your 'working' class most concerned with the app's functionality.
-abstract class ControllerMVC extends _StateObserver {
+class ControllerMVC extends _StateObserver {
   ControllerMVC([StateMVC state]) : super() {
     addState(state);
   }
@@ -89,22 +89,6 @@ class _StateObserver with _StateSetter, StateListener {
 
   /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
   void refresh() => _stateMVC?.refresh();
-
-//  /// Add a listener fired 'before' the main controller runs.
-//  bool addBeforeListener(StateListener listener) =>
-//      _stateMVC?.addBeforeListener(listener);
-//
-//  /// Add a listener fired 'after' the main controller runs.
-//  bool addAfterListener(StateListener listener) =>
-//      _stateMVC?.addAfterListener(listener);
-//
-//  /// Add a listener fired 'after' the main controller runs.
-//  bool addListener(StateListener listener) =>
-//      _stateMVC?.addAfterListener(listener);
-//
-//  /// Removes a specified listener.
-//  bool removeListener(StateListener listener) =>
-//      _stateMVC?.removeListener(listener);
 
   /// Retrieve the 'before' listener by its unique key.
   StateListener beforeListener(String key) => _stateMVC?.beforeListener(key);
@@ -213,23 +197,56 @@ mixin StateListener {
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
   }
 
-  /// Called when the system puts the app in the background or returns the app to the foreground.
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    /// Passing these possible values:
-    /// AppLifecycleState.paused (may enter the suspending state at any time)
-    /// AppLifecycleState.resumed
-    /// AppLifecycleState.inactive (may be paused at any time)
-    /// AppLifecycleState.suspending (Android only)
+  /// Called when a dependency of this [State] object changes.
+  void didChangeDependencies() {
+    /// Called when a dependency of this [State] object changes.
+    ///
+    /// For example, if the previous call to [build] referenced an
+    /// [InheritedWidget] that later changed, the framework would call this
+    /// method to notify this object about the change.
+    ///
+    /// This method is also called immediately after [initState]. It is safe to
+    /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
   }
 
-  /// Called when the system tells the app that the user's locale has changed.
-  void didChangeLocale(Locale locale) {
-    /// Called when the system tells the app that the user's locale has
-    /// changed. For example, if the user changes the system language
-    /// settings.
+  /// Called whenever the application is reassembled during debugging, for
+  /// example during hot reload.
+  void reassemble() {
+    /// Called whenever the application is reassembled during debugging, for
+    /// example during hot reload.
     ///
-    /// This method exposes notifications from [Window.onLocaleChanged].
+    /// This method should rerun any initialization logic that depends on global
+    /// state, for example, image loading from asset bundles (since the asset
+    /// bundle may have changed).
   }
+
+  /// Called when the system tells the app to pop the current route.
+  /// For example, on Android, this is called when the user presses
+  /// the back button.
+  ///
+  /// Observers are notified in registration order until one returns
+  /// true. If none return true, the application quits.
+  ///
+  /// Observers are expected to return true if they were able to
+  /// handle the notification, for example by closing an active dialog
+  /// box, and false otherwise. The [WidgetsApp] widget uses this
+  /// mechanism to notify the [Navigator] widget that it should pop
+  /// its current route if possible.
+  ///
+  /// This method exposes the `popRoute` notification from
+  /// [SystemChannels.navigation].
+  Future<bool> didPopRoute() => Future<bool>.value(true);
+  
+  /// Called when the host tells the app to push a new route onto the
+  /// navigator.
+  ///
+  /// Observers are expected to return true if they were able to
+  /// handle the notification. Observers are notified in registration
+  /// order until one returns true.
+  ///
+  /// This method exposes the `pushRoute` notification from
+  /// [SystemChannels.navigation].
+  Future<bool> didPushRoute(String route) => Future<bool>.value(true);
 
   /// Called when the application's dimensions change. For example,
   /// when a phone is rotated.
@@ -265,35 +282,35 @@ mixin StateListener {
     ///   }
   }
 
+  /// {@macro on_platform_brightness_change}
+  void didChangePlatformBrightness() {
+    /// Brightness changed.
+  }
+
+  /// Called when the system tells the app that the user's locale has changed.
+  void didChangeLocale(Locale locale) {
+    /// Called when the system tells the app that the user's locale has
+    /// changed. For example, if the user changes the system language
+    /// settings.
+    ///
+    /// This method exposes notifications from [Window.onLocaleChanged].
+  }
+
+  /// Called when the system puts the app in the background or returns the app to the foreground.
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    /// Passing these possible values:
+    /// AppLifecycleState.paused (may enter the suspending state at any time)
+    /// AppLifecycleState.resumed
+    /// AppLifecycleState.inactive (may be paused at any time)
+    /// AppLifecycleState.suspending (Android only)
+  }
+
   /// Called when the system is running low on memory.
   void didHaveMemoryPressure() {
     /// Called when the system is running low on memory.
     ///
     /// This method exposes the `memoryPressure` notification from
     /// [SystemChannels.system].
-  }
-
-  /// Called when a dependency of this [State] object changes.
-  void didChangeDependencies() {
-    /// Called when a dependency of this [State] object changes.
-    ///
-    /// For example, if the previous call to [build] referenced an
-    /// [InheritedWidget] that later changed, the framework would call this
-    /// method to notify this object about the change.
-    ///
-    /// This method is also called immediately after [initState]. It is safe to
-    /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
-  }
-
-  /// Called whenever the application is reassembled during debugging, for
-  /// example during hot reload.
-  void reassemble() {
-    /// Called whenever the application is reassembled during debugging, for
-    /// example during hot reload.
-    ///
-    /// This method should rerun any initialization logic that depends on global
-    /// state, for example, image loading from asset bundles (since the asset
-    /// bundle may have changed).
   }
 }
 
@@ -394,7 +411,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _controllerList.forEach((ControllerMVC con) => con._widget = widget);
     _beforeList.forEach((StateListener listener) => listener.initState());
     _controllerList.forEach((ControllerMVC con) => con.initState());
     _afterList.forEach((StateListener listener) => listener.initState());
@@ -571,7 +587,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// changed. For example, if the user changes the system language
   /// settings.
   @protected
-  //@override
   void didChangeLocale(Locale locale) {
     ///
     /// This method exposes notifications from [Window.onLocaleChanged].
@@ -1167,12 +1182,11 @@ abstract class AppMVC extends StatefulWidget {
 
   /// Create the 'controller' if not provided one.
   @override
-  State createState() => _AppState(con ?? AppConMVC());
+  State createState() => _AppState(con);
 }
 
 class _AppState extends StateMVC<AppMVC> {
-  _AppState(this.con) : super(con);
-  ControllerMVC con;
+  _AppState(ControllerMVC con) : super(con);
 
   void initState() {
     running = true;
