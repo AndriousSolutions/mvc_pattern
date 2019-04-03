@@ -1,5 +1,9 @@
 # MVC Pattern
 
+## 3.3.4
+ Apr. 03, 2019
+- *Correction* Controllers and Listeners dispose calls in the StateMVC were not an issue after all.
+
 ## 3.3.3
  Apr. 02, 2019
 - Call _disposeState() on all controllers when StateMVC is disposed.

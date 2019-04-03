@@ -455,11 +455,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach((StateListener listener) => listener.dispose());
-    /// Remove the reference to this Stat object!
-    _controllerList.forEach((ControllerMVC con) => con._disposeState());
+    _beforeList.forEach((StateListener listener) => listener.dispose());
+    _controllerList.forEach((ControllerMVC con) => con.dispose());
     _disposeControllerListing();
-//    _afterList.forEach((StateListener listener) => listener.dispose());
+    _afterList.forEach((StateListener listener) => listener.dispose());
     _disposeStateEventList();
 
     /// Should not be 'rebuilding' anyway. This Widget is going away.
@@ -467,7 +466,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     WidgetsBinding.instance.removeObserver(this);
 
     /// Remove any 'Controller' reference
-    _controller = null;
+   _controller = null;
 
     /// Return the original error routine.
     FlutterError.onError = _oldOnError;
