@@ -1,5 +1,9 @@
 # MVC Pattern
 
+## 3.3.2
+ Apr. 02, 2019
+- Proven prudent to not dispose any Controllers or Listeners in the StateMVC.
+ 
 ## 3.3.1
  Apr. 02, 2019
 - ControllerMVC getter 'states' returns a 'copy' of the Set of State objects. 
