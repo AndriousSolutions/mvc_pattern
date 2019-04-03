@@ -71,7 +71,6 @@ class ControllerMVC extends _StateObserver {
 }
 
 class _StateObserver with _StateSetter, StateListener {
-
   StateMVC get stateMVC => _stateMVC;
 
   /// Start using the getter, stateMVC
@@ -142,6 +141,9 @@ mixin _StateSetter {
     }
     return removed;
   }
+
+  /// Return a 'copy' of the Set of State objects.
+  Set<StateMVC> get states => Set.from(_stateMVCSet.whereType<StateMVC>());
 }
 
 /// Responsible for the event handling in all the Controllers, Listeners and Views.
@@ -236,7 +238,7 @@ mixin StateListener {
   /// This method exposes the `popRoute` notification from
   /// [SystemChannels.navigation].
   Future<bool> didPopRoute() => Future<bool>.value(true);
-  
+
   /// Called when the host tells the app to push a new route onto the
   /// navigator.
   ///
@@ -435,6 +437,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _controllerList.forEach((ControllerMVC con) => con.deactivate());
     _afterList.forEach((StateListener listener) => listener.deactivate());
     super.deactivate();
+
     /// In some cases, if then reinserted back in another part of the tree
     /// the build is called, and so setState() is not necessary.
     _rebuildRequested = false;
@@ -453,10 +456,18 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener listener) => listener.dispose());
-    _controllerList.forEach((ControllerMVC con) => con.dispose());
+    _controllerList.forEach((ControllerMVC con) {
+      if (con.states.length == 1) {
+        con.dispose();
+      } else {
+        // Merely remove state. It's going away.
+        con._disposeState();
+      }
+    });
     _disposeControllerListing();
     _afterList.forEach((StateListener listener) => listener.dispose());
     _disposeStateEventList();
+
     /// Should not be 'rebuilding' anyway. This Widget is going away.
     _rebuildRequested = false;
     WidgetsBinding.instance.removeObserver(this);
@@ -489,8 +500,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _afterList.forEach(
         (StateListener listener) => listener.didUpdateWidget(oldWidget));
     super.didUpdateWidget(oldWidget);
+
     /// No 'setState()' functions are necessary
     _rebuildRequested = false;
+
     /// The framework always calls build after calling didUpdateWidget,
     /// which means any calls to setState in didUpdateWidget are redundant.
   }
@@ -697,8 +710,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _controllerList.forEach((ControllerMVC con) => con.reassemble());
     _afterList.forEach((StateListener listener) => listener.reassemble());
     super.reassemble();
+
     /// No 'setState()' function is necessary
     _rebuildRequested = false;
+
     /// The framework always calls build with a hot reload.
   }
 
