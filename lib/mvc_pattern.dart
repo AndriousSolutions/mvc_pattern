@@ -456,14 +456,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
 //    _beforeList.forEach((StateListener listener) => listener.dispose());
-//    _controllerList.forEach((ControllerMVC con) {
-//      if (con.states.length == 1) {
-//        con.dispose();
-//      } else {
-//        // Merely remove state. It's going away.
-//        con._disposeState();
-//      }
-//    });
+    /// Remove the reference to this Stat object!
+    _controllerList.forEach((ControllerMVC con) => con._disposeState());
     _disposeControllerListing();
 //    _afterList.forEach((StateListener listener) => listener.dispose());
     _disposeStateEventList();
