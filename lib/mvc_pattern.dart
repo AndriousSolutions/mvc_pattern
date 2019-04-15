@@ -460,7 +460,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _disposeControllerListing();
     _afterList.forEach((StateListener listener) => listener.dispose());
     _disposeStateEventList();
-
+    //_rebuildAllowed = true; // Don't bother. Widget is terminating.
     /// Should not be 'rebuilding' anyway. This Widget is going away.
     _rebuildRequested = false;
     WidgetsBinding.instance.removeObserver(this);
@@ -492,13 +492,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         .forEach((ControllerMVC con) => con.didUpdateWidget(oldWidget));
     _afterList.forEach(
         (StateListener listener) => listener.didUpdateWidget(oldWidget));
+    _rebuildAllowed = true;
     super.didUpdateWidget(oldWidget);
 
     /// No 'setState()' functions are necessary
     _rebuildRequested = false;
 
-    /// The framework always calls build after calling didUpdateWidget,
-    /// which means any calls to setState in didUpdateWidget are redundant.
   }
 
   /// Called when the system puts the app in the background or returns the app to the foreground.
@@ -702,12 +701,11 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _beforeList.forEach((StateListener listener) => listener.reassemble());
     _controllerList.forEach((ControllerMVC con) => con.reassemble());
     _afterList.forEach((StateListener listener) => listener.reassemble());
+    _rebuildAllowed = true;
     super.reassemble();
-
     /// No 'setState()' function is necessary
-    _rebuildRequested = false;
-
     /// The framework always calls build with a hot reload.
+    _rebuildRequested = false;
   }
 
   /// Allows 'external' routines can call this function.

@@ -1,4 +1,6 @@
-# MVC Pattern
+## 3.3.5
+ Apr. 12, 2019
+- Return _rebuildAllowed = true; in didUpdateWidget() & reassemble()
 
 ## 3.3.4
  Apr. 03, 2019
