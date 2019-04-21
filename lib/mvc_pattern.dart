@@ -453,7 +453,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   @mustCallSuper
   void dispose() {
     /// Hot Reload may call dispose more than once which would error.
-    if(_disposed) return;
+    if (_disposed) return;
 
     /// The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
@@ -472,14 +472,14 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     WidgetsBinding.instance.removeObserver(this);
 
     /// Remove any 'Controller' reference
-   _controller = null;
+    _controller = null;
 
     /// Return the original error routine.
     FlutterError.onError = _oldOnError;
 
     /// This method has been called.
     _disposed = true;
-    
+
     super.dispose();
   }
 
@@ -507,7 +507,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are necessary
     _rebuildRequested = false;
-
   }
 
   /// Called when the system puts the app in the background or returns the app to the foreground.
@@ -713,6 +712,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _afterList.forEach((StateListener listener) => listener.reassemble());
     _rebuildAllowed = true;
     super.reassemble();
+
     /// No 'setState()' function is necessary
     /// The framework always calls build with a hot reload.
     _rebuildRequested = false;
