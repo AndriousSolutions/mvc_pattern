@@ -396,6 +396,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// May be set true to request a 'rebuild.'
   bool _rebuildRequested = false;
 
+  /// A flag to prevent dispose() called twice in a hot reload.
+  bool _disposed = false;
+
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
   @protected
@@ -449,6 +452,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   @override
   @mustCallSuper
   void dispose() {
+    /// Hot Reload may call dispose more than once which would error.
+    if(_disposed) return;
+
     /// The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
@@ -470,6 +476,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// Return the original error routine.
     FlutterError.onError = _oldOnError;
+
+    /// This method has been called.
+    _disposed = true;
+    
     super.dispose();
   }
 

@@ -1,3 +1,7 @@
+## 3.3.6
+ Apr. 21, 2019
+- Ensure StateMVC.dispose() is runs only once.  if(_disposed) return;
+
 ## 3.3.5
  Apr. 12, 2019
 - Return _rebuildAllowed = true; in didUpdateWidget() & reassemble()

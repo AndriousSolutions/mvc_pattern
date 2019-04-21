@@ -1,4 +1,5 @@
 #Root Files & Folders
+.gitignore
 /.gradle
 /backup
 /build
