@@ -1,3 +1,7 @@
+## 3.3.7
+ May 11, 2019
+- StateMVC.dispose() will only run once.  Removed if(_disposed) return;
+
 ## 3.3.6
  Apr. 21, 2019
 - Ensure StateMVC.dispose() is runs only once.  if(_disposed) return;
@@ -8,7 +12,7 @@
 
 ## 3.3.4
  Apr. 03, 2019
-- *Correction* Controllers and Listeners dispose calls in the StateMVC were not an issue after all.
+- **Correction** Controllers and Listeners dispose calls in the StateMVC were not an issue after all.
 
 ## 3.3.3
  Apr. 02, 2019
