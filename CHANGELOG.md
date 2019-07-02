@@ -1,3 +1,7 @@
+## 3.4.1
+- Flutter upgrade
+- _rebuildAllowed = true; after super.deactivate(); super.didUpdateWidget(oldWidget); super.reassemble();
+
 ## 3.4.0
  July 02, 2019
 - of() function introduced. 

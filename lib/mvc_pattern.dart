@@ -437,8 +437,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _beforeList.forEach((StateListener listener) => listener.deactivate());
     _controllerList.forEach((ControllerMVC con) => con.deactivate());
     _afterList.forEach((StateListener listener) => listener.deactivate());
-    _rebuildAllowed = true;
     super.deactivate();
+    _rebuildAllowed = true;
 
     /// In some cases, if then reinserted back in another part of the tree
     /// the build is called, and so setState() is not necessary.
@@ -516,8 +516,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         .forEach((ControllerMVC con) => con.didUpdateWidget(oldWidget));
     _afterList.forEach(
         (StateListener listener) => listener.didUpdateWidget(oldWidget));
-    _rebuildAllowed = true;
     super.didUpdateWidget(oldWidget);
+    _rebuildAllowed = true;
 
     /// No 'setState()' functions are necessary
     _rebuildRequested = false;
@@ -724,8 +724,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _beforeList.forEach((StateListener listener) => listener.reassemble());
     _controllerList.forEach((ControllerMVC con) => con.reassemble());
     _afterList.forEach((StateListener listener) => listener.reassemble());
-    _rebuildAllowed = true;
     super.reassemble();
+    _rebuildAllowed = true;
 
     /// No 'setState()' function is necessary
     /// The framework always calls build with a hot reload.
