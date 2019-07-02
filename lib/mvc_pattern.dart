@@ -47,6 +47,7 @@ import 'package:flutter/material.dart'
         Locale,
         State,
         StatefulWidget,
+        TypeMatcher,
         VoidCallback,
         Widget,
         WidgetsBinding,
@@ -396,7 +397,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// May be set true to request a 'rebuild.'
   bool _rebuildRequested = false;
 
-
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
   @protected
@@ -437,6 +437,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _beforeList.forEach((StateListener listener) => listener.deactivate());
     _controllerList.forEach((ControllerMVC con) => con.deactivate());
     _afterList.forEach((StateListener listener) => listener.deactivate());
+    _rebuildAllowed = true;
     super.deactivate();
 
     /// In some cases, if then reinserted back in another part of the tree
@@ -473,6 +474,27 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     FlutterError.onError = _oldOnError;
 
     super.dispose();
+  }
+
+  /// If `rootState` is set to true, the state from the furthest instance of
+  /// this class is given instead. Useful for pushing contents above all subsequent
+  /// instances of [StateMVC].
+  static StateMVC of(
+    BuildContext context, {
+    bool rootState = false,
+    bool nullOk = false,
+  }) {
+    final StateMVC stateObj = rootState
+        ? context.rootAncestorStateOfType(const TypeMatcher<StateMVC>())
+        : context.ancestorStateOfType(const TypeMatcher<StateMVC>());
+    assert(() {
+      if (stateObj == null && !nullOk) {
+        throw FlutterError(
+            'StateMVC operation requested with a context that does not include a StateMVC.');
+      }
+      return true;
+    }());
+    return stateObj;
   }
 
   /// Override this method to respond when the [widget] changes (e.g., to start

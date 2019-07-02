@@ -1,3 +1,12 @@
+## 3.4.0
+ July 02, 2019
+- of() function introduced. 
+- expect() functions in mvc_pattern_test.dart
+
+## 3.3.8
+ June 28, 2019
+- **Bug fix** _rebuildAllowed = true; in StateMVC.deactivate()
+
 ## 3.3.7
  May 11, 2019
 - StateMVC.dispose() will only run once.  Removed if(_disposed) return;
