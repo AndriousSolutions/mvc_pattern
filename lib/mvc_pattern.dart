@@ -927,44 +927,6 @@ String _addKeyId(_StateObserver sv) {
   return keyId;
 }
 
-/// View Class
-/// Extend and implement its build() function to compose its interface.
-abstract class ViewMVC extends _StateObserver with _ControllerListing {
-  /// Implement this build() function to compose the View's interface.
-  Widget build(BuildContext context);
-
-  /// Must take in one Controller when this Class instantiates.
-  ViewMVC(this.controller) {
-    _addKeyId(this);
-
-    // Add this Controller to the Controller Listing!
-    add(controller);
-  }
-  final ControllerMVC controller;
-
-  /// Retrieve a Controller from this View.
-  /// Retrieved by using a unique String identifier.
-  ControllerMVC con(String keyId) {
-    assert(_stateMVC != null, "Pass this ViewMVC to a StateViewMVC!");
-    return super._con(keyId);
-  }
-
-  /// Add a Controller to this View.
-  @override
-  String add(ControllerMVC c) {
-    assert(_stateMVC != null, "Pass this ViewMVC to a StateViewMVC!");
-    return super.add(c);
-  }
-
-  /// Called to 'clean up' the List of Controllers and such
-  /// associated with this View.
-  @override
-  void dispose() {
-    _disposeControllerListing();
-    super.dispose();
-  }
-}
-
 /// The State Object with an Error Handler in its build() function.
 abstract class StateViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   /// Takes in a View and passes the View's Controller to the parent class.
@@ -1125,6 +1087,44 @@ abstract class StateViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   }
 }
 
+/// View Class
+/// Extend and implement its build() function to compose its interface.
+abstract class ViewMVC extends _StateObserver with _ControllerListing {
+  /// Implement this build() function to compose the View's interface.
+  Widget build(BuildContext context);
+
+  /// Must take in one Controller when this Class instantiates.
+  ViewMVC(this.controller) {
+    _addKeyId(this);
+
+    // Add this Controller to the Controller Listing!
+    add(controller);
+  }
+  final ControllerMVC controller;
+
+  /// Retrieve a Controller from this View.
+  /// Retrieved by using a unique String identifier.
+  ControllerMVC con(String keyId) {
+    assert(_stateMVC != null, "Pass this ViewMVC to a StateViewMVC!");
+    return super._con(keyId);
+  }
+
+  /// Add a Controller to this View.
+  @override
+  String add(ControllerMVC c) {
+    assert(_stateMVC != null, "Pass this ViewMVC to a StateViewMVC!");
+    return super.add(c);
+  }
+
+  /// Called to 'clean up' the List of Controllers and such
+  /// associated with this View.
+  @override
+  void dispose() {
+    _disposeControllerListing();
+    super.dispose();
+  }
+}
+
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 abstract class AppMVC extends StatefulWidget {
   /// Simple constructor. Calls the initApp() function.
@@ -1156,7 +1156,7 @@ abstract class AppMVC extends StatefulWidget {
   /// Called in State object.
   @mustCallSuper
   void dispose() {
-    states.clear();
+    _states.clear();
   }
 
   /// Determines if running in an IDE or in production.
@@ -1170,13 +1170,13 @@ abstract class AppMVC extends StatefulWidget {
   /// Determine if the 'MVCApp' is being used.
   static String _appStatus = '';
 
-  static List<Map<String, StateMVC>> states = [];
+  static Set<Map<String, StateMVC>> _states = Set();
 
   /// Returns a StateView object using a unique String identifier.
   // There's a better way. Just too tired now.
   static StateMVC getState(String keyId) {
     StateMVC sv;
-    for (Map map in states) {
+    for (Map map in _states) {
       if (map.containsKey(keyId)) {
         sv = map[keyId];
         break;
@@ -1207,7 +1207,7 @@ abstract class AppMVC extends StatefulWidget {
       _appStatus = _AppState.running ? 'running' : 'not running';
     var map = Map<String, StateMVC>();
     map[state._keyId] = state;
-    states.add(map);
+    _states.add(map);
   }
 
   /// Create the 'controller' if not provided one.

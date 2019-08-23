@@ -1,3 +1,6 @@
+## 3.4.2
+- states property in AppMVC set to private, _states.
+
 ## 3.4.1
 - Flutter upgrade
 - _rebuildAllowed = true; after super.deactivate(); super.didUpdateWidget(oldWidget); super.reassemble();
