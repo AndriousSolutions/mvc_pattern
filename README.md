@@ -1,6 +1,5 @@
 mvc_pattern
 ===========
-[![Build Status](https://travis-ci.org/AndriousSolutions/mvc_pattern.svg?branch=master)](https://travis-ci.org/AndriousSolutions/mvc_pattern)
 ![flutter and mvc](https://user-images.githubusercontent.com/32497443/47087365-c9524f80-d1e9-11e8-85e5-6c8bbabb18cc.png)
 ###### The "Kiss" of Flutter Frameworks
 In keeping with the ["KISS Principle"](https://en.wikipedia.org/wiki/KISS_principle), this is an attempt to offer the MVC design pattern to Flutter in an intrinsic fashion incorporating much of the Flutter framework itself. All in a standalone Flutter Package.
