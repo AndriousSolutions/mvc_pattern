@@ -1,7 +1,14 @@
+## 3.4.3
+ Sept. 02, 2019
+- _AppState super.initState();
+- SDK constraints sdk: ">=2.2.2 <3.0.0"
+ 
 ## 3.4.2
+ August 23, 2019
 - states property in AppMVC set to private, _states.
 
 ## 3.4.1
+ July 02, 2019
 - Flutter upgrade
 - _rebuildAllowed = true; after super.deactivate(); super.didUpdateWidget(oldWidget); super.reassemble();
 

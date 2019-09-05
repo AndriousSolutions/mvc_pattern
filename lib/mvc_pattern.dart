@@ -1219,9 +1219,9 @@ class _AppState extends StateMVC<AppMVC> {
   _AppState(ControllerMVC con) : super(con);
 
   void initState() {
+    super.initState();
     running = true;
     widget.initApp();
-    super.initState();
   }
 
   /// If this class is running, indicate it so.
