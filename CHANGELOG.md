@@ -1,3 +1,11 @@
+## 3.5.0
+ Sept. 20, 2019
+- New functions, rebuild() notifyListeners() calls refresh()
+- T controllerByType<T extends ControllerMVC>(
+- abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
+- class _InheritedMVC<T extends Object> extends InheritedWidget {
+- class SetState extends StatelessWidget {
+ 
 ## 3.4.3
  Sept. 02, 2019
 - _AppState super.initState();

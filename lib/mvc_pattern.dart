@@ -43,17 +43,19 @@ import 'package:flutter/material.dart'
         BuildContext,
         FlutterError,
         FlutterErrorDetails,
+        InheritedWidget,
         Key,
         Locale,
         State,
+        StatelessWidget,
         StatefulWidget,
-        TypeMatcher,
         VoidCallback,
         Widget,
         WidgetsBinding,
         WidgetsBindingObserver,
         mustCallSuper,
-        protected;
+        protected,
+        required;
 
 import 'package:flutter_test/flutter_test.dart'
     show Future, TestWidgetsFlutterBinding;
@@ -89,6 +91,12 @@ class _StateObserver with _StateSetter, StateListener {
 
   /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
   void refresh() => _stateMVC?.refresh();
+
+  /// Allow for a more accurate description
+  void rebuild() => refresh();
+
+  /// For those accustom to the 'Provider' approach.
+  void notifyListeners() => refresh();
 
   /// Retrieve the 'before' listener by its unique key.
   StateListener beforeListener(String key) => _stateMVC?.beforeListener(key);
@@ -174,7 +182,8 @@ mixin StateListener {
   }
 
   /// The framework calls this method when this [State] object will never
-  /// build again. The [State] object's lifecycle is terminated.
+  /// build again.
+  /// Note: THERE IS NO GUARANTEE THIS METHOD WILL RUN in the Framework.
   @mustCallSuper
   void dispose() {
     /// The framework calls this method when this [State] object will never
@@ -381,7 +390,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     if (list == null) return;
 
     /// It may have been a listener. Can't be both.
-    list.forEach((ControllerMVC con) => removeListener(con));
+//    list.forEach((ControllerMVC con) => removeListener(con));
     return super.addList(list);
   }
 
@@ -390,6 +399,19 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
   /// Contains the unique String identifier.
   String _keyId = Uuid().generateV4();
+
+  T controllerByType<T extends ControllerMVC>(
+      [BuildContext context, bool listen = true]){
+    T con;
+    if (context != null && listen) {
+      Type type = _type<_InheritedMVC<T>>();
+      _InheritedMVC<T> w = context.inheritFromWidgetOfExactType(type);
+      con = w?.object;
+    }
+    return con ?? _cons[_type<T>()];
+  }
+
+  Type _type<T>() => T;
 
   /// May be set false to prevent unnecessary 'rebuilds'.
   bool _rebuildAllowed = true;
@@ -410,7 +432,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    AppMVC._addStateMVC(this);
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
@@ -470,31 +491,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// Remove any 'Controller' reference
     _controller = null;
 
+    /// Clear the list of Controllers.
+    _cons.clear();
+
     /// Return the original error routine.
     FlutterError.onError = _oldOnError;
 
     super.dispose();
-  }
-
-  /// If `rootState` is set to true, the state from the furthest instance of
-  /// this class is given instead. Useful for pushing contents above all subsequent
-  /// instances of [StateMVC].
-  static StateMVC of(
-    BuildContext context, {
-    bool rootState = false,
-    bool nullOk = false,
-  }) {
-    final StateMVC stateObj = rootState
-        ? context.rootAncestorStateOfType(const TypeMatcher<StateMVC>())
-        : context.ancestorStateOfType(const TypeMatcher<StateMVC>());
-    assert(() {
-      if (stateObj == null && !nullOk) {
-        throw FlutterError(
-            'StateMVC operation requested with a context that does not include a StateMVC.');
-      }
-      return true;
-    }());
-    return stateObj;
   }
 
   /// Override this method to respond when the [widget] changes (e.g., to start
@@ -736,8 +739,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   // Note not 'protected' and so can be called by 'anyone.' -gp
   void setState(VoidCallback fn) {
     if (_rebuildAllowed) {
+      _rebuildAllowed = false;
       /// Call the State object's setState() function.
       super.setState(fn);
+      _rebuildAllowed = true;
     } else {
       /// Can't rebuild at this moment but at least make the request.
       _rebuildRequested = true;
@@ -865,12 +870,12 @@ class _ControllerListing {
       list.forEach((ControllerMVC con) => add(con));
 
   List<ControllerMVC> listControllers(List<String> keys) =>
-      controllers(keys).values.toList();
+      _controllers(keys).values.toList();
 
   /// Never supply a public list of Controllers. User must know the key identifier(s).
   List<ControllerMVC> get _controllerList => _asList; //_controllers.asList;
 
-  Map<String, ControllerMVC> controllers(List<String> keys) {
+  Map<String, ControllerMVC> _controllers(List<String> keys) {
     Map<String, ControllerMVC> controllers = {};
     keys.forEach(
         (String key) => controllers[key] = map[key]); //_controllers.map[key]);
@@ -889,8 +894,14 @@ class _ControllerListing {
     /// This connects the Controller to this View!
     con._addState(_stateMVC);
 
+    String keyId = (contains(con)) ? con._keyId : addConId(con);
+
+    AppMVC._addStateMVC(this);
+
+    if (!_cons.containsValue(con)) _cons.addAll({con.runtimeType: con});
+
     /// It's already there?! Return its key.
-    return (contains(con)) ? con._keyId : addConId(con);
+    return keyId;
   }
 
   bool remove(String keyId) {
@@ -914,6 +925,8 @@ class _ControllerListing {
     _map[keyId] = con;
     return keyId;
   }
+
+  Map<Type, ControllerMVC> _cons = Map();
 }
 
 String _addKeyId(_StateObserver sv) {
@@ -927,203 +940,68 @@ String _addKeyId(_StateObserver sv) {
   return keyId;
 }
 
-/// The State Object with an Error Handler in its build() function.
-abstract class StateViewMVC<T extends StatefulWidget> extends StateMVC<T> {
-  /// Takes in a View and passes the View's Controller to the parent class.
-  StateViewMVC(this.view) : super(view.controller) {
-    assert(view != null, "View can't be null! Pass a ViewMVC to StateViewMVC.");
-
-    /// IMPORTANT! Add the View's controllers first before calling setter. -gp
-    addList(view._controllerList);
-
-    /// Clear any controllers associated.
-    view._disposeControllerListing();
-
-    /// IMPORTNANT! This setter connects the State Object!
-    view._stateMVC = this;
-    view._addState(this);
+abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
+  ViewMVC({this.key, this.controller, this.controllers, this.object})
+      : super(controller) {
+    addList(controllers?.toList());
   }
-  final ViewMVC view;
-
-  /// Supply the every Widget returned by the build() function.
-  Widget get buildWidget => _widget;
-  Widget _widget;
-
-  Function(FlutterErrorDetails details) _currentOnError;
-
-  /// The build function wrapped in an Error Handler to prevent
-  /// crashes from unruly Controllers and or Listeners.
-  @override
-  @protected
-  Widget build(BuildContext context) {
-    /// Save the current Error Handler if any.
-    _currentOnError = FlutterError.onError;
-
-    /// If a tester is running. Don't switch out its error handler.
-    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
-      FlutterError.onError = (FlutterErrorDetails details) {
-        /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
-        var thisOnError = onError;
-
-        /// Always favour a custom error handler.
-        if (thisOnError != StateMVC._defaultError) {
-          onError(details);
-        } else if (_currentOnError != StateMVC._defaultError) {
-          /// Likely a Controller Error Handler.
-          _currentOnError(details);
-        } else if (_oldOnError != StateMVC._defaultError) {
-          /// An even older routine is available? App level routine?
-          _oldOnError(details);
-        } else {
-          /// You've not choice. Run the ol' 'red screen of death'
-          onError(details);
-        }
-      };
-    }
-
-    /// Where the magic happens!
-    _widget = view.build(context);
-
-    /// Restore the current error handler.
-    FlutterError.onError = _currentOnError;
-    return _widget;
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void initState() {
-    super.initState();
-    view.initState();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void deactivate() {
-    view.deactivate();
-    super.deactivate();
-  }
-
-  /// Dispose any View and its Controllers
-  @protected
-  @override
-  @mustCallSuper
-  void dispose() {
-    view.dispose();
-    super.dispose();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didUpdateWidget(StatefulWidget oldWidget) {
-    view.didUpdateWidget(oldWidget);
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    view.didChangeAppLifecycleState(state);
-    super.didChangeAppLifecycleState(state);
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didChangeMetrics() {
-    view.didChangeMetrics();
-    super.didChangeMetrics();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didChangeTextScaleFactor() {
-    view.didChangeTextScaleFactor();
-    super.didChangeTextScaleFactor();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didChangeLocale(Locale locale) {
-    view.didChangeLocale(locale);
-    super.didChangeLocale(locale);
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didHaveMemoryPressure() {
-    view.didHaveMemoryPressure();
-    super.didHaveMemoryPressure();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didChangeAccessibilityFeatures() {
-    view.didChangeAccessibilityFeatures();
-    super.didChangeAccessibilityFeatures();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void didChangeDependencies() {
-    view.didChangeDependencies();
-    super.didChangeDependencies();
-  }
-
-  @protected
-  @override
-  @mustCallSuper
-  void reassemble() {
-    view.reassemble();
-    super.reassemble();
-  }
-}
-
-/// View Class
-/// Extend and implement its build() function to compose its interface.
-abstract class ViewMVC extends _StateObserver with _ControllerListing {
-  /// Implement this build() function to compose the View's interface.
-  Widget build(BuildContext context);
-
-  /// Must take in one Controller when this Class instantiates.
-  ViewMVC(this.controller) {
-    _addKeyId(this);
-
-    // Add this Controller to the Controller Listing!
-    add(controller);
-  }
+  final Key key;
+  final List<ControllerMVC> controllers;
   final ControllerMVC controller;
+  Object object;
 
-  /// Retrieve a Controller from this View.
-  /// Retrieved by using a unique String identifier.
-  ControllerMVC con(String keyId) {
-    assert(_stateMVC != null, "Pass this ViewMVC to a StateViewMVC!");
-    return super._con(keyId);
+  /// Implement this function to compose the View.
+  Widget buildView(BuildContext context);
+
+  Widget build(BuildContext context) => _InheritedMVC(
+      key: key, state: this, object: object, child: buildView(context));
+
+  @override
+  void setState(VoidCallback fn) {
+    if (!inBuilder) super.setState(fn);
   }
 
-  /// Add a Controller to this View.
   @override
-  String add(ControllerMVC c) {
-    assert(_stateMVC != null, "Pass this ViewMVC to a StateViewMVC!");
-    return super.add(c);
+  void refresh() {
+    if (!inBuilder) super.refresh();
   }
 
-  /// Called to 'clean up' the List of Controllers and such
-  /// associated with this View.
-  @override
-  void dispose() {
-    _disposeControllerListing();
-    super.dispose();
+  bool inBuilder = false;
+  bool setStates = false;
+}
+
+class _InheritedMVC<T extends Object> extends InheritedWidget {
+  _InheritedMVC({Key key, this.state, this.object, Widget child})
+      : super(key: key, child: child);
+  final ViewMVC state;
+  final T object;
+  bool updateShouldNotify(_InheritedMVC oldWidget) =>
+      state.setStates && !state.inBuilder;
+}
+
+class SetState extends StatelessWidget {
+  SetState({Key key, @required this.builder})
+      : assert(builder != null, "Must provide a builder to SetState()"),
+        super(key: key);
+  final BuilderWidget builder;
+
+  Widget build(BuildContext context) {
+    /// Go up the widget tree and obtain the closes 'View'
+    _InheritedMVC inheritWidget =
+        context.inheritFromWidgetOfExactType(_InheritedMVC);
+    ViewMVC state = inheritWidget?.state;
+    state.setStates = true;
+    state.inBuilder = true;
+    state._rebuildAllowed = false;
+    Object object = inheritWidget?.object;
+    Widget widget = builder(context, object);
+    state._rebuildAllowed = true;
+    state.inBuilder = false;
+    return widget;
   }
 }
+
+typedef Widget BuilderWidget<T extends Object>(BuildContext context, T object);
 
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 abstract class AppMVC extends StatefulWidget {
@@ -1156,8 +1034,11 @@ abstract class AppMVC extends StatefulWidget {
   /// Called in State object.
   @mustCallSuper
   void dispose() {
+    controllers.clear();
     _states.clear();
   }
+
+  static Map<Type, Object> controllers = Map();
 
   /// Determines if running in an IDE or in production.
   static bool get inDebugger {
@@ -1208,9 +1089,11 @@ abstract class AppMVC extends StatefulWidget {
     var map = Map<String, StateMVC>();
     map[state._keyId] = state;
     _states.add(map);
+    for (ControllerMVC con in state._controllerList) {
+      controllers.addAll({con.runtimeType: con});
+    }
   }
 
-  /// Create the 'controller' if not provided one.
   @override
   State createState() => _AppState(con);
 }
