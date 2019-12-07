@@ -401,11 +401,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   String _keyId = Uuid().generateV4();
 
   T controllerByType<T extends ControllerMVC>(
-      [BuildContext context, bool listen = true]){
+      [BuildContext context, bool listen = true]) {
     T con;
     if (context != null && listen) {
-      Type type = _type<_InheritedMVC<T>>();
-      _InheritedMVC<T> w = context.inheritFromWidgetOfExactType(type);
+      //Type type = _type<_InheritedMVC<T>>();
+      //_InheritedMVC<T> w = context.inheritFromWidgetOfExactType(type);
+      _InheritedMVC<T> w =
+          context.dependOnInheritedWidgetOfExactType<_InheritedMVC<T>>();
       con = w?.object;
     }
     return con ?? _cons[_type<T>()];
@@ -425,6 +427,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   @override
   @mustCallSuper
   void initState() {
+    assert(this.mounted, "${this.toString()} is not instantiated properly.");
+
     /// Override this method to perform initialization that depends on the
     /// location at which this object was inserted into the tree.
     /// (i.e. Subscribe to another object it depends on during [initState],
@@ -740,6 +744,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   void setState(VoidCallback fn) {
     if (_rebuildAllowed) {
       _rebuildAllowed = false;
+
       /// Call the State object's setState() function.
       super.setState(fn);
       _rebuildAllowed = true;
@@ -966,6 +971,12 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
     if (!inBuilder) super.refresh();
   }
 
+  /// Catch and explicitly handle the error.
+  void catchError(Exception ex) {
+    if (ex == null) return;
+    FlutterError.onError(FlutterErrorDetails(exception: ex));
+  }
+
   bool inBuilder = false;
   bool setStates = false;
 }
@@ -987,8 +998,10 @@ class SetState extends StatelessWidget {
 
   Widget build(BuildContext context) {
     /// Go up the widget tree and obtain the closes 'View'
+//    _InheritedMVC inheritWidget =
+//        context.inheritFromWidgetOfExactType(_InheritedMVC);
     _InheritedMVC inheritWidget =
-        context.inheritFromWidgetOfExactType(_InheritedMVC);
+        context.dependOnInheritedWidgetOfExactType<_InheritedMVC>();
     ViewMVC state = inheritWidget?.state;
     state.setStates = true;
     state.inBuilder = true;
@@ -1028,7 +1041,7 @@ abstract class AppMVC extends StatefulWidget {
   Future<bool> init() async {
     bool init = true;
     if (con is AppConMVC) init = await (con as AppConMVC)?.init();
-    return Future.value(init);
+    return init;
   }
 
   /// Called in State object.

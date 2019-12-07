@@ -1,3 +1,10 @@
+## 3.6.0
+ December 06, 2019
+- void catchError(Exception ex)
+- context.dependOnInheritedWidgetOfExactType
+- assert(this.mounted, "StateMVC is not instantiated properly.");
+- SDK constraints sdk: ">=2.3.0 <3.0.0"
+
 ## 3.5.0
  Sept. 20, 2019
 - New functions, rebuild() notifyListeners() calls refresh()
