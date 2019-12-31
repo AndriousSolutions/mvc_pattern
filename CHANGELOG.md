@@ -1,3 +1,7 @@
+## 3.6.1
+ December 30, 2019
+- Don't dispose Controller if it's in other State objects.
+
 ## 3.6.0
  December 06, 2019
 - void catchError(Exception ex)

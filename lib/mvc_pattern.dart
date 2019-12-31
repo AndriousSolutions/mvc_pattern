@@ -109,7 +109,8 @@ class _StateObserver with _StateSetter, StateListener {
   void dispose() {
     /// The view association is severed.
     _disposeState();
-    super.dispose();
+    /// Don't dispose if it's in other State objects.
+    if (_stateMVCSet.isEmpty) super.dispose();
   }
 
   /// Supply an 'error handler' routine to fire when an error occurs.
