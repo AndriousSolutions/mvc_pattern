@@ -61,7 +61,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
     super.initState();
 
     /// Add to StateMVC to then access the State Object's lifecycle events.
-    String id = add(Controller.con);
+    String id = add(Controller());
 
     /// More than one way to then access your Controller.
     _con = controllerById(id);
@@ -104,16 +104,9 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
 class Controller extends ControllerMVC {
   /// Singleton Factory
-  factory Controller() {
-    if (_this == null) _this = Controller._();
-    return _this;
-  }
-  static Controller _this;
-
+  factory Controller() => _this;
+  static final Controller _this = Controller._();
   Controller._();
-
-  /// Allow for easy access to 'the Controller' throughout the application.
-  static Controller get con => _this;
 
   int get counter => _counter;
   int _counter = 0;

@@ -1,3 +1,7 @@
+## 3.7.0
+ January 16, 2020
+- Custom 'Error Screen' instead of 'Red Screen of Death'
+
 ## 3.6.1
  December 30, 2019
 - Don't dispose Controller if it's in other State objects.

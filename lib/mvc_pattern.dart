@@ -39,18 +39,30 @@ import 'dart:async' show Future;
 import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
 import 'package:flutter/material.dart'
     show
+        AppBar,
         AppLifecycleState,
         BuildContext,
+        Center,
+        EdgeInsets,
+        ErrorWidget,
+        ErrorWidgetBuilder,
         FlutterError,
         FlutterErrorDetails,
         InheritedWidget,
         Key,
         Locale,
+        Navigator,
+        Padding,
+        Scaffold,
+        SingleChildScrollView,
         State,
-        StatelessWidget,
         StatefulWidget,
+        StatelessWidget,
+        Text,
+        TextStyle,
         VoidCallback,
         Widget,
+        WidgetsApp,
         WidgetsBinding,
         WidgetsBindingObserver,
         mustCallSuper,
@@ -109,10 +121,12 @@ class _StateObserver with _StateSetter, StateListener {
   void dispose() {
     /// The view association is severed.
     _disposeState();
+
     /// Don't dispose if it's in other State objects.
     if (_stateMVCSet.isEmpty) super.dispose();
   }
 
+  /// Error Handling now only in StateMVC class.
   /// Supply an 'error handler' routine to fire when an error occurs.
   /// Allows the user to define their own with each Controller.
   /// The default routine is to dump the error to the console.
@@ -947,14 +961,26 @@ String _addKeyId(_StateObserver sv) {
 }
 
 abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
-  ViewMVC({this.key, this.controller, this.controllers, this.object})
+  ViewMVC(
+      {this.key,
+      this.controller,
+      this.controllers,
+      this.object,
+      this.errorScreen})
       : super(controller) {
+    _defaultErrorWidgetBuilder = ErrorWidget.builder;
+    ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) =>
+        errorScreen == null
+            ? errorScreen(flutterErrorDetails)
+            : _errorScreen(flutterErrorDetails);
     addList(controllers?.toList());
   }
   final Key key;
   final List<ControllerMVC> controllers;
   final ControllerMVC controller;
   Object object;
+  ErrorWidgetBuilder _defaultErrorWidgetBuilder;
+  Function(FlutterErrorDetails flutterErrorDetails) errorScreen;
 
   /// Implement this function to compose the View.
   Widget buildView(BuildContext context);
@@ -980,6 +1006,36 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
 
   bool inBuilder = false;
   bool setStates = false;
+
+  @override
+  void dispose() {
+    ErrorWidget.builder = _defaultErrorWidgetBuilder;
+    super.dispose();
+  }
+
+  //Custom Widget
+  Widget _errorScreen(FlutterErrorDetails flutterErrorDetails) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Error'),
+        ),
+        body: Padding(
+            padding: EdgeInsets.all(20.0),
+            child:
+                //Check is it release mode
+                AppMVC.inDebugger
+                    //Widget for release mode
+                    ? SingleChildScrollView(
+                        child: Text(
+                            "Exeption Details:\n\n${flutterErrorDetails.exception}"))
+                    //Widget for debug mode
+                    : Center(
+                        child: Text(
+                          'Sorry for inconvenience',
+                          style: TextStyle(fontSize: 24.0),
+                        ),
+                      )));
+  }
 }
 
 class _InheritedMVC<T extends Object> extends InheritedWidget {
