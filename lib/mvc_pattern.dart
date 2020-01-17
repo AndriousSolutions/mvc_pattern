@@ -971,8 +971,8 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
     _defaultErrorWidgetBuilder = ErrorWidget.builder;
     ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) =>
         errorScreen == null
-            ? errorScreen(flutterErrorDetails)
-            : _errorScreen(flutterErrorDetails);
+            ? _errorScreen(flutterErrorDetails)
+            : errorScreen(flutterErrorDetails);
     addList(controllers?.toList());
   }
   final Key key;

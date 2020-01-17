@@ -1,3 +1,7 @@
+## 3.7.1
+ January 16, 2020
+- errorScreen == null
+
 ## 3.7.0
  January 16, 2020
 - Custom 'Error Screen' instead of 'Red Screen of Death'
