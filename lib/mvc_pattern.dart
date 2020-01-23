@@ -116,16 +116,6 @@ class _StateObserver with _StateSetter, StateListener {
   /// Retrieve the 'after' listener by its unique key.
   StateListener afterListener(String key) => _stateMVC?.afterListener(key);
 
-  /// Dispose the State Object and Controller references.
-  @mustCallSuper
-  void dispose() {
-    /// The view association is severed.
-    _disposeState();
-
-    /// Don't dispose if it's in other State objects.
-    if (_stateMVCSet.isEmpty) super.dispose();
-  }
-
   /// Error Handling now only in StateMVC class.
   /// Supply an 'error handler' routine to fire when an error occurs.
   /// Allows the user to define their own with each Controller.
@@ -498,7 +488,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     _beforeList.forEach((StateListener listener) => listener.dispose());
-    _controllerList.forEach((ControllerMVC con) => con.dispose());
+    _controllerList.forEach((ControllerMVC con) {
+      /// This state's association is severed.
+      con._disposeState();
+
+      /// Don't call its dispose if it's in other State objects.
+      if (con._stateMVCSet.isEmpty) con.dispose();
+    });
     _disposeControllerListing();
     _afterList.forEach((StateListener listener) => listener.dispose());
     _disposeStateEventList();
@@ -968,6 +964,7 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
       this.object,
       this.errorScreen})
       : super(controller) {
+    // Record the current 'widget error screen'.
     _defaultErrorWidgetBuilder = ErrorWidget.builder;
     ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) =>
         errorScreen == null
@@ -1009,6 +1006,7 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
 
   @override
   void dispose() {
+    // Restore the original routine.
     ErrorWidget.builder = _defaultErrorWidgetBuilder;
     super.dispose();
   }

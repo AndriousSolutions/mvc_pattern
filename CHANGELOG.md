@@ -1,3 +1,7 @@
+## 3.7.2
+ January 22, 2019
+- **Correction** Don't call Controller's dispose in StateMVC if it's in other State objects.
+
 ## 3.7.1
  January 16, 2020
 - errorScreen == null
