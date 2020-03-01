@@ -1,3 +1,7 @@
+## 3.8.0
+ February 26, 2020
+- Returned the getter, context, to the Controller.
+ 
 ## 3.7.2
  January 22, 2019
 - **Correction** Don't call Controller's dispose in StateMVC if it's in other State objects.

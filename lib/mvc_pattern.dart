@@ -86,13 +86,14 @@ class ControllerMVC extends _StateObserver {
 }
 
 class _StateObserver with _StateSetter, StateListener {
+  //
   StateMVC get stateMVC => _stateMVC;
 
   /// Start using the getter, stateMVC
   @deprecated
   StateMVC get stateView => _stateMVC;
 
-  /// Overridden by mixin, StateSetter.
+  /// Overridden by mixin, _StateSetter.
   StateMVC _stateMVC;
 
   List<ControllerMVC> listControllers(List<String> keys) =>
@@ -115,6 +116,9 @@ class _StateObserver with _StateSetter, StateListener {
 
   /// Retrieve the 'after' listener by its unique key.
   StateListener afterListener(String key) => _stateMVC?.afterListener(key);
+
+  /// Provide the context
+  BuildContext get context => _stateMVC?.context;
 
   /// Error Handling now only in StateMVC class.
   /// Supply an 'error handler' routine to fire when an error occurs.
@@ -770,6 +774,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     if (mounted) {
       /// Refresh the interface by 'rebuilding' the Widget Tree
       setState(() {});
+//      /// The widget tree may be locked. setState() when unlocked.
+//      WidgetsBinding.instance.addPostFrameCallback((_) {
+//        setState(() {});
+//      });
     }
   }
 
