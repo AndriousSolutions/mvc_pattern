@@ -1,3 +1,10 @@
+## 4.0.0
+ April 07, 2020
+- Introduced integrated error handling. 
+- ViewMVC remove errorScreen, 
+- AppConMVC stateMVC?.onError(details)
+- AppMVC void onError(details)
+
 ## 3.8.0
  February 26, 2020
 - Returned the getter, context, to the Controller.

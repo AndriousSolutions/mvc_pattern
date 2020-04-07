@@ -119,15 +119,6 @@ class _StateObserver with _StateSetter, StateListener {
 
   /// Provide the context
   BuildContext get context => _stateMVC?.context;
-
-  /// Error Handling now only in StateMVC class.
-  /// Supply an 'error handler' routine to fire when an error occurs.
-  /// Allows the user to define their own with each Controller.
-  /// The default routine is to dump the error to the console.
-  // details.exception, details.stack
-  @deprecated
-  void onError(FlutterErrorDetails details) =>
-      FlutterError.dumpErrorToConsole(details);
 }
 
 mixin _StateSetter {
@@ -339,32 +330,13 @@ mixin StateListener {
 abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     with WidgetsBindingObserver, _ControllerListing, _StateListeners
     implements StateListener {
-  /// The View!
-  Widget build(BuildContext context);
-
-  /// You need to be able access the widget.
-  T get widget => super.widget;
-
-  /// Record the 'default' error handler for Flutter.
-  static final FlutterExceptionHandler _defaultError = FlutterError.onError;
-
   /// With an optional Controller parameter, this constructor imposes its own Errror Handler.
-  StateMVC([this._controller]) : _oldOnError = _recOnError() {
+  StateMVC([this._controller]) : currentErrorFunc = FlutterError.onError {
     /// If a tester is running. Don't switch out its error handler.
     if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
-      FlutterError.onError = (FlutterErrorDetails details) {
-        Function(FlutterErrorDetails details) thisOnError = onError;
-
-        /// Always favour a custom error handler.
-        if (thisOnError == _defaultError && _oldOnError != _defaultError) {
-          _oldOnError(details);
-        } else {
-          onError(details);
-        }
-      };
+      FlutterError.onError = onError;
     }
-
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
     /// Any subsequent calls to add() will be assigned, stateMVC.
     _stateMVC = this;
@@ -372,8 +344,14 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   }
   ControllerMVC _controller;
 
-  /// Save the original Error Handler.
-  final Function(FlutterErrorDetails details) _oldOnError;
+  /// The View!
+  Widget build(BuildContext context);
+
+  /// Save the current Error Handler.
+  final FlutterExceptionHandler currentErrorFunc;
+
+  /// You need to be able access the widget.
+  T get widget => super.widget;
 
   /// Provide the 'main' controller to this 'State View.'
   /// If _controller == null, get the 'first assigned' controller.
@@ -514,7 +492,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _cons.clear();
 
     /// Return the original error routine.
-    FlutterError.onError = _oldOnError;
+    FlutterError.onError = currentErrorFunc;
 
     super.dispose();
   }
@@ -786,21 +764,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// The default routine is to dump the error to the console.
   // details.exception, details.stack
   @protected
-  void onError(FlutterErrorDetails details) =>
-      FlutterError.dumpErrorToConsole(details);
-}
-
-/// Records 'the current' error handler.
-Function(FlutterErrorDetails details) _recOnError() {
-  var func;
-
-  /// If the 'current' Error Handler is not the 'default' routine, you better save it.
-  if (FlutterError.onError != StateMVC._defaultError) {
-    func = FlutterError.onError;
-  } else {
-    func = StateMVC._defaultError;
-  }
-  return func;
+  void onError(FlutterErrorDetails details) => currentErrorFunc(details);
 }
 
 /// Add, List, and Remove Listeners.
@@ -969,23 +933,23 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
       {this.key,
       this.controller,
       this.controllers,
-      this.object,
-      this.errorScreen})
+      this.object,   })
+//      this.errorScreen})
       : super(controller) {
-    // Record the current 'widget error screen'.
-    _defaultErrorWidgetBuilder = ErrorWidget.builder;
-    ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) =>
-        errorScreen == null
-            ? _errorScreen(flutterErrorDetails)
-            : errorScreen(flutterErrorDetails);
+//    // Record the current 'widget error screen'.
+//    _defaultErrorWidgetBuilder = ErrorWidget.builder;
+//    ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) =>
+//        errorScreen == null
+//            ? _errorScreen(flutterErrorDetails)
+//            : errorScreen(flutterErrorDetails);
     addList(controllers?.toList());
   }
   final Key key;
   final List<ControllerMVC> controllers;
   final ControllerMVC controller;
   Object object;
-  ErrorWidgetBuilder _defaultErrorWidgetBuilder;
-  Function(FlutterErrorDetails flutterErrorDetails) errorScreen;
+//  ErrorWidgetBuilder _defaultErrorWidgetBuilder;
+//  Function(FlutterErrorDetails flutterErrorDetails) errorScreen;
 
   /// Implement this function to compose the View.
   Widget buildView(BuildContext context);
@@ -1012,36 +976,36 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   bool inBuilder = false;
   bool setStates = false;
 
-  @override
-  void dispose() {
-    // Restore the original routine.
-    ErrorWidget.builder = _defaultErrorWidgetBuilder;
-    super.dispose();
-  }
+//  @override
+//  void dispose() {
+//    // Restore the original routine.
+//    ErrorWidget.builder = _defaultErrorWidgetBuilder;
+//    super.dispose();
+//  }
 
-  //Custom Widget
-  Widget _errorScreen(FlutterErrorDetails flutterErrorDetails) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Error'),
-        ),
-        body: Padding(
-            padding: EdgeInsets.all(20.0),
-            child:
-                //Check is it release mode
-                AppMVC.inDebugger
-                    //Widget for release mode
-                    ? SingleChildScrollView(
-                        child: Text(
-                            "Exeption Details:\n\n${flutterErrorDetails.exception}"))
-                    //Widget for debug mode
-                    : Center(
-                        child: Text(
-                          'Sorry for inconvenience',
-                          style: TextStyle(fontSize: 24.0),
-                        ),
-                      )));
-  }
+//  //Custom Widget
+//  Widget _errorScreen(FlutterErrorDetails flutterErrorDetails) {
+//    return Scaffold(
+//        appBar: AppBar(
+//          title: Text('Error'),
+//        ),
+//        body: Padding(
+//            padding: EdgeInsets.all(20.0),
+//            child:
+//                //Check is it release mode
+//                AppMVC.inDebugger
+//                    //Widget for release mode
+//                    ? SingleChildScrollView(
+//                        child: Text(
+//                            "Exeption Details:\n\n${flutterErrorDetails.exception}"))
+//                    //Widget for debug mode
+//                    : Center(
+//                        child: Text(
+//                          'Sorry for inconvenience',
+//                          style: TextStyle(fontSize: 24.0),
+//                        ),
+//                      )));
+//  }
 }
 
 class _InheritedMVC<T extends Object> extends InheritedWidget {
@@ -1079,11 +1043,31 @@ class SetState extends StatelessWidget {
 
 typedef Widget BuilderWidget<T extends Object>(BuildContext context, T object);
 
+class AppConMVC extends ControllerMVC {
+  AppConMVC() : super();
+
+  /// Initialize any immediate 'none time-consuming' operations at the very beginning.
+  void initApp() {}
+
+  /// Initialize any 'time-consuming' operations at the beginning.
+  /// Initialize items essential to the Mobile Applications.
+  /// Called by the MVCApp.init() function.
+  @mustCallSuper
+  Future<bool> init() async => true;
+
+  /// Override if you like to customize your error handling.
+  void onError(FlutterErrorDetails details) => stateMVC?.onError(details);
+}
+
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 abstract class AppMVC extends StatefulWidget {
   /// Simple constructor. Calls the initApp() function.
-  AppMVC({this.con, Key key}) : super(key: key);
-  final ControllerMVC con;
+  AppMVC({this.con, Key key})
+      : _appState = _AppState(con),
+        super(key: key);
+  final AppConMVC con;
+
+  final _AppState _appState;
 
   /// Get the controller if any
   ControllerMVC get controller => con;
@@ -1093,9 +1077,7 @@ abstract class AppMVC extends StatefulWidget {
 
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.
   @mustCallSuper
-  void initApp() {
-    if (con is AppConMVC) (con as AppConMVC)?.initApp();
-  }
+  void initApp() => con?.initApp();
 
   /// Initialize any 'time-consuming' operations at the beginning.
   /// Initialize items essential to the Mobile Applications.
@@ -1103,7 +1085,7 @@ abstract class AppMVC extends StatefulWidget {
   @mustCallSuper
   Future<bool> init() async {
     bool init = true;
-    if (con is AppConMVC) init = await (con as AppConMVC)?.init();
+    con?.init();
     return init;
   }
 
@@ -1112,6 +1094,16 @@ abstract class AppMVC extends StatefulWidget {
   void dispose() {
     controllers.clear();
     _states.clear();
+  }
+
+  /// Override if you like to customize your error handling.
+  void onError(FlutterErrorDetails details) {
+    if (con != null) {
+      con.onError(details);
+    } else {
+      // Call the State object's Exception handler
+      _appState.currentErrorFunc(details);
+    }
   }
 
   static Map<Type, Object> controllers = Map();
@@ -1171,12 +1163,13 @@ abstract class AppMVC extends StatefulWidget {
   }
 
   @override
-  State createState() => _AppState(con);
+  State createState() => _appState;
 }
 
 class _AppState extends StateMVC<AppMVC> {
   _AppState(ControllerMVC con) : super(con);
 
+  @override
   void initState() {
     super.initState();
     running = true;
@@ -1186,7 +1179,12 @@ class _AppState extends StateMVC<AppMVC> {
   /// If this class is running, indicate it so.
   static bool running = false;
 
+  @override
   Widget build(BuildContext context) => widget.build(context);
+
+  /// Call the StatefulWidget's error routine;
+  @override
+  void onError(FlutterErrorDetails details) => widget.onError(details);
 
   /// Dispose the 'StateView(s)' that may be running.
   @protected
@@ -1195,21 +1193,6 @@ class _AppState extends StateMVC<AppMVC> {
     running = false;
     widget.dispose();
     super.dispose();
-  }
-}
-
-class AppConMVC extends ControllerMVC {
-  AppConMVC() : super();
-
-  /// Initialize any immediate 'none time-consuming' operations at the very beginning.
-  void initApp() {}
-
-  /// Initialize any 'time-consuming' operations at the beginning.
-  /// Initialize items essential to the Mobile Applications.
-  /// Called by the MVCApp.init() function.
-  @mustCallSuper
-  Future<bool> init() async {
-    return Future.value(true);
   }
 }
 

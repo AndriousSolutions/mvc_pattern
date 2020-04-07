@@ -102,7 +102,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
   }
 }
 
-class Controller extends ControllerMVC {
+class Controller extends AppConMVC {
   /// Singleton Factory
   factory Controller() => _this;
   static final Controller _this = Controller._();
