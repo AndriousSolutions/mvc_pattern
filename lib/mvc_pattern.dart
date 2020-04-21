@@ -39,27 +39,17 @@ import 'dart:async' show Future;
 import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
 import 'package:flutter/material.dart'
     show
-        AppBar,
         AppLifecycleState,
         BuildContext,
-        Center,
-        EdgeInsets,
-        ErrorWidget,
-        ErrorWidgetBuilder,
         FlutterError,
         FlutterErrorDetails,
         InheritedWidget,
         Key,
         Locale,
         Navigator,
-        Padding,
-        Scaffold,
-        SingleChildScrollView,
         State,
         StatefulWidget,
         StatelessWidget,
-        Text,
-        TextStyle,
         VoidCallback,
         Widget,
         WidgetsApp,
@@ -161,6 +151,11 @@ mixin StateListener {
   String get keyId => _keyId;
   String _keyId = Uuid().generateV4();
 
+  /// Initialize any 'time-consuming' operations at the beginning.
+  /// Initialize asynchronous items essential to the Mobile Applications.
+  /// Typically called within a FutureBuilder() widget.
+  Future<bool> initAsync() async => true;
+
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
   void initState() {
@@ -239,7 +234,7 @@ mixin StateListener {
   ///
   /// This method exposes the `popRoute` notification from
   /// [SystemChannels.navigation].
-  Future<bool> didPopRoute() => Future<bool>.value(true);
+  Future<bool> didPopRoute() async => true;
 
   /// Called when the host tells the app to push a new route onto the
   /// navigator.
@@ -250,7 +245,7 @@ mixin StateListener {
   ///
   /// This method exposes the `pushRoute` notification from
   /// [SystemChannels.navigation].
-  Future<bool> didPushRoute(String route) => Future<bool>.value(true);
+  Future<bool> didPushRoute(String route) async => true;
 
   /// Called when the application's dimensions change. For example,
   /// when a phone is rotated.
@@ -337,6 +332,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       FlutterError.onError = onError;
     }
+
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
     /// Any subsequent calls to add() will be assigned, stateMVC.
     _stateMVC = this;
@@ -407,6 +403,46 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
   /// May be set true to request a 'rebuild.'
   bool _rebuildRequested = false;
+
+  /// A flag indicating initAsync was called
+  bool futureBuilt = false;
+
+  /// Initialize any 'time-consuming' operations at the beginning.
+  /// Initialize asynchronous items essential to the Mobile Applications.
+  /// Typically called within a FutureBuilder() widget.
+  @override
+  @mustCallSuper
+  Future<bool> initAsync() async {
+    /// It's been done. Don't run again.
+    if (futureBuilt) return futureBuilt;
+
+    /// This will call any and all Controllers that need asynchronous operations
+    /// completed before continuing.
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+    for (var listener in _beforeList) {
+      await listener.initAsync();
+    }
+    bool after = true;
+    // Built if nothing to run.
+    if (_controllerList.length == 0) futureBuilt = true;
+    for (var con in _controllerList) {
+      futureBuilt = await con.initAsync();
+      if (!futureBuilt) {
+        // It's to continue but in error.
+        futureBuilt = true;
+        after = false;
+        break;
+      }
+    }
+    if (after) {
+      for (var listener in _afterList) {
+        await listener.initAsync();
+      }
+    }
+    // Set the flag
+    return futureBuilt;
+  }
 
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
@@ -929,13 +965,14 @@ String _addKeyId(_StateObserver sv) {
 }
 
 abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
-  ViewMVC(
-      {this.key,
-      this.controller,
-      this.controllers,
-      this.object,   })
+  ViewMVC({
+    this.key,
+    this.controller,
+    this.controllers,
+    this.object,
+  })
 //      this.errorScreen})
-      : super(controller) {
+  : super(controller) {
 //    // Record the current 'widget error screen'.
 //    _defaultErrorWidgetBuilder = ErrorWidget.builder;
 //    ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) =>
@@ -1049,11 +1086,11 @@ class AppConMVC extends ControllerMVC {
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.
   void initApp() {}
 
-  /// Initialize any 'time-consuming' operations at the beginning.
-  /// Initialize items essential to the Mobile Applications.
-  /// Called by the MVCApp.init() function.
-  @mustCallSuper
-  Future<bool> init() async => true;
+//  /// Initialize any 'time-consuming' operations at the beginning.
+//  /// Initialize items essential to the Mobile Applications.
+//  /// Called by the MVCApp.init() function.
+//  @mustCallSuper
+//  Future<bool> init() async => true;
 
   /// Override if you like to customize your error handling.
   void onError(FlutterErrorDetails details) => stateMVC?.onError(details);
@@ -1083,11 +1120,7 @@ abstract class AppMVC extends StatefulWidget {
   /// Initialize items essential to the Mobile Applications.
   /// Called by the MVCApp.init() function.
   @mustCallSuper
-  Future<bool> init() async {
-    bool init = true;
-    con?.init();
-    return init;
-  }
+  Future<bool> initAsync() => _appState.initAsync();
 
   /// Called in State object.
   @mustCallSuper

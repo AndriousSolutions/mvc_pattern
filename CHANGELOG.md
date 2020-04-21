@@ -1,3 +1,9 @@
+## 5.0.0
+ April 19, 2020
+- Future<bool> initAsync() async in mixin StateListener
+- Removed Future<bool> init() async in class AppConMVC
+- Replaced  Future<bool>.value(true) in didPopRoute(), didPushRoute(), 
+  
 ## 4.0.0
  April 07, 2020
 - Introduced integrated error handling. 
