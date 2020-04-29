@@ -1,3 +1,8 @@
+## 5.1.0
+ April 26, 2020
+- AppConMVC(state) provide the state parameter.
+- AppState should not rebuild.
+
 ## 5.0.0
  April 19, 2020
 - Future<bool> initAsync() async in mixin StateListener
