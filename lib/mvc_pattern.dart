@@ -587,6 +587,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// when a phone is rotated.
   @protected
   @override
+  @mustCallSuper
   void didChangeMetrics() {
     /// In general, this is not overridden often as the layout system takes care of
     /// automatically recomputing the application geometry when the application
@@ -617,6 +618,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Called when the platform's text scale factor changes.
   @protected
   @override
+  @mustCallSuper
   void didChangeTextScaleFactor() {
     ///
     /// This typically happens as the result of the user changing system
@@ -651,6 +653,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// changed. For example, if the user changes the system language
   /// settings.
   @protected
+  @mustCallSuper
   void didChangeLocale(Locale locale) {
     ///
     /// This method exposes notifications from [Window.onLocaleChanged].
@@ -674,6 +677,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Called when the system is running low on memory.
   @protected
   @override
+  @mustCallSuper
   void didHaveMemoryPressure() {
     ///
     /// This method exposes the `memoryPressure` notification from
@@ -699,6 +703,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// features.
   @protected
   @override
+  @mustCallSuper
   void didChangeAccessibilityFeatures() {
     ///
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
@@ -752,8 +757,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// This provides an opportunity to reinitialize any data that was prepared
   /// in the initState method.
   @protected
-  @mustCallSuper
   @override
+  @mustCallSuper
   void reassemble() {
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
@@ -969,8 +974,7 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
     this.controller,
     this.controllers,
     this.object,
-  })
-  : super(controller) {
+  }) : super(controller) {
     addList(controllers?.toList());
   }
   final Key key;

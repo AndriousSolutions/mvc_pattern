@@ -1,3 +1,8 @@
+## 5.1.1
+ May 02, 2020
+- @mustCallSuper to didChangeMetrics() didChangeTextScaleFactor() didChangeLocale() 
+- didHaveMemoryPressure() didChangeAccessibilityFeatures() didChangeDependencies() reassemble() 
+
 ## 5.1.0
  April 26, 2020
 - AppConMVC(state) provide the state parameter.
