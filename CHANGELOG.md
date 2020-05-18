@@ -1,3 +1,7 @@
+## 6.0.0
+ May 18, 2020
+- Fixed controllerByType(); AppMVC.controllers to AppMVC._controllers
+
 ## 5.1.1
  May 02, 2020
 - @mustCallSuper to didChangeMetrics() didChangeTextScaleFactor() didChangeLocale() 

@@ -62,13 +62,14 @@ import 'package:flutter/material.dart'
 import 'package:flutter_test/flutter_test.dart'
     show Future, TestWidgetsFlutterBinding;
 
-/// Controller Class
 /// Your 'working' class most concerned with the app's functionality.
 class ControllerMVC extends _StateObserver {
   ControllerMVC([StateMVC state]) : super() {
     addState(state);
   }
 
+  /// Associate this Controller to the specified State object
+  /// to use that State object's functions and features.
   String addState(StateMVC state) {
     if (state == null) return '';
     return state.add(this);
@@ -79,13 +80,10 @@ class _StateObserver with _StateSetter, StateListener {
   //
   StateMVC get stateMVC => _stateMVC;
 
-  /// Start using the getter, stateMVC
-  @deprecated
-  StateMVC get stateView => _stateMVC;
-
   /// Overridden by mixin, _StateSetter.
   StateMVC _stateMVC;
 
+  /// Return a List of Controllers specified by key id.
   List<ControllerMVC> listControllers(List<String> keys) =>
       _stateMVC.listControllers(keys);
 
@@ -383,17 +381,24 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Contains the unique String identifier.
   String _keyId = Uuid().generateV4();
 
-  T controllerByType<T extends ControllerMVC>(
-      [BuildContext context, bool listen = true]) {
-    T con;
-    if (context != null && listen) {
-      //Type type = _type<_InheritedMVC<T>>();
-      //_InheritedMVC<T> w = context.inheritFromWidgetOfExactType(type);
-      _InheritedMVC<T> w =
-          context.dependOnInheritedWidgetOfExactType<_InheritedMVC<T>>();
-      con = w?.object;
-    }
-    return con ?? _cons[_type<T>()];
+  /// Retrieve a Controller in the widget tree by type.
+  //  T controllerByType<T extends ControllerMVC>(
+//      [BuildContext context, bool listen = true]) {
+//    T con;
+//    if (context != null && listen) {
+//      _InheritedMVC<Object> w =
+//          context.dependOnInheritedWidgetOfExactType<_InheritedMVC<Object>>();
+//      con = w?.object;
+//    }
+//    return con ?? _cons[_type<T>()];
+//  }
+
+  /// Retrieve a Controller in the MVC framework by type.
+  T controllerByType<T extends ControllerMVC>() {
+    // Look in this State objects list of Controllers.  Maybe not?
+    T con = _cons[_type<T>()];
+    con ??= AppMVC._controllers[_type<T>()];
+    return con;
   }
 
   Type _type<T>() => T;
@@ -849,21 +854,26 @@ mixin _StateListeners {
   /// Add a listener fired 'after' the main controller runs.
   bool addListener(StateListener listener) => addAfterListener(listener);
 
+  /// Removes the specified listener.
   bool removeListener(StateListener listener) {
     bool removed = _listenersBefore.remove(listener);
     if (_listenersAfter.remove(listener)) removed = true;
     return removed;
   }
 
+  /// Returns true of the listener specified is already added.
   bool beforeContains(StateListener listener) =>
       _listenersBefore.contains(listener);
 
+  /// Returns true of the listener specified is already added.
   bool afterContains(StateListener listener) =>
       _listenersAfter.contains(listener);
 
+  /// Returns the specified 'before' listener.
   StateListener beforeListener(String key) =>
       _getStateEvents(key, _listenersBefore);
 
+  /// Returns the specified 'after' listener.
   StateListener afterListener(String key) =>
       _getStateEvents(key, _listenersAfter);
 
@@ -926,7 +936,9 @@ class _ControllerListing {
 
     AppMVC._addStateMVC(this);
 
-    if (!_cons.containsValue(con)) _cons.addAll({con.runtimeType: con});
+    if (!_cons.containsValue(con)) {
+      _cons.addAll({con.runtimeType: con});
+    }
 
     /// It's already there?! Return its key.
     return keyId;
@@ -968,6 +980,7 @@ String _addKeyId(_StateObserver sv) {
   return keyId;
 }
 
+/// The StatMVC object at the 'app level.' Used to effect the whole app.
 abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   ViewMVC({
     this.key,
@@ -1017,6 +1030,9 @@ class _InheritedMVC<T extends Object> extends InheritedWidget {
       state.setStates && !state.inBuilder;
 }
 
+///  Used to like the function, setState(), to 'spontaneously' call
+///  build() functions here and there in your app. Much like the Scoped
+///  Model's ScopedModelDescendant() class.
 class SetState extends StatelessWidget {
   SetState({Key key, @required this.builder})
       : assert(builder != null, "Must provide a builder to SetState()"),
@@ -1043,6 +1059,7 @@ class SetState extends StatelessWidget {
 
 typedef Widget BuilderWidget<T extends Object>(BuildContext context, T object);
 
+/// A Controller for the 'app level' to influence the whole app.
 class AppConMVC extends ControllerMVC {
   AppConMVC([StateMVC state]) : super(state);
 
@@ -1080,11 +1097,17 @@ abstract class AppMVC extends StatefulWidget {
   Future<bool> initAsync() => _appState.initAsync();
 
   /// Called in State object.
+  /// Called when this [State] object will never build again.
+  /// Note: THERE IS NO GUARANTEE THIS METHOD WILL RUN in the Framework.
   @mustCallSuper
   void dispose() {
-    controllers.clear();
+    _controllers.clear();
     _states.clear();
   }
+
+  static Map<Type, Object> _controllers = Map();
+
+  static Set<Map<String, StateMVC>> _states = Set();
 
   /// Override if you like to customize your error handling.
   void onError(FlutterErrorDetails details) {
@@ -1096,8 +1119,6 @@ abstract class AppMVC extends StatefulWidget {
     }
   }
 
-  static Map<Type, Object> controllers = Map();
-
   /// Determines if running in an IDE or in production.
   static bool get inDebugger {
     var inDebugMode = false;
@@ -1105,11 +1126,6 @@ abstract class AppMVC extends StatefulWidget {
     assert(inDebugMode = true);
     return inDebugMode;
   }
-
-  /// Determine if the 'MVCApp' is being used.
-  static String _appStatus = '';
-
-  static Set<Map<String, StateMVC>> _states = Set();
 
   /// Returns a StateView object using a unique String identifier.
   // There's a better way. Just too tired now.
@@ -1141,14 +1157,11 @@ abstract class AppMVC extends StatefulWidget {
 
   /// This is 'privatized' as it is an critical method and not for public access.
   static _addStateMVC(StateMVC state) {
-    if (_appStatus == 'not running') return;
-    if (_appStatus.isEmpty)
-      _appStatus = _AppState.running ? 'running' : 'not running';
     var map = Map<String, StateMVC>();
     map[state._keyId] = state;
     _states.add(map);
     for (ControllerMVC con in state._controllerList) {
-      controllers.addAll({con.runtimeType: con});
+      _controllers.addAll({con.runtimeType: con});
     }
   }
 
@@ -1157,17 +1170,14 @@ abstract class AppMVC extends StatefulWidget {
 }
 
 class _AppState extends StateMVC<AppMVC> {
+  //
   _AppState(ControllerMVC con) : super(con);
 
   @override
   void initState() {
     super.initState();
-    running = true;
     widget.initApp();
   }
-
-  /// If this class is running, indicate it so.
-  static bool running = false;
 
   /// The underlying App state should not be rebuilt.
   @override
@@ -1184,7 +1194,6 @@ class _AppState extends StateMVC<AppMVC> {
   @protected
   @mustCallSuper
   void dispose() {
-    running = false;
     widget.dispose();
     super.dispose();
   }
