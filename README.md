@@ -56,8 +56,8 @@ View’s function, **setState()**, telling it to rebuild the widget tree.
 
 ![viewandcontroller](https://user-images.githubusercontent.com/32497443/48676337-6844d100-eb33-11e8-8405-be476668f431.jpg)
 
-Maybe we don’t want that. Maybe we want the View to be solely concern with the
-interface and solely determine when to rebuild the widget tree or not. It’s a simple change.
+Maybe we don’t want that. Maybe we want the View to be solely concerned with the
+interface and solely determine when to rebuild the widget tree (if at all). It’s a simple change.
 ![myhomepage2](https://user-images.githubusercontent.com/32497443/48676526-13ef2080-eb36-11e8-8c7a-d1dc5886b39f.jpg)
 The View knows how to 'talk to' the Controller, but the Controller doesn't need to know how to 'talk to' the View.
 Notice what I did to the Controller? Makes the API between the View and the Controller a little clearer.
