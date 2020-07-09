@@ -8,6 +8,9 @@ Principle"](https://en.wikipedia.org/wiki/KISS_principle), this is an attempt to
 offer the MVC design pattern to Flutter in an intrinsic fashion incorporating
 much of the Flutter framework itself. All in a standalone Flutter Package.
 
+Note, there is now the 'MVC framework' which wraps around this library package as its core:
+[![MVC](https://user-images.githubusercontent.com/32497443/86506052-2791de00-bd91-11ea-8fc9-7a9768656ecb.png)](https://medium.com/follow-flutter/an-mvc-approach-to-flutter-f333d6288078)
+
 **Installing**
 
 I don't always like the version number suggested in the '[Installing](https://pub.dev/packages/mvc_pattern#-installing-tab-)' page.

@@ -463,6 +463,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// unsubscribe object and subscribe to a new object when it changes in
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
     super.initState();
+
+    /// Registers the given object as a binding observer. Binding
+    /// observers are notified when various application events occur,
+    /// for example when the system locale changes. Generally, one
+    /// widget in the widget tree registers itself as a binding
+    /// observer, and converts the system state into inherited widgets.
     WidgetsBinding.instance.addObserver(this);
 
     /// No 'setState()' functions are allowed to fully function at this point.
@@ -524,6 +530,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     //_rebuildAllowed = true; // Don't bother. Widget is terminating.
     /// Should not be 'rebuilding' anyway. This Widget is going away.
     _rebuildRequested = false;
+
+    /// Unregisters the given observer.
     WidgetsBinding.instance.removeObserver(this);
 
     /// Remove any 'Controller' reference
@@ -588,6 +596,75 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     }
   }
 
+  /// Called when the system tells the app to pop the current route.
+  /// For example, on Android, this is called when the user presses
+  /// the back button.
+  /// Observers are notified in registration order until one returns
+  /// true. If none return true, the application quits.
+  ///
+  @protected
+  @override
+  @mustCallSuper
+  Future<bool> didPopRoute() async {
+    /// Observers are expected to return true if they were able to
+    /// handle the notification, for example by closing an active dialog
+    /// box, and false otherwise. The [WidgetsApp] widget uses this
+    /// mechanism to notify the [Navigator] widget that it should pop
+    /// its current route if possible.
+    ///
+    /// This method exposes the `popRoute` notification from
+    /// [SystemChannels.navigation].
+    ///
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+    _beforeList.forEach(
+        (StateListener listener) async => await listener.didPopRoute());
+    _controllerList
+        .forEach((ControllerMVC con) async => await con.didPopRoute());
+    _afterList.forEach(
+        (StateListener listener) async => await listener.didPopRoute());
+    _rebuildAllowed = true;
+    if (_rebuildRequested) {
+      _rebuildRequested = false;
+
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
+    // Return false to pop out
+    return false;
+  }
+
+  /// Called when the host tells the app to push a new route onto the
+  /// navigator.
+  ///
+  @protected
+  @override
+  @mustCallSuper
+  Future<bool> didPushRoute(String route) async {
+    /// Observers are expected to return true if they were able to
+    /// handle the notification. Observers are notified in registration
+    /// order until one returns true.
+    ///
+    /// This method exposes the `pushRoute` notification from
+
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+    _beforeList.forEach(
+        (StateListener listener) async => await listener.didPushRoute(route));
+    _controllerList
+        .forEach((ControllerMVC con) async => await con.didPushRoute(route));
+    _afterList.forEach(
+        (StateListener listener) async => await listener.didPushRoute(route));
+    _rebuildAllowed = true;
+    if (_rebuildRequested) {
+      _rebuildRequested = false;
+
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
+    return false;
+  }
+
   /// Called when the application's dimensions change. For example,
   /// when a phone is rotated.
   @protected
@@ -645,6 +722,28 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         .forEach((ControllerMVC con) => con.didChangeTextScaleFactor());
     _afterList.forEach(
         (StateListener listener) => listener.didChangeTextScaleFactor());
+    _rebuildAllowed = true;
+    if (_rebuildRequested) {
+      _rebuildRequested = false;
+
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
+  }
+
+  /// Called when the platform brightness changes.
+  @protected
+  @override
+  @mustCallSuper
+  void didChangePlatformBrightness() {
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+    _beforeList.forEach(
+        (StateListener listener) => listener.didChangePlatformBrightness());
+    _controllerList
+        .forEach((ControllerMVC con) => con.didChangePlatformBrightness());
+    _afterList.forEach(
+        (StateListener listener) => listener.didChangePlatformBrightness());
     _rebuildAllowed = true;
     if (_rebuildRequested) {
       _rebuildRequested = false;
@@ -734,6 +833,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   bool _firstBuild = true;
 
   /// Called when a dependency of this [State] object changes.
+  /// This method is also called immediately after [initState].
   @protected
   @override
   @mustCallSuper
@@ -996,10 +1096,15 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   Object object;
 
   /// Implement this function to compose the View.
+  /// Deprecated. Now use buildApp(BuildContext context);
+  @deprecated
   Widget buildView(BuildContext context);
 
+  /// Override to impose your own WidgetsApp (like CupertinoApp or MaterialApp)
+  Widget buildApp(BuildContext context) => buildView(context);
+
   Widget build(BuildContext context) => _InheritedMVC(
-      key: key, state: this, object: object, child: buildView(context));
+      key: key, state: this, object: object, child: buildApp(context));
 
   @override
   void setState(VoidCallback fn) {

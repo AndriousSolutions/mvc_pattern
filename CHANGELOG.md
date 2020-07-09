@@ -1,3 +1,8 @@
+## 6.1.0
+ July 09, 2020
+- @deprecated  Widget buildView(BuildContext context);
+- README  Note, there is now the 'MVC framework' which wraps around this
+
 ## 6.0.0
  May 18, 2020
 - Fixed controllerByType(); AppMVC.controllers to AppMVC._controllers
