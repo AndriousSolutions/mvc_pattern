@@ -24,14 +24,14 @@ much of the Flutter framework itself. All in a standalone Flutter Package.
   object as 'The Controller.'
  
  This package is essentially the result, and it involves just two 'new' classes: StateMVC and ControllerMVC. 
- A StateMVC object is a State object with an explicit life-cycle (Android developers will recognize that),
+ A StateMVC object is a State object with an explicit life-cycle (Android developers will appreciate that),
   and a ControllerMVC object can be that separate Dart file with access to the State object (StateMVC in this case). 
   All done with Flutter objects and libraries---no re-inventing here. It looks and tastes like Flutter.
  
  Indeed, it just happens to be named after the 'granddaddy' of design patterns, MVC, but it's actually a bit more like the [PAC](https://medium.com/follow-flutter/flutter-mvc-at-last-275a0dc1e730#b671) 
- design pattern. In truth, you could use any other architecture if you like. By design, you can just use the classes,
+ design pattern. In truth, you could use any other architecture you like with it. By design, you can just use the classes,
   StateMVC, and ControllerMVC. Heck! You could call objects that extend ControllerMVC, BLoC's for all that matters! 
-  Again, all I wanted was some means to bound a State object to separate Dart files containing the 'guts' of the app. 
+  Again, all I wanted was some means to bond a State object to separate Dart files containing the 'guts' of the app. 
   I think you'll find it useful.
 
 Note, there is now the 'MVC framework' which wraps around this library package as its core:
