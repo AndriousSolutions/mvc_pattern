@@ -1,20 +1,30 @@
-os:
-  - linux
-sudo: false
-addons:
-  apt:
-    # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
-    sources:
-      - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
-    packages:
-      - libstdc++6
-      - fonts-droid
+notifications:
+  email: support@andrioussolutions.com
+
+language: dart
+
+dart:
+  - stable
+
+jobs:
+  include:
+    - name: Flutter Test Stable Channel
+      language: dart
+      os: linux
+      script:
+        - ./flutter/bin/flutter test
+      env: FLUTTER_VERSION=stable
+
+    - name: Flutter Test Stable Channel
+      language: dart
+      os: linux
+      script:
+        - ./flutter/bin/flutter test
+      env: FLUTTER_VERSION=beta
+
+    allow_failures:
+    - env: FLUTTER_VERSION=beta
+
 before_script:
-  - git clone https://github.com/flutter/flutter.git -b beta
-  - ./flutter/bin/flutter doctor
-# Runs the 'test' command: flutter test
-script:
-  - ./flutter/bin/flutter test
-cache:
-  directories:
-    - $HOME/.pub-cache
+  - git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
+  - "./flutter/bin/flutter doctor"
