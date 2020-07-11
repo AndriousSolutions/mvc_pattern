@@ -8,8 +8,34 @@ Principle"](https://en.wikipedia.org/wiki/KISS_principle), this is an attempt to
 offer the MVC design pattern to Flutter in an intrinsic fashion incorporating
 much of the Flutter framework itself. All in a standalone Flutter Package.
 
+ In truth, this all came about only because I wanted a place to put me 'mutable' code (the business logic for the app) 
+ without the compiler complaining about it! Placing such code in a StatefulWidget or a StatelessWidget is discouraged of course--only immutable code should be in those objects.
+ Sure, all that code could go into the State object. That's good since you want access to the State object anyway. 
+ After all, it's the main player when it comes to 'State Management' in Flutter. However, it makes for rather big and 
+ messy State objects!
+ 
+ Placing the code in separate Dart files would be the solution, but then there have to be a means to access that 
+ ever-important State object. I wanted the separate Dart file or files that had all the functionality and capability 
+ of the State object. In other words, needed that separate Dart file to have access to a State object! This was the result.
+ 
+ Now, I had no interest in re-inventing the wheel. I wanted to keep it all Flutter, and so I stopped and looked at 
+ Flutter closely to see how to apply some already known design pattern onto it. That's when I saw the State
+  object (its build() function actually) as 'The View,' and the separate Dart file or files with access to that State 
+  object as 'The Controller.'
+ 
+ This package essentially involves just two 'new' classes: StateMVC and ControllerMVC. 
+ StateMVC<StatefulWidget> is a State<StatefulWidget> with an explicit life-cycle (Android developers will recognize that),
+  and ControllerMVC is that separate Dart file with access to the State object (StateMVC in this case). 
+  All done with Flutter objects and libraries---no re-inventing here. It looks and tastes like Flutter.
+ 
+ Indeed, it just happens to be named after the 'granddaddy' of design patterns, MVC. It's actually a bit more like the [PAC](https://medium.com/follow-flutter/flutter-mvc-at-last-275a0dc1e730#b671) 
+ design pattern, but in truth, you could use any other architecture if you like. By design, you can just use the classes,
+  StateMVC, and ControllerMVC. Heck! You could call objects that extend ControllerMVC, BLoC's for all that matters! 
+  Again, all I wanted was some means to bound a State object to separate Dart files containing the 'guts' of the app. 
+  I think you'll find it useful.
+
 Note, there is now the 'MVC framework' which wraps around this library package as its core:
-[![MVC](https://user-images.githubusercontent.com/32497443/86506052-2791de00-bd91-11ea-8fc9-7a9768656ecb.png)](https://medium.com/follow-flutter/an-mvc-approach-to-flutter-f333d6288078)
+[![MVC](https://user-images.githubusercontent.com/32497443/87212839-54407b00-c2e6-11ea-8fc9-a56c38114229.png)](https://medium.com/follow-flutter/an-mvc-approach-to-flutter-f333d6288078)
 
 **Installing**
 

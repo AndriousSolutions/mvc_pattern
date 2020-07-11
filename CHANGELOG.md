@@ -1,7 +1,12 @@
+## 6.1.1
+ July 10, 2020
+- Corrected the README.md
+ 
 ## 6.1.0
  July 09, 2020
 - @deprecated  Widget buildView(BuildContext context);
 - README  Note, there is now the 'MVC framework' which wraps around this
+- Remove 'author' section from pubspec.yaml
 
 ## 6.0.0
  May 18, 2020
