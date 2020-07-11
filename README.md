@@ -20,7 +20,7 @@ much of the Flutter framework itself. All in a standalone Flutter Package.
  
  Now, I had no interest in re-inventing the wheel. I wanted to keep it all Flutter, and so I stopped and looked at 
  Flutter closely to see how to apply some already known design pattern onto it. That's when I saw the State
-  object (its build() function actually) as 'The View,' and the separate Dart file or files with access to that State 
+  object (its build() function specifically) as 'The View,' and the separate Dart file or files with access to that State 
   object as 'The Controller.'
  
  This package is essentially the result, and it involves just two 'new' classes: StateMVC and ControllerMVC. 
@@ -483,8 +483,5 @@ Iterable<String> makeWordPairs(int count) {
 }
 ```
 
-Further information on the MVC package can be found in the article, [‘Flutter + MVC at Last!’](https://medium.com/p/275a0dc1e730/)
-[![online article](https://user-images.githubusercontent.com/32497443/47087365-c9524f80-d1e9-11e8-85e5-6c8bbabb18cc.png)](https://medium.com/flutter-community/flutter-mvc-at-last-275a0dc1e730)
-##### Other Dart Packages
-[![packages](https://user-images.githubusercontent.com/32497443/64993716-5c818280-d89c-11e9-87b5-f35aee3e22f4.jpg)](https://pub.dev/publishers/andrioussolutions.com/packages)
-Other Dart packages from the author can also be found at [Pub.dev](https://pub.dev/publishers/andrioussolutions.com/packages)
+Further information on the MVC package can be found in the article, [‘MVC in Flutter’](https://medium.com/follow-flutter/mvc-in-flutter-1d26b86328ea)
+[![online article](https://user-images.githubusercontent.com/32497443/87216185-c626bd80-c302-11ea-9535-c5dac12ea106.png)](https://medium.com/follow-flutter/mvc-in-flutter-1d26b86328ea)
