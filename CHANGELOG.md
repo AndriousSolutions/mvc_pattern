@@ -1,4 +1,4 @@
-## 6.1.1
+## 6.1.2
  July 10, 2020
 - Corrected the README.md
  
