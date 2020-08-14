@@ -1266,7 +1266,7 @@ mixin _ControllerListing {
 abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   ViewMVC({
     this.key,
-    this.controller,
+    ControllerMVC controller,
     this.controllers,
     this.object,
   }) : super(controller) {
@@ -1274,7 +1274,6 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   }
   final Key key;
   final List<ControllerMVC> controllers;
-  final ControllerMVC controller;
   Object object;
 
   /// Implement this function to compose the View.

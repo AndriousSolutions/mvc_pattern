@@ -1,3 +1,7 @@
+## 6.2.0+1
+ August 14, 2020
+- ControllerMVC controller in class, ViewMVC
+
 ## 6.2.0
  August 13, 2020
 - Strict Flutter Lint Rules following Dart Style Guide.
