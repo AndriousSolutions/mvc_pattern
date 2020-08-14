@@ -1,3 +1,7 @@
+## 6.3.0
+ August 14, 2020
+- Remove import 'package:flutter_test/flutter_test.dart' to support Flutter Web 
+
 ## 6.2.0+1
  August 14, 2020
 - ControllerMVC controller in class, ViewMVC

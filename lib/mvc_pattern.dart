@@ -43,6 +43,7 @@ import 'package:flutter/material.dart'
         BuildContext,
         FlutterError,
         FlutterErrorDetails,
+        WidgetsFlutterBinding,
         InheritedWidget,
         Key,
         Locale,
@@ -58,9 +59,6 @@ import 'package:flutter/material.dart'
         mustCallSuper,
         protected,
         required;
-
-import 'package:flutter_test/flutter_test.dart'
-    show Future, TestWidgetsFlutterBinding;
 
 /// Your 'working' class most concerned with the app's functionality.
 class ControllerMVC extends _StateObserver {
@@ -338,10 +336,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         _StateListeners
     implements
         StateListener {
-  /// With an optional Controller parameter, this constructor imposes its own Errror Handler.
+  /// With an optional Controller parameter, this constructor imposes its own Error Handler.
   StateMVC([this._controller]) : currentErrorFunc = FlutterError.onError {
     /// If a tester is running. Don't switch out its error handler.
-    if (WidgetsBinding.instance is! TestWidgetsFlutterBinding) {
+    if (WidgetsBinding.instance == null || WidgetsBinding.instance is WidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       FlutterError.onError = onError;
     }
