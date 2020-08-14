@@ -6,6 +6,15 @@ language: dart
 dart:
   - stable
 
+dart_task:
+  - dartanalyzer
+  - dartfmt
+
+os:
+  - linux
+  - osx
+  - windows
+
 jobs:
   include:
     - name: Flutter Test Stable Channel

@@ -35,6 +35,8 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
+  MyApp({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -42,20 +44,24 @@ class MyApp extends AppMVC {
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: RandomWords(),
+      home: const RandomWords(),
     );
   }
 }
 
 class RandomWords extends StatefulWidget {
+  const RandomWords({Key key}) : super(key: key);
   @override
   State createState() => _RandomWordsState();
 }
 
 class _RandomWordsState extends StateMVC<RandomWords> {
-  _RandomWordsState() : super(Con());
+  _RandomWordsState() : super(Con()) {
+    con = controller;
+  }
+  Con con;
 
-  final TextStyle _biggerFont = const TextStyle(fontSize: 18.0);
+  final TextStyle _biggerFont = const TextStyle(fontSize: 18);
 
   @override
 
@@ -78,7 +84,7 @@ class _RandomWordsState extends StateMVC<RandomWords> {
 
   Widget _buildSuggestions() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       // The itemBuilder callback is called once per suggested word pairing,
       // and places each suggestion into a ListTile row.
       // For even rows, the function adds a ListTile row for the word pairing.
@@ -87,7 +93,9 @@ class _RandomWordsState extends StateMVC<RandomWords> {
       // to see on smaller devices.
       itemBuilder: (context, i) {
         // Add a one-pixel-high divider widget before each row in theListView.
-        if (i.isOdd) return Divider();
+        if (i.isOdd) {
+          return const Divider();
+        }
 
         // The syntax "i ~/ 2" divides i by 2 and returns an integer result.
         // For example: 1, 2, 3, 4, 5 becomes 0, 1, 1, 2, 2.
@@ -95,9 +103,9 @@ class _RandomWordsState extends StateMVC<RandomWords> {
         // minus the divider widgets.
         final index = i ~/ 2;
         // If you've reached the end of the available word pairings...
-        if (index >= Con.length) {
+        if (index >= con.length) {
           // ...then generate 10 more and add them to the suggestions list.
-          Con.addAll(10);
+          con.addAll(10);
         }
         return buildRow(index);
       },
@@ -127,11 +135,13 @@ class _RandomWordsState extends StateMVC<RandomWords> {
   }
 
   Widget buildRow(int index) {
-    if (index == null && index < 0) index = 0;
+    if (index == null && index < 0) {
+      index = 0;
+    }
 
-    String something = Con.something(index);
+    final something = con.something(index);
 
-    final alreadySaved = Con.contains(something);
+    final alreadySaved = con.contains(something);
 
     return ListTile(
       title: Text(
@@ -144,13 +154,13 @@ class _RandomWordsState extends StateMVC<RandomWords> {
       ),
       onTap: () {
         setState(() {
-          Con.somethingHappens(something);
+          con.somethingHappens(something);
         });
       },
     );
   }
 
-  Iterable<ListTile> get tiles => Con.mapHappens(
+  Iterable<ListTile> get tiles => con.mapHappens(
         (String something) {
           return ListTile(
             title: Text(
@@ -163,38 +173,52 @@ class _RandomWordsState extends StateMVC<RandomWords> {
 }
 
 class Con extends ControllerMVC {
-  static int get length => Model.length;
+  Con([StateMVC state]) : super(state) {
+    data = Model();
+  }
+  Model data;
 
-  static void addAll(int count) => Model.addAll(count);
+  int get length => data.length;
 
-  static String something(int index) => Model.wordPair(index);
+  void addAll(int count) => data.addAll(count);
 
-  static bool contains(String something) => Model.contains(something);
+  String something(int index) => data.wordPair(index);
 
-  static void somethingHappens(String something) => Model.save(something);
+  bool contains(String something) => data.contains(something);
 
-  static Iterable<ListTile> mapHappens<ListTile>(Function f) => Model.saved(f);
+  void somethingHappens(String something) => data.save(something);
+
+  Iterable<ListTile> mapHappens<ListTile>(Function f) => data.saved(f);
 }
 
 class Model {
-  static final List<String> _suggestions = [];
-  static int get length => _suggestions.length;
+  final List<String> _suggestions = [];
 
-  static String wordPair(int index) {
-    if (index == null || index < 0) index = 0;
+  int get length => _suggestions.length;
+
+  String wordPair(int index) {
+    if (index == null || index < 0) {
+      index = 0;
+    }
     return _suggestions[index];
   }
 
-  static bool contains(String pair) {
-    if (pair == null || pair.isEmpty) return false;
+  bool contains(String pair) {
+    if (pair == null || pair.isEmpty) {
+      return false;
+    }
     return _saved.contains(pair);
   }
 
-  static final Set<String> _saved = Set();
+  final Set<String> _saved = {};
 
-  static void save(String pair) {
-    if (pair == null || pair.isEmpty) return;
+  void save(String pair) {
+    if (pair == null || pair.isEmpty) {
+      return;
+    }
+
     final alreadySaved = contains(pair);
+
     if (alreadySaved) {
       _saved.remove(pair);
     } else {
@@ -202,11 +226,11 @@ class Model {
     }
   }
 
-  static Iterable<ListTile> saved<ListTile>(Function f) => _saved.map(f);
+  Iterable<ListTile> saved<ListTile>(Function f) => _saved.map(f);
 
-  static Iterable<String> wordPairs([int count = 10]) => makeWordPairs(count);
+  Iterable<String> wordPairs([int count = 10]) => makeWordPairs(count);
 
-  static void addAll(int count) {
+  void addAll(int count) {
     _suggestions.addAll(wordPairs(count));
   }
 }

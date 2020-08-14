@@ -4,63 +4,81 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
-//import 'counter_app_test.dart';
-import 'counter_app_test2.dart';
-//import 'counter_app_test3.dart';
-//import 'counter_app_test4.dart';
+import 'counter_app_test.dart' as one ;
+import 'counter_app_test2.dart' as two;
+import 'counter_app_test3.dart' as three;
+import 'counter_app_test4.dart' as four;
+import 'counter_app_test5.dart' as five;
 
 void main() {
+  // Use a key to locate the widget you need to test
+  Key key = UniqueKey();
+  _testApp(key, one.MyApp(key: key));
+  key = UniqueKey();
+  _testApp(key, two.MyApp(key: key));
+  key = UniqueKey();
+  _testApp(key, three.MyApp(key: key));
+  key = UniqueKey();
+  _testApp(key, four.MyApp(key: key));
+  key = UniqueKey();
+  _testApp(key, five.MyApp(key: key));
+}
+
+void _testApp(Key key, AppMVC app) {
   testWidgets('Counter App Test', (WidgetTester tester) async {
-    // Use a key to locate the widget you need to test
-    Key key = UniqueKey();
 
     // Tells the tester to build a UI based on the widget tree passed to it
-    await tester.pumpWidget(MyApp(key: key));
+    await tester.pumpWidget(app);
 
     /// You can directly access the 'internal workings' of the app!
-    MyApp _app = tester.widget(find.byKey(key));
+    final widget = tester.widget(find.byKey(key));
 
-    expect(_app, isInstanceOf<AppMVC>());
+    expect(widget, isInstanceOf<AppMVC>());
+
+    final AppMVC appObj = widget;
 
     /// Reference to the Controller.
-    Controller _con = _app.controller;
+    final ControllerMVC con = appObj.controller;
+    
+    if(con != null) {
 
-    expect(_con, isInstanceOf<ControllerMVC>());
+      expect(con, isInstanceOf<ControllerMVC>());
 
-    /// Reference to the StateMVC.
-    StateMVC _sv = _con.stateMVC;
+      /// Reference to the StateMVC.
+      final _sv = con.stateMVC;
 
-    expect(_sv, isInstanceOf<State<StatefulWidget>>());
+      expect(_sv, isInstanceOf<State<StatefulWidget>>());
 
-    /// The State object.
-    State _state = _con.stateMVC;
+      /// The State object.
+      final _state = con.stateMVC;
 
-    expect(_state, isInstanceOf<State<StatefulWidget>>());
+      expect(_state, isInstanceOf<State<StatefulWidget>>());
 
-    /// Controller's unique identifier.
-    String id = _con.keyId;
+      /// Controller's unique identifier.
+      final id = con.keyId;
 
-    expect(id, isInstanceOf<String>());
+      expect(id, isInstanceOf<String>());
 
-    /// The StateView's unique identifier.
-    String svId = _sv.keyId;
+      /// The StateView's unique identifier.
+      final svId = _sv.keyId;
 
-    expect(svId, isInstanceOf<String>());
+      expect(svId, isInstanceOf<String>());
 
-    /// Current context.
-    BuildContext context2 = _sv.context;
+      /// Current context.
+      final context2 = _sv.context;
 
-    expect(context2, isInstanceOf<BuildContext>());
+      expect(context2, isInstanceOf<BuildContext>());
 
-    /// Is the widget mounted?
-    bool mounted2 = _sv.mounted;
+      /// Is the widget mounted?
+      final mounted2 = _sv.mounted;
 
-    expect(mounted2, isInstanceOf<bool>());
+      expect(mounted2, isInstanceOf<bool>());
 
-    /// The StatefulWidget.
-    StatefulWidget widget2 = _sv.widget;
+      /// The StatefulWidget.
+      final widget2 = _sv.widget;
 
-    expect(widget2, isInstanceOf<StatefulWidget>());
+      expect(widget2, isInstanceOf<StatefulWidget>());
+    }
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
@@ -71,7 +89,7 @@ void main() {
     await tester.pump();
 
     /// You can access the Controller's properties.
-//    expect(_con.displayThis == 1, true);
+//    expect(con.displayThis == 1, true);
 
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);

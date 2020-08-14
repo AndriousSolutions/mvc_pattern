@@ -1,3 +1,8 @@
+## 6.2.0
+ August 13, 2020
+- Strict Flutter Lint Rules following Dart Style Guide.
+- Introduced analysis_options.yaml
+
 ## 6.1.3+2
  July 10, 2020
 - Corrected the README.md

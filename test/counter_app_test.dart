@@ -32,7 +32,7 @@ void main() => runApp(MyApp());
 class MyApp extends AppMVC {
   MyApp({Key key}) : super(key: key);
 
-  static final String title = 'Flutter Demo Home Page';
+  static const String title = 'Flutter Demo Home Page';
   final MyHomePage home = MyHomePage(title);
 
   ControllerMVC get controller => home.controller;
@@ -58,6 +58,7 @@ class MyHomePage extends StatefulWidget {
   Controller get controller => state.controller;
 
   @override
+  // ignore: no_logic_in_create_state
   State createState() => state;
 }
 
@@ -83,7 +84,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
             ),
             Text(
               '${_con.counter}',
-              style: Theme.of(context).textTheme.display1,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
@@ -93,7 +94,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
           setState(_con.incrementCounter);
         },
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

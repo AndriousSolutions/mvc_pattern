@@ -29,73 +29,82 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends AppMVC {
   MyApp({Key key}) : super(key: key);
 
-  static final String title = 'Flutter Demo Home Page';
+  static const String title = 'Flutter Demo Home Page';
 
   /// This is 'the View' for this application.
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  const MyHomePage({Key key}) : super(key: key);
   @protected
   @override
-  createState() => _MyHomePageState();
+  State createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-  _MyHomePageState() : super(Controller());
+  _MyHomePageState() : super(Controller()){
+    con = controller;
+  }
+  Controller con;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(MyApp.title),
+        title: const Text(MyApp.title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               MyApp.title,
             ),
             Text(
-              '${Controller.displayThis}',
-              style: Theme.of(context).textTheme.display1,
+              '${con.displayThis}',
+              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(Controller.whatever);
+          setState(con.whatever);
         },
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
 }
 
 class Controller extends ControllerMVC {
+  Controller(){
+    data = Model();
+  }
+  Model data;
   /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
-  static int get displayThis => Model.counter;
-  static void whatever() => Model._incrementCounter();
+  int get displayThis => data.counter;
+  void whatever() => data._incrementCounter();
 }
 
 class Model {
-  static int get counter => _counter;
-  static int _counter = 0;
-  static int _incrementCounter() => ++_counter;
+  int get counter => _counter;
+  int _counter = 0;
+  int _incrementCounter() => ++_counter;
 }

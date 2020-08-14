@@ -30,35 +30,37 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
-  MyApp({Key key}) : super(key: key);
-
-  static final String title = 'Flutter Demo Home Page';
-
-  @override
+  MyApp({Key key, this.homeKey}) : super(key: key);
+  final Key homeKey;
+  static const String title = 'Flutter Demo Home Page';
 
   /// This is 'the View' for this application.
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: MyHomePage(key: homeKey),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  const MyHomePage({Key key}) : super(key: key);
   // Fields in a Widget subclass are always marked "final".
   @protected
   @override
-  createState() => _MyHomePageState();
+  State createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
   /// The Controller then has access the State Object's lifecycle events.
-  _MyHomePageState() : super(Controller());
+  _MyHomePageState() : super(Controller()) {
+    con = controller;
+  }
+  Controller con;
 
   @override
   Widget build(BuildContext context) {
@@ -66,35 +68,35 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(MyApp.title),
+        title: const Text(MyApp.title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               MyApp.title,
             ),
             Text(
-              '${Controller.counter}',
-              style: Theme.of(context).textTheme.display1,
+              '${con.counter}',
+              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(Controller.incrementCounter);
+          setState(con.incrementCounter);
         },
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
 }
 
 class Controller extends ControllerMVC {
-  static int get counter => _counter;
-  static int _counter = 0;
-  static void incrementCounter() => _counter++;
+  int get counter => _counter;
+  int _counter = 0;
+  void incrementCounter() => _counter++;
 }

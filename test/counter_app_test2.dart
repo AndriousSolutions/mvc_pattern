@@ -33,7 +33,7 @@ class MyApp extends AppMVC {
   /// Supply 'the Controller' for this application.
   MyApp({Key key}) : super(con: Controller(), key: key);
 
-  static final String title = 'Flutter Demo Home Page';
+  static const String title = 'Flutter Demo Home Page';
 
   /// This is 'the View' for this application.
   @override
@@ -43,16 +43,16 @@ class MyApp extends AppMVC {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  const MyHomePage({Key key}) : super(key: key);
   @protected
   @override
-  createState() => _MyHomePageState();
+  State createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
@@ -61,11 +61,11 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
     super.initState();
 
     /// Add to StateMVC to then access the State Object's lifecycle events.
-    String id = add(Controller());
+    final String id = add(Controller());
 
     /// More than one way to then access your Controller.
-    _con = controllerById(id);
     _con = controller;
+    _con = controllerById(id);
   }
 
   Controller _con;
@@ -75,18 +75,18 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         // Using a static reference to set our appbar title.
-        title: Text(MyApp.title),
+        title: const Text(MyApp.title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               MyApp.title,
             ),
             Text(
               '${_con.counter}',
-              style: Theme.of(context).textTheme.display1,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
@@ -96,7 +96,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
           _con.incrementCounter();
         },
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -104,9 +104,9 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
 class Controller extends AppConMVC {
   /// Singleton Factory
-  factory Controller() => _this;
-  static final Controller _this = Controller._();
+  factory Controller() => _this ??= Controller._();
   Controller._();
+  static Controller _this;
 
   int get counter => _counter;
   int _counter = 0;
