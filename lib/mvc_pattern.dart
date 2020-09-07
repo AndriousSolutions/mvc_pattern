@@ -60,8 +60,18 @@ import 'package:flutter/material.dart'
         protected,
         required;
 
+/// This class is to be concerned with the data
+/// It is accessed by the Controller but can call setState() as well.
+class ModelMVC extends StateSetter {
+  //
+  ModelMVC([StateMVC state]) : super() {
+    pushState(state);
+  }
+}
+
 /// Your 'working' class most concerned with the app's functionality.
-class ControllerMVC extends _StateObserver {
+class ControllerMVC extends StateSetter with StateListener {
+  //
   ControllerMVC([StateMVC state]) : super() {
     addState(state);
   }
@@ -74,18 +84,29 @@ class ControllerMVC extends _StateObserver {
     }
     return state.add(this);
   }
-}
 
-class _StateObserver with _StateSetter, StateListener {
-  //
+  /// The current StateMVC object.
   StateMVC get stateMVC => _stateMVC;
+
+  /// The current State object.
+  State get state => _stateMVC;
 
   /// Return a List of Controllers specified by key id.
   List<ControllerMVC> listControllers(List<String> keys) =>
       _stateMVC.listControllers(keys);
 
+  /// Retrieve the 'before' listener by its unique key.
+  StateListener beforeListener(String key) => _stateMVC?.beforeListener(key);
+
+  /// Retrieve the 'after' listener by its unique key.
+  StateListener afterListener(String key) => _stateMVC?.afterListener(key);
+}
+
+/// Allows you to call 'setState' for the current the State object.
+class StateSetter with StateSets {
+
   /// Provide the setState() function to external actors
-  void setState(fn) => _stateMVC?.setState(fn);
+  void setState(VoidCallback fn) => _stateMVC?.setState(fn);
 
   /// Allows external classes to 'refresh' or 'rebuild' the widget tree.
   void refresh() => _stateMVC?.refresh();
@@ -95,22 +116,15 @@ class _StateObserver with _StateSetter, StateListener {
 
   /// For those accustom to the 'Provider' approach.
   void notifyListeners() => refresh();
-
-  /// Retrieve the 'before' listener by its unique key.
-  StateListener beforeListener(String key) => _stateMVC?.beforeListener(key);
-
-  /// Retrieve the 'after' listener by its unique key.
-  StateListener afterListener(String key) => _stateMVC?.afterListener(key);
-
-  /// Provide the context
-  BuildContext get context => _stateMVC?.context;
 }
 
-mixin _StateSetter {
+/// Record in a Set any previous State objects
+/// and the current State object being used.
+mixin StateSets {
   StateMVC _stateMVC;
   final Set<StateMVC> _stateMVCSet = {};
 
-  void _addState(StateMVC state) {
+  void pushState(StateMVC state) {
     if (state == null) {
       return;
     }
@@ -118,17 +132,17 @@ mixin _StateSetter {
     _stateMVCSet.add(state);
   }
 
-  bool _removeState(StateMVC state) {
+  bool removeState(StateMVC state) {
     if (state == null) {
       return false;
     }
     if (state == _stateMVC) {
-      return _disposeState();
+      return popState();
     }
     return _stateMVCSet.remove(state);
   }
 
-  bool _disposeState() {
+  bool popState() {
     // Don't continue if null.
     if (_stateMVC == null) {
       return false;
@@ -339,7 +353,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// With an optional Controller parameter, this constructor imposes its own Error Handler.
   StateMVC([this._controller]) : currentErrorFunc = FlutterError.onError {
     /// If a tester is running. Don't switch out its error handler.
-    if (WidgetsBinding.instance == null || WidgetsBinding.instance is WidgetsFlutterBinding) {
+    if (WidgetsBinding.instance == null ||
+        WidgetsBinding.instance is WidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       FlutterError.onError = onError;
     }
@@ -570,7 +585,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 //    });
     for (final con in _controllerList) {
       /// This state's association is severed.
-      con._disposeState();
+      con.popState();
 
       /// Don't call its dispose if it's in other State objects.
       if (con._stateMVCSet.isEmpty) {
@@ -1210,7 +1225,7 @@ mixin _ControllerListing {
     }
 
     /// This connects the Controller to this View!
-    con._addState(_stateMVC);
+    con.pushState(_stateMVC);
 
     final String keyId = (contains(con)) ? con._keyId : addConId(con);
 
@@ -1228,7 +1243,7 @@ mixin _ControllerListing {
     final con = _map[keyId];
     final there = con != null;
     if (there) {
-      con._removeState(_stateMVC);
+      con.removeState(_stateMVC);
       _map.remove(keyId);
     }
     return there;
@@ -1263,14 +1278,12 @@ mixin _ControllerListing {
 /// The StatMVC object at the 'app level.' Used to effect the whole app.
 abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   ViewMVC({
-    this.key,
     ControllerMVC controller,
     this.controllers,
     this.object,
   }) : super(controller) {
     addList(controllers?.toList());
   }
-  final Key key;
   final List<ControllerMVC> controllers;
   Object object;
 
@@ -1283,8 +1296,8 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   Widget buildApp(BuildContext context) => buildView(context);
 
   @override
-  Widget build(BuildContext context) => _InheritedMVC(
-      key: key, state: this, object: object, child: buildApp(context));
+  Widget build(BuildContext context) =>
+      _InheritedMVC(state: this, object: object, child: buildApp(context));
 
   @override
   void setState(VoidCallback fn) {
@@ -1322,7 +1335,7 @@ class _InheritedMVC<T extends Object> extends InheritedWidget {
       state.setStates && !state.inBuilder;
 }
 
-///  Used to like the function, setState(), to 'spontaneously' call
+///  Used like the function, setState(), to 'spontaneously' call
 ///  build() functions here and there in your app. Much like the Scoped
 ///  Model's ScopedModelDescendant() class.
 class SetState extends StatelessWidget {

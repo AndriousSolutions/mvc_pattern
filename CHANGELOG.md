@@ -1,3 +1,10 @@
+## 6.4.0
+ September 07, 2020
+- Introduced class, ModelMVC
+- Introduced class, StateSetter
+- Introduced mixin, StateSets
+- Removed key from class, ViewMVC
+
 ## 6.3.0
  August 14, 2020
 - Remove import 'package:flutter_test/flutter_test.dart' to support Flutter Web 
