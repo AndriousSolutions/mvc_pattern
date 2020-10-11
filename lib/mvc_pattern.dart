@@ -104,7 +104,6 @@ class ControllerMVC extends StateSetter with StateListener {
 
 /// Allows you to call 'setState' for the current the State object.
 class StateSetter with StateSets {
-
   /// Provide the setState() function to external actors
   void setState(VoidCallback fn) => _stateMVC?.setState(fn);
 
@@ -1287,13 +1286,9 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
   final List<ControllerMVC> controllers;
   Object object;
 
-  /// Implement this function to compose the View.
-  /// Deprecated. Now use buildApp(BuildContext context);
-  @Deprecated('Use buildApp(context) instead.')
-  Widget buildView(BuildContext context);
-
+  /// Implement this function to compose the App's View.
   /// Override to impose your own WidgetsApp (like CupertinoApp or MaterialApp)
-  Widget buildApp(BuildContext context) => buildView(context);
+  Widget buildApp(BuildContext context);
 
   @override
   Widget build(BuildContext context) =>
@@ -1351,15 +1346,20 @@ class SetState extends StatelessWidget {
 //        context.inheritFromWidgetOfExactType(_InheritedMVC);
     final _InheritedMVC inheritWidget =
         context.dependOnInheritedWidgetOfExactType<_InheritedMVC>();
-    final ViewMVC state = inheritWidget?.state
-      ..setStates = true
-      ..inBuilder = true
-      .._rebuildAllowed = false;
+    final ViewMVC state = inheritWidget?.state;
+    if (state != null) {
+      state
+        ..setStates = true
+        ..inBuilder = true
+        .._rebuildAllowed = false;
+    }
     final Object object = inheritWidget?.object;
     final Widget widget = builder(context, object);
-    state
-      .._rebuildAllowed = true
-      ..inBuilder = false;
+    if (state != null) {
+      state
+        .._rebuildAllowed = true
+        ..inBuilder = false;
+    }
     return widget;
   }
 }

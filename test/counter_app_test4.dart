@@ -55,7 +55,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-  _MyHomePageState() : super(Controller()){
+  _MyHomePageState() : super(Controller()) {
     con = controller;
   }
   Controller con;
@@ -94,10 +94,11 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  Controller(){
+  Controller() {
     data = Model();
   }
   Model data;
+
   /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
   int get displayThis => data.counter;
   void whatever() => data._incrementCounter();

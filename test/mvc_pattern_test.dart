@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
-import 'counter_app_test.dart' as one ;
+import 'counter_app_test.dart' as one;
 import 'counter_app_test2.dart' as two;
 import 'counter_app_test3.dart' as three;
 import 'counter_app_test4.dart' as four;
@@ -26,7 +26,6 @@ void main() {
 
 void _testApp(Key key, AppMVC app) {
   testWidgets('Counter App Test', (WidgetTester tester) async {
-
     // Tells the tester to build a UI based on the widget tree passed to it
     await tester.pumpWidget(app);
 
@@ -39,9 +38,8 @@ void _testApp(Key key, AppMVC app) {
 
     /// Reference to the Controller.
     final ControllerMVC con = appObj.controller;
-    
-    if(con != null) {
 
+    if (con != null) {
       expect(con, isInstanceOf<ControllerMVC>());
 
       /// Reference to the StateMVC.

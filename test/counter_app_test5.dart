@@ -55,7 +55,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
-  _MyHomePageState() : super(Controller()){
+  _MyHomePageState() : super(Controller()) {
     con = controller;
   }
   Controller con;
@@ -94,7 +94,9 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 }
 
 class Controller extends ControllerMVC {
-  Controller(): model = Model(), super();
+  Controller()
+      : model = Model(),
+        super();
   final Model model;
   void incrementCounter() => model._incrementCounter();
 }
