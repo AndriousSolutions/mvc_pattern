@@ -172,6 +172,13 @@ mixin StateListener {
   /// Typically called within a FutureBuilder() widget.
   Future<bool> initAsync() async => true;
 
+  /// Supply an 'error handler' routine if something goes wrong
+  /// in the corresponding initAsync() routine.
+  /// Returns true if the error was properly handled.
+  bool onAsyncError(FlutterErrorDetails details) {
+    return false;
+  }
+
   /// The framework will call this method exactly once.
   /// Only when the [State] object is first created.
   void initState() {
@@ -510,15 +517,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-    //   _beforeList.forEach((StateListener listener) => listener.initState());
     for (final listener in _beforeList) {
       listener.initState();
     }
-//    _controllerList.forEach((ControllerMVC con) => con.initState());
     for (final con in _controllerList) {
       con.initState();
     }
-//    _afterList.forEach((StateListener listener) => listener.initState());
     for (final listener in _afterList) {
       listener.initState();
     }
@@ -539,15 +543,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach((StateListener listener) => listener.deactivate());
     for (final listener in _beforeList) {
       listener.deactivate();
     }
-//    _controllerList.forEach((ControllerMVC con) => con.deactivate());
     for (final con in _beforeList) {
       con.deactivate();
     }
-//    _afterList.forEach((StateListener listener) => listener.deactivate());
     for (final listener in _beforeList) {
       listener.deactivate();
     }
@@ -571,17 +572,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach((StateListener listener) => listener.dispose());
     for (final listener in _beforeList) {
       listener.dispose();
     }
-//    _controllerList.forEach((ControllerMVC con) {
-//      /// This state's association is severed.
-//      con._disposeState();
-//
-//      /// Don't call its dispose if it's in other State objects.
-//      if (con._stateMVCSet.isEmpty) con.dispose();
-//    });
     for (final con in _controllerList) {
       /// This state's association is severed.
       con.popState();
@@ -592,7 +585,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       }
     }
     _disposeControllerListing();
-//    _afterList.forEach((StateListener listener) => listener.dispose());
     for (final listener in _afterList) {
       listener.dispose();
     }
@@ -629,18 +621,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// The framework always calls build after calling didUpdateWidget,
     /// which means any calls to setState in didUpdateWidget are redundant.
     _rebuildAllowed = false;
-//    _beforeList.forEach(
-//        (StateListener listener) => listener.didUpdateWidget(oldWidget));
     for (final listener in _beforeList) {
       listener.didUpdateWidget(oldWidget);
     }
-//    _controllerList
-//        .forEach((ControllerMVC con) => con.didUpdateWidget(oldWidget));
     for (final con in _controllerList) {
       con.didUpdateWidget(oldWidget);
     }
-//    _afterList.forEach(
-//        (StateListener listener) => listener.didUpdateWidget(oldWidget));
     for (final listener in _afterList) {
       listener.didUpdateWidget(oldWidget);
     }
@@ -660,18 +646,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach(
-//        (StateListener listener) => listener.didChangeAppLifecycleState(state));
     for (final listener in _beforeList) {
       listener.didChangeAppLifecycleState(state);
     }
-//    _controllerList
-//        .forEach((ControllerMVC con) => con.didChangeAppLifecycleState(state));
     for (final con in _controllerList) {
       con.didChangeAppLifecycleState(state);
     }
-//    _afterList.forEach(
-//        (StateListener listener) => listener.didChangeAppLifecycleState(state));
     for (final listener in _afterList) {
       listener.didChangeAppLifecycleState(state);
     }
@@ -705,18 +685,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     ///
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach(
-//        (StateListener listener) async => await listener.didPopRoute());
     for (final listener in _beforeList) {
       await listener.didPopRoute();
     }
-//    _controllerList
-//        .forEach((ControllerMVC con) async => await con.didPopRoute());
     for (final con in _controllerList) {
       await con.didPopRoute();
     }
-//    _afterList.forEach(
-//        (StateListener listener) async => await listener.didPopRoute());
     for (final listener in _afterList) {
       await listener.didPopRoute();
     }
@@ -746,18 +720,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach(
-//        (StateListener listener) async => await listener.didPushRoute(route));
     for (final listener in _beforeList) {
       await listener.didPushRoute(route);
     }
-//    _controllerList
-//        .forEach((ControllerMVC con) async => await con.didPushRoute(route));
     for (final con in _controllerList) {
       await con.didPushRoute(route);
     }
-//    _afterList.forEach(
-//        (StateListener listener) async => await listener.didPushRoute(route));
     for (final listener in _afterList) {
       await listener.didPushRoute(route);
     }
@@ -790,16 +758,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList
-//        .forEach((StateListener listener) => listener.didChangeMetrics());
     for (final listener in _beforeList) {
       listener.didChangeMetrics();
     }
-//    _controllerList.forEach((ControllerMVC con) => con.didChangeMetrics());
     for (final con in _controllerList) {
       con.didChangeMetrics();
     }
-//    _afterList.forEach((StateListener listener) => listener.didChangeMetrics());
     for (final listener in _afterList) {
       listener.didChangeMetrics();
     }
@@ -831,18 +795,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach(
-//        (StateListener listener) => listener.didChangeTextScaleFactor());
     for (final listener in _beforeList) {
       listener.didChangeTextScaleFactor();
     }
-//    _controllerList
-//        .forEach((ControllerMVC con) => con.didChangeTextScaleFactor());
     for (final con in _controllerList) {
       con.didChangeTextScaleFactor();
     }
-//    _afterList.forEach(
-//        (StateListener listener) => listener.didChangeTextScaleFactor());
     for (final listener in _afterList) {
       listener.didChangeTextScaleFactor();
     }
@@ -862,18 +820,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   void didChangePlatformBrightness() {
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach(
-//        (StateListener listener) => listener.didChangePlatformBrightness());
     for (final listener in _beforeList) {
       listener.didChangePlatformBrightness();
     }
-//    _controllerList
-//        .forEach((ControllerMVC con) => con.didChangePlatformBrightness());
     for (final con in _controllerList) {
       con.didChangePlatformBrightness();
     }
-//    _afterList.forEach(
-//        (StateListener listener) => listener.didChangePlatformBrightness());
     for (final listener in _afterList) {
       listener.didChangePlatformBrightness();
     }
@@ -898,17 +850,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList
-//        .forEach((StateListener listener) => listener.didChangeLocale(locale));
     for (final listener in _beforeList) {
       listener.didChangeLocale(locale);
     }
-//    _controllerList.forEach((ControllerMVC con) => con.didChangeLocale(locale));
     for (final con in _controllerList) {
       con.didChangeLocale(locale);
     }
-//    _afterList
-//        .forEach((StateListener listener) => listener.didChangeLocale(locale));
     for (final listener in _afterList) {
       listener.didChangeLocale(locale);
     }
@@ -932,18 +879,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList
-//        .forEach((StateListener listener) => listener.didHaveMemoryPressure());
     for (final listener in _beforeList) {
       listener.didHaveMemoryPressure();
     }
-//    _controllerList.forEach((ControllerMVC con) => con.didHaveMemoryPressure());
     for (final con in _controllerList) {
       con.didHaveMemoryPressure();
     }
-
-//    _afterList
-//        .forEach((StateListener listener) => listener.didHaveMemoryPressure());
     for (final listener in _afterList) {
       listener.didHaveMemoryPressure();
     }
@@ -966,19 +907,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
 
     /// No 'setState()' functions are allowed to fully function at this point.
-//    _rebuildAllowed = false;
-//    _beforeList.forEach(
-//        (StateListener listener) => listener.didChangeAccessibilityFeatures());
     for (final listener in _beforeList) {
       listener.didChangeAccessibilityFeatures();
     }
-//    _controllerList
-//        .forEach((ControllerMVC con) => con.didChangeAccessibilityFeatures());
     for (final con in _controllerList) {
       con.didChangeAccessibilityFeatures();
     }
-//    _afterList.forEach(
-//        (StateListener listener) => listener.didChangeAccessibilityFeatures());
     for (final listener in _afterList) {
       listener.didChangeAccessibilityFeatures();
     }
@@ -1002,17 +936,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   void didChangeDependencies() {
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList
-//        .forEach((StateListener listener) => listener.didChangeDependencies());
     for (final listener in _beforeList) {
       listener.didChangeDependencies();
     }
-    //   _controllerList.forEach((ControllerMVC con) => con.didChangeDependencies());
     for (final con in _controllerList) {
       con.didChangeDependencies();
     }
-//    _afterList
-//        .forEach((StateListener listener) => listener.didChangeDependencies());
     for (final listener in _afterList) {
       listener.didChangeDependencies();
     }
@@ -1038,15 +967,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   void reassemble() {
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
-//    _beforeList.forEach((StateListener listener) => listener.reassemble());
     for (final listener in _beforeList) {
       listener.reassemble();
     }
-//    _controllerList.forEach((ControllerMVC con) => con.reassemble());
     for (final con in _controllerList) {
       con.reassemble();
     }
-    //   _afterList.forEach((StateListener listener) => listener.reassemble());
     for (final listener in _afterList) {
       listener.reassemble();
     }
@@ -1079,10 +1005,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     if (mounted) {
       /// Refresh the interface by 'rebuilding' the Widget Tree
       setState(() {});
-//      /// The widget tree may be locked. setState() when unlocked.
-//      WidgetsBinding.instance.addPostFrameCallback((_) {
-//        setState(() {});
-//      });
     }
   }
 
@@ -1091,6 +1013,28 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   // details.exception, details.stack
   @protected
   void onError(FlutterErrorDetails details) => currentErrorFunc(details);
+
+  /// Supply an 'error handler' routine if something goes wrong
+  /// in the corresponding initAsync() routine.
+  @override
+  bool onAsyncError(FlutterErrorDetails details) {
+    /// This will call any and all Controllers
+    /// that may have ran asynchronous operations.
+    bool handled = true;
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+    for (final con in _controllerList) {
+      try {
+        if (!con.onAsyncError(details)) {
+          handled = false;
+        }
+      } catch (ex) {
+        handled = false;
+      }
+    }
+    _rebuildAllowed = false;
+    return handled;
+  }
 }
 
 /// Add, List, and Remove Listeners.
@@ -1194,7 +1138,6 @@ mixin _ControllerListing {
   }
 
   void addList(List<ControllerMVC> list) => list.forEach(add);
-//    list.forEach((ControllerMVC con) => add(con));
 
   List<ControllerMVC> listControllers(List<String> keys) =>
       _controllers(keys).values.toList();
@@ -1204,8 +1147,7 @@ mixin _ControllerListing {
 
   Map<String, ControllerMVC> _controllers(List<String> keys) {
     final Map<String, ControllerMVC> controllers = {};
-//    keys.forEach(
-//        (String key) => controllers[key] = map[key]); //_controllers.map[key]);
+
     for (final key in keys) {
       controllers[key] = map[key];
     }
@@ -1262,17 +1204,6 @@ mixin _ControllerListing {
 
   final Map<Type, ControllerMVC> _cons = {};
 }
-
-//String _addKeyId(_StateObserver sv) {
-//  String keyId = sv._keyId;
-//
-//  /// May already have been assigned a key.
-//  if (keyId.isEmpty) {
-//    keyId = Uuid().generateV4();
-//    sv._keyId = keyId;
-//  }
-//  return keyId;
-//}
 
 /// The StatMVC object at the 'app level.' Used to effect the whole app.
 abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
@@ -1342,8 +1273,6 @@ class SetState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// Go up the widget tree and obtain the closes 'View'
-//    _InheritedMVC inheritWidget =
-//        context.inheritFromWidgetOfExactType(_InheritedMVC);
     final _InheritedMVC inheritWidget =
         context.dependOnInheritedWidgetOfExactType<_InheritedMVC>();
     final ViewMVC state = inheritWidget?.state;
@@ -1379,6 +1308,7 @@ class AppConMVC extends ControllerMVC {
 }
 
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
+/// AppStatefulWidget is its subclass
 abstract class AppMVC extends StatefulWidget {
   /// Simple constructor. Calls the initApp() function.
   AppMVC({this.con, Key key})
@@ -1451,12 +1381,6 @@ abstract class AppMVC extends StatefulWidget {
   /// Returns a Map of StateView objects using unique String identifiers.
   static Map<String, StateMVC> getStates(List<String> keys) {
     final Map<String, StateMVC> map = {};
-//    keys.forEach((String key) {
-//      final sv = getState(key);
-//      if (sv != null) {
-//        map[key] = sv;
-//      }
-//    });
     for (final key in keys) {
       final sv = getState(key);
       if (sv != null) {

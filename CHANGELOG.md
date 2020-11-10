@@ -1,3 +1,6 @@
+## 6.6.0
+- New method onAsyncError(FlutterErrorDetails details)
+
 ## 6.5.0
  October 10, 2020
 - Removed deprecated function, buildView();

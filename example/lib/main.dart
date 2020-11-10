@@ -26,11 +26,12 @@
 /// To try this example,
 /// Uncomment the import statement the line in the function, makeWordPairs(), below.
 /// Of course, that means you'll have to modify your pubspec.yaml file.
-//import 'package:english_words/english_words.dart';
 
 import 'package:flutter/material.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
+
+//import 'package:english_words/english_words.dart';
 
 void main() => runApp(MyApp());
 
@@ -236,7 +237,9 @@ class Model {
 }
 
 Iterable<String> makeWordPairs(int count) {
-  /// Uncomment the import statement above and the line below to try this example.
+  /// Uncomment the the line below to try this example.
   /// Of course, that means you'll have to modify your pubspec.yaml
-//  return generateWordPairs().take(count).map((pair){return pair.asPascalCase;});
+  return generateWordPairs().take(count).map((pair) {
+    return pair.asPascalCase;
+  });
 }
