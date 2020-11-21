@@ -1002,10 +1002,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
   /// Allows the user to call setState() within the Controller.
   void refresh() {
-    if (mounted) {
-      /// Refresh the interface by 'rebuilding' the Widget Tree
-      setState(() {});
-    }
+    //   if (mounted) {
+    /// Refresh the interface by 'rebuilding' the Widget Tree
+    setState(() {});
+//    }
   }
 
   /// Supply an 'error handler' routine to fire when an error occurs.
@@ -1021,6 +1021,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// This will call any and all Controllers
     /// that may have ran asynchronous operations.
     bool handled = true;
+
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     for (final con in _controllerList) {
