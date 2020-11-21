@@ -1,3 +1,6 @@
+## 6.6.3
+- _rebuildAllowed = true; in dispose();
+
 ## 6.6.2
 - **Critical fix** _rebuildAllowed = true; in initAsync()
 

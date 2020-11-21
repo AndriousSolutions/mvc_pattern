@@ -571,16 +571,17 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
 
-    /// No 'setState()' functions are allowed to fully function at this point.
+    // No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
+
     for (final listener in _beforeList) {
       listener.dispose();
     }
     for (final con in _controllerList) {
-      /// This state's association is severed.
+      // This state's association is severed.
       con.popState();
 
-      /// Don't call its dispose if it's in other State objects.
+      // Don't call its dispose if it's in other State objects.
       if (con._stateMVCSet.isEmpty) {
         con.dispose();
       }
@@ -590,20 +591,20 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.dispose();
     }
     _disposeStateEventList();
-    //_rebuildAllowed = true; // Don't bother. Widget is terminating.
-    /// Should not be 'rebuilding' anyway. This Widget is going away.
-    _rebuildRequested = false;
 
-    /// Unregisters the given observer.
+    // *In some cases, the setState() will be called again! gp
+    _rebuildAllowed = true;
+
+    // Unregisters the given observer.
     WidgetsBinding.instance.removeObserver(this);
 
-    /// Remove any 'Controller' reference
+    // Remove any 'Controller' reference
     _controller = null;
 
-    /// Clear the list of Controllers.
+    // Clear the list of Controllers.
     _cons.clear();
 
-    /// Return the original error routine.
+    // Return the original error routine.
     FlutterError.onError = currentErrorFunc;
 
     super.dispose();
