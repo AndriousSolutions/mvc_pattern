@@ -1,3 +1,6 @@
+## 6.6.2
+- **Critical fix** _rebuildAllowed = true; in initAsync()
+
 ## 6.6.1
 - Commented out , if (mounted), in refresh()
 

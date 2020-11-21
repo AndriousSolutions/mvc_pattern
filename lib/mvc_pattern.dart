@@ -489,6 +489,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         await listener.initAsync();
       }
     }
+    _rebuildAllowed = true;
     // Set the flag
     return futureBuilt;
   }
@@ -1002,10 +1003,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
   /// Allows the user to call setState() within the Controller.
   void refresh() {
-    //   if (mounted) {
-    /// Refresh the interface by 'rebuilding' the Widget Tree
-    setState(() {});
-//    }
+    if (mounted) {
+      /// Refresh the interface by 'rebuilding' the Widget Tree
+      setState(() {});
+    } else {
+      /// Refresh the interface by 'rebuilding' the Widget Tree
+      setState(() {});
+    }
   }
 
   /// Supply an 'error handler' routine to fire when an error occurs.
