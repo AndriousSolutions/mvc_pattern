@@ -1,6 +1,6 @@
 name: mvc_pattern
 description: To develop apps using a framework following the MVC design pattern separating the app's 'interface' from its 'business logic' and from its 'data source' if any.
-version: 6.6.3
+version: 6.6.3+2
 homepage: https://github.com/AndriousSolutions/mvc_pattern
 repository: https://github.com/AndriousSolutions/mvc_pattern
 
@@ -20,7 +20,7 @@ dev_dependencies:
   # Most of the recommended lints directly implement the guidelines set out in Effective Dart:
   # https://dart.dev/guides/language/effective-dart
   # https://pub.dev/packages/pedantic
-  pedantic: ^1.0.0
+  pedantic: ^1.0.0 #^1.10.0-nullsafety.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

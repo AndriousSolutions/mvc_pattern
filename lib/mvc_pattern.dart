@@ -347,7 +347,7 @@ mixin StateListener {
   }
 }
 
-/// Main State Object seen as the 'StateView.'
+/// Main State Object seen as the 'View of the State.'
 abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     with
         // ignore: prefer_mixin
@@ -1270,6 +1270,7 @@ class _InheritedMVC<T extends Object> extends InheritedWidget {
 ///  Used like the function, setState(), to 'spontaneously' call
 ///  build() functions here and there in your app. Much like the Scoped
 ///  Model's ScopedModelDescendant() class.
+@protected
 class SetState extends StatelessWidget {
   const SetState({Key key, @required this.builder})
       : assert(builder != null, 'Must provide a builder to SetState()'),

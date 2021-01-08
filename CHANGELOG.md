@@ -1,3 +1,6 @@
+## 6.6.3+2
+- Updated README.md to include mvc_application.
+
 ## 6.6.3
 - _rebuildAllowed = true; in dispose();
 
