@@ -359,6 +359,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// With an optional Controller parameter, this constructor imposes its own Error Handler.
   StateMVC([this._controller]) : currentErrorFunc = FlutterError.onError {
     /// If a tester is running. Don't switch out its error handler.
+    /// WidgetsBinding.instance is LiveTestWidgetsFlutterBinding
     if (WidgetsBinding.instance == null ||
         WidgetsBinding.instance is WidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
@@ -606,6 +607,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     // Return the original error routine.
     FlutterError.onError = currentErrorFunc;
+
+    AppMVC._removeStateMVC(this);
 
     super.dispose();
   }
@@ -986,6 +989,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _rebuildRequested = false;
   }
 
+
   /// Allows 'external' routines can call this function.
   // Note not 'protected' and so can be called by 'anyone.' -gp
   @override
@@ -1008,8 +1012,11 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       /// Refresh the interface by 'rebuilding' the Widget Tree
       setState(() {});
     } else {
-      /// Refresh the interface by 'rebuilding' the Widget Tree
-      setState(() {});
+      if (WidgetsBinding.instance == null ||
+          WidgetsBinding.instance is WidgetsFlutterBinding) {
+        /// Refresh the interface by 'rebuilding' the Widget Tree
+        setState(() {});
+      }
     }
   }
 
@@ -1328,6 +1335,15 @@ abstract class AppMVC extends StatefulWidget {
   /// Get the controller if any
   ControllerMVC get controller => con;
 
+  /// Most recent BuildContext/Element
+  BuildContext get context {
+    BuildContext context;
+    if(_states.isNotEmpty){
+      context = _states.last.values.last.context;
+    }
+    return context;
+  }
+
   /// Create the View!
   Widget build(BuildContext context);
 
@@ -1410,6 +1426,16 @@ abstract class AppMVC extends StatefulWidget {
     for (final con in state._controllerList) {
       _controllers.addAll({con.runtimeType: con});
     }
+  }
+
+  static bool _removeStateMVC(StateMVC state){
+    var removed = state != null;
+    if(removed){
+      final Map<String, StateMVC> map = {};
+      map[state._keyId] = state;
+      removed = _states.remove(map);
+    }
+    return removed;
   }
 
   @override

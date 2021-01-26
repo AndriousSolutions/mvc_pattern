@@ -35,6 +35,7 @@ class MyApp extends AppMVC {
   static const String title = 'Flutter Demo Home Page';
   final MyHomePage home = MyHomePage(title);
 
+  @override
   ControllerMVC get controller => home.controller;
 
   /// This is 'the View' for this application.

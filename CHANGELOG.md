@@ -1,3 +1,7 @@
+## 6.6.4
+- AppMVC._removeStateMVC(this);
+- BuildContext get context
+
 ## 6.6.3+2
 - Updated README.md to include mvc_application.
 
