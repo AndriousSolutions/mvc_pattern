@@ -989,7 +989,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _rebuildRequested = false;
   }
 
-
   /// Allows 'external' routines can call this function.
   // Note not 'protected' and so can be called by 'anyone.' -gp
   @override
@@ -1338,7 +1337,7 @@ abstract class AppMVC extends StatefulWidget {
   /// Most recent BuildContext/Element
   BuildContext get context {
     BuildContext context;
-    if(_states.isNotEmpty){
+    if (_states.isNotEmpty) {
       context = _states.last.values.last.context;
     }
     return context;
@@ -1428,9 +1427,9 @@ abstract class AppMVC extends StatefulWidget {
     }
   }
 
-  static bool _removeStateMVC(StateMVC state){
+  static bool _removeStateMVC(StateMVC state) {
     var removed = state != null;
-    if(removed){
+    if (removed) {
       final Map<String, StateMVC> map = {};
       map[state._keyId] = state;
       removed = _states.remove(map);

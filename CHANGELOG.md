@@ -1,20 +1,26 @@
-## 6.6.4
+## 6.6.4+2
+ January 25, 2021
 - AppMVC._removeStateMVC(this);
 - BuildContext get context
 
 ## 6.6.3+2
+ January 08, 2021
 - Updated README.md to include mvc_application.
 
 ## 6.6.3
+ January 08, 2021
 - _rebuildAllowed = true; in dispose();
 
 ## 6.6.2
+ November 21, 2020
 - **Critical fix** _rebuildAllowed = true; in initAsync()
 
 ## 6.6.1
+ November 21, 2020
 - Commented out , if (mounted), in refresh()
 
 ## 6.6.0
+ November 09, 2020
 - New method onAsyncError(FlutterErrorDetails details)
 
 ## 6.5.0
