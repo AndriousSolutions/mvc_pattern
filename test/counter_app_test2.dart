@@ -31,7 +31,7 @@ void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
   /// Supply 'the Controller' for this application.
-  MyApp({Key key}) : super(con: Controller(), key: key);
+  MyApp({Key? key}) : super(con: Controller(), key: key);
 
   static const String title = 'Flutter Demo Home Page';
 
@@ -49,7 +49,7 @@ class MyApp extends AppMVC {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
   @protected
   @override
   State createState() => _MyHomePageState();
@@ -64,11 +64,13 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
     final String id = add(Controller());
 
     /// More than one way to then access your Controller.
-    _con = controller;
-    _con = controllerById(id);
+    // ignore: avoid_as
+    _con = controller as Controller?;
+    // ignore: avoid_as
+    _con = controllerById(id) as Controller?;
   }
 
-  Controller _con;
+  Controller? _con;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +87,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
               MyApp.title,
             ),
             Text(
-              '${_con.counter}',
+              '${_con!.counter}',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
@@ -93,7 +95,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _con.incrementCounter();
+          _con!.incrementCounter();
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
@@ -106,7 +108,7 @@ class Controller extends AppConMVC {
   /// Singleton Factory
   factory Controller() => _this ??= Controller._();
   Controller._();
-  static Controller _this;
+  static Controller? _this;
 
   int get counter => _counter;
   int _counter = 0;

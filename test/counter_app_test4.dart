@@ -30,7 +30,7 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
-  MyApp({Key key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
   static const String title = 'Flutter Demo Home Page';
 
@@ -48,7 +48,7 @@ class MyApp extends AppMVC {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
   @protected
   @override
   State createState() => _MyHomePageState();
@@ -56,9 +56,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
   _MyHomePageState() : super(Controller()) {
-    con = controller;
+    // ignore: avoid_as
+    con = controller as Controller;
   }
-  Controller con;
+  late Controller con;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +98,7 @@ class Controller extends ControllerMVC {
   Controller() {
     data = Model();
   }
-  Model data;
+  late Model data;
 
   /// The Controller knows how to 'talk to' the Model. It knows the name, but Model does the work.
   int get displayThis => data.counter;

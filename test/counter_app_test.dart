@@ -30,7 +30,7 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
-  MyApp({Key key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
   static const String title = 'Flutter Demo Home Page';
   final MyHomePage home = MyHomePage(title);
@@ -52,11 +52,12 @@ class MyApp extends AppMVC {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage(this.title, {Key key}) : super(key: key);
+  MyHomePage(this.title, {Key? key}) : super(key: key);
   final String title;
   final _MyHomePageState state = _MyHomePageState();
 
-  Controller get controller => state.controller;
+  // ignore: avoid_as
+  Controller get controller => state.controller as Controller;
 
   @override
   // ignore: no_logic_in_create_state
@@ -65,9 +66,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends StateMVC<MyHomePage> {
   _MyHomePageState() : super(Controller()) {
-    _con = controller;
+    // ignore: avoid_as
+    _con = controller as Controller;
   }
-  Controller _con;
+  late Controller _con;
 
   @override
   Widget build(BuildContext context) {

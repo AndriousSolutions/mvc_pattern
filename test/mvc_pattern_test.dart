@@ -34,16 +34,17 @@ void _testApp(Key key, AppMVC app) {
 
     expect(widget, isInstanceOf<AppMVC>());
 
-    final AppMVC appObj = widget;
+    // ignore: avoid_as
+    final AppMVC appObj = widget as AppMVC;
 
     /// Reference to the Controller.
-    final ControllerMVC con = appObj.controller;
+    final ControllerMVC? con = appObj.controller;
 
     if (con != null) {
       expect(con, isInstanceOf<ControllerMVC>());
 
       /// Reference to the StateMVC.
-      final _sv = con.stateMVC;
+      final _sv = con.stateMVC!;
 
       expect(_sv, isInstanceOf<State<StatefulWidget>>());
 

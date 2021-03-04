@@ -30,8 +30,8 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends AppMVC {
-  MyApp({Key key, this.homeKey}) : super(key: key);
-  final Key homeKey;
+  MyApp({Key? key, this.homeKey}) : super(key: key);
+  final Key? homeKey;
   static const String title = 'Flutter Demo Home Page';
 
   /// This is 'the View' for this application.
@@ -48,7 +48,7 @@ class MyApp extends AppMVC {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
   // Fields in a Widget subclass are always marked "final".
   @protected
   @override
@@ -58,9 +58,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends StateMVC<MyHomePage> {
   /// The Controller then has access the State Object's lifecycle events.
   _MyHomePageState() : super(Controller()) {
-    con = controller;
+    // ignore: avoid_as
+    con = controller as Controller;
   }
-  Controller con;
+  late Controller con;
 
   @override
   Widget build(BuildContext context) {

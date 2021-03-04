@@ -1,3 +1,8 @@
+
+## 7.0.0   Null safety
+ March 04, 2021
+- Migrated to Dart SDK 2.12.0
+
 ## 6.6.4+2
  January 25, 2021
 - AppMVC._removeStateMVC(this);
