@@ -41,10 +41,7 @@ jobs:
       
       # Check for any formatting issues in the code.
       - run: flutter format .
-      
-      # Build  
-      - run: flutter build apk
-      
+
       # Analyze our Dart code
       - run: flutter analyze
       
