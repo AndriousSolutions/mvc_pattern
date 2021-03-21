@@ -35,11 +35,18 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
+      
       # Get flutter packages
       - run: flutter pub get
+      
+      # Check for any formatting issues in the code.
+      - run: flutter format --set-exit-if-changed .
+      
       # Build  
-      - run: flutter build aot
+      - run: flutter build apk
+      
       # Analyze our Dart code
       - run: flutter analyze
+      
       # Run our tests
       - run: flutter test      
