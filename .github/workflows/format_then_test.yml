@@ -43,7 +43,7 @@ jobs:
       - run: flutter format .
 
       # Analyze our Dart code
-      - run: flutter analyze
+#      - run: flutter analyze
       
       # Run our tests
-      - run: flutter test      
+      - run: flutter test --coverage      
