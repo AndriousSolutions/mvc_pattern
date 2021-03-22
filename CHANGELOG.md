@@ -1,4 +1,15 @@
 
+## 7.1.0
+ March 21, 2021
+- Removed deprecated function, popState()
+- Improved test widget
+- Introduced CI/CD with Github Actions
+- Introduced Test coverage with Codecov
+
+## 7.0.1
+ March 21, 2021
+- for (final listener in set) {
+
 ## 7.0.0   Null safety
  March 04, 2021
 - Migrated to Dart SDK 2.12.0

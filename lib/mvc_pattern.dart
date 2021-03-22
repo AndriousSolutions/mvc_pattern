@@ -69,6 +69,7 @@ class ModelMVC extends StateSetter {
 }
 
 /// Your 'working' class most concerned with the app's functionality.
+/// Add it to a 'StateMVC' object to associate it with that State object.
 class ControllerMVC extends StateSetter with StateListener {
   //
   ControllerMVC([StateMVC? state]) : super() {
@@ -122,14 +123,18 @@ mixin StateSets {
   StateMVC? _stateMVC;
   final Set<StateMVC> _stateMVCSet = {};
 
-  void pushState(StateMVC? state) {
+  /// Push the StateMVC object to a Set of such objects
+  /// Internal use only: This connects the Controller to this View!
+  bool pushState(StateMVC? state) {
     if (state == null) {
-      return;
+      return false;
     }
     _stateMVC = state;
-    _stateMVCSet.add(state);
+    return _stateMVCSet.add(state);
   }
 
+  /// Remove the specified StateMVC object to a Set of such objects
+  /// Internal use only: This disconnects the Controller to this View!
   bool removeState(StateMVC? state) {
     if (state == null) {
       return false;
@@ -140,6 +145,10 @@ mixin StateSets {
     return _stateMVCSet.remove(state);
   }
 
+  /// This removes the most recent StateMVC object added
+  /// to the Set of StateMVC state objects.
+  /// Primarily internal use only: This disconnects the Controller from that StateMVC object.
+  @Deprecated("Will soon not allow you to 'pop' StateMVC objects yourself.")
   bool popState() {
     // Don't continue if null.
     if (_stateMVC == null) {
@@ -179,7 +188,7 @@ mixin StateListener {
   }
 
   /// The framework will call this method exactly once.
-  /// Only when the [State] object is first created.
+  /// Only when the [StateMVC] object is first created.
   void initState() {
     /// Override this method to perform initialization that depends on the
     /// location at which this object was inserted into the tree.
@@ -188,7 +197,7 @@ mixin StateListener {
     /// [didUpdateWidget], and then unsubscribe from the object in [dispose].
   }
 
-  /// The framework calls this method whenever it removes this [State] object
+  /// The framework calls this method whenever it removes this [StateMVC] object
   /// from the tree.
   void deactivate() {
     /// The framework calls this method whenever it removes this [State] object
@@ -198,12 +207,12 @@ mixin StateListener {
     /// ancestor with a pointer to a descendant's [RenderObject]).
   }
 
-  /// The framework calls this method when this [State] object will never
+  /// The framework calls this method when this [StateMVC] object will never
   /// build again.
   /// Note: THERE IS NO GUARANTEE THIS METHOD WILL RUN in the Framework.
   @mustCallSuper
   void dispose() {
-    /// The framework calls this method when this [State] object will never
+    /// The framework calls this method when this [StateMVC] object will never
     /// build again. The [State] object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
@@ -219,7 +228,7 @@ mixin StateListener {
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
   }
 
-  /// Called when a dependency of this [State] object changes.
+  /// Called when a dependency of this [StateMVC] object changes.
   void didChangeDependencies() {
     /// Called when a dependency of this [State] object changes.
     ///
@@ -346,7 +355,8 @@ mixin StateListener {
   }
 }
 
-/// Main State Object seen as the 'View of the State.'
+/// The State Object seen as the 'View of the State.'
+/// Uses the mixins: WidgetsBindingObserver, _ControllerList, _StateListeners
 abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     with
         // ignore: prefer_mixin
@@ -404,6 +414,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     return super.add(c);
   }
 
+  /// Add a list of 'Controllers' to be associated with this StatMVC object.
   @override
   void addList(List<ControllerMVC>? list) {
     if (list == null) {
@@ -415,7 +426,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     return super.addList(list);
   }
 
-  /// The Unique key identifier for this State object.
+  /// The unique key identifier for this State object.
   @override
   String get keyId => _keyId;
 
@@ -498,7 +509,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   }
 
   /// The framework will call this method exactly once.
-  /// Only when the [State] object is first created.
+  /// Only when the [StateMVC] object is first created.
   @protected
   @override
   @mustCallSuper
@@ -564,7 +575,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _rebuildRequested = false;
   }
 
-  /// The framework calls this method when this [State] object will never
+  /// The framework calls this method when this [StateMVC] object will never
   /// build again.
   @protected
   @override
@@ -1125,12 +1136,12 @@ mixin _StateListeners {
     if (key == null || key.isEmpty) {
       return se;
     }
-    set.map((StateListener evt) {
-      if (evt._keyId == key) {
-        se = evt;
-        return;
+    for (final listener in set) {
+      if (listener._keyId == key) {
+        se = listener;
+        break;
       }
-    });
+    }
     return se;
   }
 
@@ -1140,6 +1151,8 @@ mixin _StateListeners {
   }
 }
 
+/// Manages the number of 'Controllers' associated with this
+/// StateMVC object at any one time during the App's lifecycle.
 mixin _ControllerListing {
   StateMVC? _stateMVC;
 
@@ -1151,14 +1164,17 @@ mixin _ControllerListing {
     return _map[keyId];
   }
 
+  /// Associate a list of 'Controllers' to this StateMVC object at one time.
   void addList(List<ControllerMVC> list) => list.forEach(add);
 
+  /// Returns the list of 'Controllers' associated with this StateMVC object.
   List<ControllerMVC?> listControllers(List<String> keys) =>
       _controllers(keys).values.toList();
 
   /// Never supply a public list of Controllers. User must know the key identifier(s).
   List<ControllerMVC> get _controllerList => _asList; //_controllers.asList;
 
+  /// Returns a specific 'Controller' by looking up its unique 'key' identifier.
   Map<String, ControllerMVC?> _controllers(List<String> keys) {
     final Map<String, ControllerMVC?> controllers = {};
 
@@ -1170,10 +1186,15 @@ mixin _ControllerListing {
 
   final Map<String, ControllerMVC> _map = {};
 
+  /// Returns a Map containing all the 'Controllers' associated with this
+  /// StateMVC object each with their unique 'key' identifier.
   Map<String, ControllerMVC> get map => _map;
 
   List<ControllerMVC> get _asList => _map.values.toList();
 
+  /// Add a 'Controller' to then associate it to this
+  /// particular StateMVC object. Returns the Controller's
+  /// unique 'key' identifier.
   String add(ControllerMVC? con) {
     if (con == null) {
       return '';
@@ -1185,6 +1206,7 @@ mixin _ControllerListing {
     final String keyId = (contains(con)) ? con._keyId : addConId(con);
 
     // ignore: avoid_as
+    /// Collects this StateMVC object to the 'main list' of such objects.
     AppMVC._addStateMVC(this as StateMVC<StatefulWidget>);
 
     if (!_cons.containsValue(con)) {
@@ -1195,6 +1217,8 @@ mixin _ControllerListing {
     return keyId;
   }
 
+  /// Remove a specific associated 'Controller' from this StateMVC object
+  /// by using its unique 'key' identifier.
   bool remove(String keyId) {
     final con = _map[keyId];
     final there = con != null;
@@ -1205,12 +1229,16 @@ mixin _ControllerListing {
     return there;
   }
 
+  /// Returns 'the first' Controller associated with this StateMVC object.
   ControllerMVC get firstCon => _asList.first;
 
+  /// Returns true if the specified 'Controller' is associated with this StateMVC object.
   bool contains(ControllerMVC con) => _map.containsValue(con);
 
   void _disposeControllerListing() => _map.clear();
 
+  /// Adds a 'Controller' to be associated with this StateMVC object
+  /// and returns Controller's the unique 'key' identifier assigned to it.
   String addConId(ControllerMVC con) {
     final keyId = con.keyId; //_addKeyId(con);
     _map[keyId] = con;
@@ -1230,16 +1258,25 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
     addList(controllers?.toList());
   }
   final List<ControllerMVC>? controllers;
+
+  /// This is of type Object allowing you
+  /// to propagate any class object you wish down the widget tree.
   Object? object;
 
   /// Implement this function to compose the App's View.
   /// Override to impose your own WidgetsApp (like CupertinoApp or MaterialApp)
   Widget buildApp(BuildContext context);
 
+  /// The App's View's true build function called the
+  /// abstract function, buildApp, but also implements a
+  /// InheritedWidget allowing you to pass down the Widget
+  /// tree any 'object' you wish.
   @override
   Widget build(BuildContext context) =>
       _InheritedMVC(state: this, object: object, child: buildApp(context));
 
+  /// Calls the State object's setState() function if not
+  /// already in the SetState.builder() function (see class SetState below).
   @override
   void setState(VoidCallback fn) {
     if (!inBuilder) {
@@ -1247,6 +1284,10 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
     }
   }
 
+  /// Calls the State object's refresh() function if not
+  /// already in the SetState.builder() function (see class SetState below).
+  /// The refresh() function is just another name used to call
+  /// the State object's setState() function.
   @override
   void refresh() {
     if (!inBuilder) {
@@ -1267,7 +1308,8 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
 }
 
 class _InheritedMVC<T extends Object> extends InheritedWidget {
-  const _InheritedMVC({Key? key, this.state, this.object, required Widget child})
+  const _InheritedMVC(
+      {Key? key, this.state, this.object, required Widget child})
       : super(key: key, child: child);
   final ViewMVC? state;
   final T? object;
@@ -1279,12 +1321,17 @@ class _InheritedMVC<T extends Object> extends InheritedWidget {
 ///  Used like the function, setState(), to 'spontaneously' call
 ///  build() functions here and there in your app. Much like the Scoped
 ///  Model's ScopedModelDescendant() class.
+///  More information:
+///  https://medium.com/flutter-community/shrine-in-mvc-7984e08d8e6b#488c
 @protected
 class SetState extends StatelessWidget {
-  const SetState({Key? key, required this.builder})
-      : super(key: key);
+  const SetState({Key? key, required this.builder}) : super(key: key);
   final BuilderWidget builder;
 
+  /// Calls the required Function object:
+  /// Function(BuildContext context, T? object)
+  /// and passes along the InheritWidget's custom 'object'
+  ///
   @override
   Widget build(BuildContext context) {
     /// Go up the widget tree and obtain the closest 'View'
@@ -1308,10 +1355,13 @@ class SetState extends StatelessWidget {
   }
 }
 
+/// The 'type of function' required by the class, SetState.
 typedef BuilderWidget<T extends Object> = Widget Function(
     BuildContext context, T? object);
 
 /// A Controller for the 'app level' to influence the whole app.
+/// Full overview of mvc_pattern can be found in this article:
+/// https://medium.com/follow-flutter/flutter-mvc-at-last-275a0dc1e730
 class AppConMVC extends ControllerMVC {
   AppConMVC([StateMVC? state]) : super(state);
 
@@ -1323,7 +1373,7 @@ class AppConMVC extends ControllerMVC {
 }
 
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
-/// AppStatefulWidget is its subclass
+/// AppStatefulWidget is its subclass.
 abstract class AppMVC extends StatefulWidget {
   /// Simple constructor. Calls the initApp() function.
   AppMVC({this.con, Key? key})
@@ -1346,6 +1396,7 @@ abstract class AppMVC extends StatefulWidget {
   }
 
   /// Create the View!
+  /// Look for an example:
   Widget build(BuildContext context);
 
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.
@@ -1382,6 +1433,7 @@ abstract class AppMVC extends StatefulWidget {
   }
 
   /// Determines if running in an IDE or in production.
+  /// Returns true if the App is under in the Debugger and not production.
   static bool get inDebugger {
     var inDebugMode = false;
     // assert is removed in production.
@@ -1420,6 +1472,7 @@ abstract class AppMVC extends StatefulWidget {
   }
 
   /// This is 'privatized' as it is an critical method and not for public access.
+  /// This contains the 'main list' of StateMVC objects present in the app!
   static void _addStateMVC(StateMVC state) {
     final Map<String, StateMVC> map = {};
     map[state._keyId] = state;
@@ -1439,16 +1492,20 @@ abstract class AppMVC extends StatefulWidget {
     return removed;
   }
 
+  /// Programmatically creates the App's State object.
   @override
   // ignore: no_logic_in_create_state
   State createState() => _appState;
 }
 
-
+/// The App's first State object.
+/// It brings in the first State object
 class _AppState extends StateMVC<AppMVC> {
   //
   _AppState(ControllerMVC? con) : super(con);
 
+  /// Calls the Flutter App's object (AppMVC) own initApp() function.
+  /// It's where non-synchronous operations are performed when the app is starting up.
   @override
   void initState() {
     super.initState();
@@ -1460,6 +1517,8 @@ class _AppState extends StateMVC<AppMVC> {
   // ignore: avoid_returning_null_for_void
   void setState(VoidCallback fn) => null;
 
+  /// This State object calls the StatefulWidgets (AppMVC) own abstract function,
+  /// build().
   @override
   Widget build(BuildContext context) => widget.build(context);
 
