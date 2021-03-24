@@ -27,13 +27,14 @@ import 'package:flutter/material.dart';
 
 import 'package:mvc_pattern/mvc_pattern.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MyApp(key: const Key('MyApp')));
 
 class MyApp extends AppMVC {
   MyApp({Key? key}) : super(key: key);
 
   /// Merely for testing purposes, supply a class field, home.
   final home = MyHomePage(
+    key: const Key('MyHomePage'),
     title: 'MVC Pattern Demo',
   );
 
@@ -49,7 +50,10 @@ class MyApp extends AppMVC {
 
 // ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title = 'Flutter Demo'}) : super(key: key);
+  MyHomePage({Key? key, this.title = 'Flutter Demo'}) : super(key: key) {
+    /// Creating a ambiguous StateMVC object merely for testing purposes.
+    SecondState();
+  }
   // Fields in a StatefulWidget should always be "final".
   final String title;
 
@@ -260,4 +264,21 @@ class ListenTester with StateListener {
   /// Called when the system changes the set of active accessibility features.
   @override
   void didChangeAccessibilityFeatures() {}
+}
+
+/// A fake StateMVC object for testing purposes.
+class SecondState extends StateMVC<MyHomePage> {
+  factory SecondState() => _this ??= SecondState._();
+  SecondState._() : super(Controller());
+  static SecondState? _this;
+
+  @override
+  Widget build(BuildContext context) => const Center();
+}
+
+/// A fake Controller object for testing purposes.
+class FakeController extends ControllerMVC {
+  factory FakeController() => _this ??= FakeController._();
+  FakeController._();
+  static FakeController? _this;
 }

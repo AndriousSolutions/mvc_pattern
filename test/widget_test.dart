@@ -16,8 +16,6 @@ void main() {
   _testApp(key, MyApp(key: key));
 }
 
-
-
 void _testApp(Key key, AppMVC app) {
   //
   testWidgets('test mvc_pattern', (WidgetTester tester) async {
@@ -25,9 +23,40 @@ void _testApp(Key key, AppMVC app) {
     await tester.pumpWidget(app);
 
     /// You can directly access the 'internal workings' of the app!
-    final appMVC = tester.widget(find.byKey(key));
+    final AppMVC appMVC = tester.widget(find.byKey(key));
 
     expect(appMVC, isInstanceOf<AppMVC>());
+
+    final context = appMVC.context;
+
+    expect(context, isInstanceOf<BuildContext?>());
+
+    final con = appMVC.con;
+
+    expect(con, isInstanceOf<AppConMVC?>());
+
+    final ControllerMVC? controller = appMVC.controller;
+
+    expect(controller, isInstanceOf<ControllerMVC?>());
+
+    final init = appMVC.initAsync();
+
+    expect(init, isInstanceOf<Future<bool>>());
+
+    final debugging = AppMVC.inDebugger;
+
+    expect(debugging, isInstanceOf<bool>());
+
+    /// Test looking up State objects by id.
+    final keyId = MyHomePageState().keyId;
+
+    final map = AppMVC.getStates([keyId]);
+
+    expect(map, isInstanceOf<Map<String, StateMVC>>());
+
+    final list = AppMVC.listStates([keyId]);
+
+    expect(list, isInstanceOf<List<StateMVC>>());
 
     /// cast the AppMVC object to type MyApp
     /// to access its unique property, home.
@@ -68,8 +97,6 @@ void _testApp(Key key, AppMVC app) {
   });
 }
 
-
-
 void _testsListeners(StateMVC? stateObj) {
   //
   expect(stateObj, isInstanceOf<StateMVC>());
@@ -105,20 +132,13 @@ void _testsListeners(StateMVC? stateObj) {
   expect(obj, isInstanceOf<StateListener>());
 }
 
-
-
 Future<void> _testsStateMVC(StateMVC? stateObj) async {
   //
   expect(stateObj, isInstanceOf<StateMVC>());
 
-  final con = stateObj?.controller;
+  var con = stateObj?.controller;
 
   expect(con, isInstanceOf<ControllerMVC>());
-
-  /// Reference to the StateMVC.
-  final _sv = con?.stateMVC!;
-
-  expect(_sv, isInstanceOf<State<StatefulWidget>>());
 
   /// The StateMVC object.
   final _stateMVC = con?.stateMVC;
@@ -130,30 +150,69 @@ Future<void> _testsStateMVC(StateMVC? stateObj) async {
 
   expect(_state, isInstanceOf<State>());
 
+  _stateMVC?.add(FakeController());
+
+  /// Return a List of Controllers specified by key id.
+  final listCons =
+      _stateMVC?.listControllers([Controller().keyId, FakeController().keyId]);
+
+  expect(listCons, isInstanceOf<List<ControllerMVC?>>());
+
+  final map = _stateMVC?.map;
+
+  expect(map, isInstanceOf<Map<String, ControllerMVC>>());
+
+  final remove = _stateMVC?.remove(FakeController().keyId);
+
+  expect(remove, isInstanceOf<bool>());
+
+  con = _stateMVC?.firstCon;
+
+  expect(con, isInstanceOf<ControllerMVC>());
+
   /// Controller's unique identifier.
   final id = con?.keyId;
 
   expect(id, isInstanceOf<String>());
 
   /// The StateView's unique identifier.
-  final svId = _sv?.keyId;
+  final svId = _stateMVC?.keyId;
 
   expect(svId, isInstanceOf<String>());
 
-  /// Current context.
-  final context = _sv?.context;
-
-  expect(context, isInstanceOf<BuildContext>());
+  /// Will get an error because its unmounted.
+  // /// Current context.
+  // final context = _stateMVC?.context;
+  //
+  // expect(context, isInstanceOf<BuildContext>());
 
   /// Is the widget mounted?
-  final mounted = _sv?.mounted;
+  final mounted = _stateMVC?.mounted;
 
   expect(mounted, isInstanceOf<bool>());
 
-  /// The StatefulWidget.
-  final widget = _sv?.widget;
+  // /// The StatefulWidget.
+  // final widget = _stateMVC?.widget;
+  //
+  // expect(widget, isInstanceOf<StatefulWidget>());
 
-  expect(widget, isInstanceOf<StatefulWidget>());
+  final listenId = ListenTester().keyId;
+
+  var add = _stateMVC?.addBeforeListener(ListenTester());
+
+  expect(add, isInstanceOf<bool>());
+
+  add = _stateMVC?.addBeforeListener(ListenTester());
+
+  expect(add, isInstanceOf<bool>());
+
+  var list = _stateMVC?.beforeList([listenId]);
+
+  expect(list, isInstanceOf<List<StateListener>>());
+
+  list = _stateMVC?.afterList([listenId]);
+
+  expect(list, isInstanceOf<List<StateListener>>());
 
   var boolean = await stateObj?.initAsync();
 
@@ -168,6 +227,8 @@ Future<void> _testsStateMVC(StateMVC? stateObj) async {
   boolean = await stateObj?.didPushRoute('/');
 
   expect(boolean, isInstanceOf<bool>());
+
+  stateObj?.reassemble();
 
   stateObj?.deactivate();
 
@@ -190,8 +251,6 @@ Future<void> _testsStateMVC(StateMVC? stateObj) async {
   stateObj?.refresh();
 }
 
-
-
 void _testsController(StateMVC? stateObj) {
   //
   expect(stateObj, isInstanceOf<StateMVC>());
@@ -212,46 +271,89 @@ void _testsController(StateMVC? stateObj) {
 
   expect(conObj, isInstanceOf<Controller>());
 
+  stateObj?.add(FakeController());
+
   conId = conObj?.keyId;
 
   /// Another way to retrieve its Controller from a list of Controllers
   /// Retrieve it by its key id Note the casting.
   /// The function controllerById returns an object of type ControllerMVC.
-// ignore: avoid_as
   conObj = stateObj?.controllerById(conId!) as Controller;
 
   expect(conObj, isInstanceOf<Controller>());
 
+  /// Return a List of Controllers specified by key id.
+  final listCons = conObj.listControllers([conId!]);
+
+  expect(listCons, isInstanceOf<List<ControllerMVC?>>());
+
+  /// This listener object has a factory constructor and so
+  /// has already been instantiated. It's here to provide
+  /// its unique key identifier.
+  final listener = ListenTester();
+
+  /// Retrieve the 'before' listener by its unique key.
+  /// The very same listener instantiated above.
+  var listenerObj = conObj.beforeListener(listener.keyId);
+
+  expect(listenerObj, isInstanceOf<StateListener?>());
+
+  /// Retrieve the 'before' listener by its unique key.
+  /// The very same listener instantiated above.
+  listenerObj = conObj.afterListener(listener.keyId);
+
+  expect(listenerObj, isInstanceOf<StateListener?>());
+
+  /// Only when the [StateMVC] object is first created.
+  conObj.initState();
+
+  /// The framework calls this method when removed from the widget tree.
+  conObj.deactivate();
+
+  /// Called during development whenever there's a hot reload.
+  conObj.reassemble();
+
+  /// Allows you to call 'setState' from the 'current' the State object.
   conObj.setState(() {});
 
+  /// Allows you to call 'setState' from the 'current' the State object.
   conObj.refresh();
 
+  /// Allows you to call 'setState' from the 'current' the State object.
   conObj.rebuild();
 
+  /// Allows you to call 'setState' from the 'current' the State object.
   conObj.notifyListeners();
 
+  /// Return a 'copy' of the Set of State objects.
   final Set<StateMVC> states = conObj.states;
 
   expect(states, isInstanceOf<Set<StateMVC>>());
 
+  /// The current StateMVC object.
   final state = conObj.stateMVC;
 
-  final remove = conObj.removeState(state);
+  /// Remove the specified StateMVC object to a Set of such objects
+  var result = conObj.removeState(state);
 
-  expect(remove, isInstanceOf<bool>());
+  expect(result, isInstanceOf<bool>());
 
-  conObj.pushState(state);
+  result = conObj.removeState(SecondState());
+
+  expect(result, isInstanceOf<bool>());
+
+  result = conObj.pushState(state);
+
+  expect(result, isInstanceOf<bool>());
+
+  conObj.addState(state);
 }
-
 
 /// Record any errors for any try-catch statements.
 void _catchError(Object error) {
   _inError = true;
   _errorMessage = '$_errorMessage${error.toString()} \r\n';
 }
-
-
-
 
 /// Throw any collected errors
 void _reportErrors() {

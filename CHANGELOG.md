@@ -1,6 +1,8 @@
 
 ## 7.1.0
  March 21, 2021
+- **BREAKING CHANGE** addState() returns State object's unique identifier; not the controller's
+- Corrected AppMVC._addStateMVC(this as StateMVC);
 - Removed deprecated function, popState()
 - Improved test widget
 - Introduced CI/CD with Github Actions

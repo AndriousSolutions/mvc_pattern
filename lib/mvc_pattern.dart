@@ -78,11 +78,16 @@ class ControllerMVC extends StateSetter with StateListener {
 
   /// Associate this Controller to the specified State object
   /// to use that State object's functions and features.
+  /// Returns that State object's unique identifier.
   String addState(StateMVC? state) {
     if (state == null) {
       return '';
     }
-    return state.add(this);
+    if (state.add(this).isNotEmpty) {
+      return state.keyId;
+    } else {
+      return '';
+    }
   }
 
   /// The current StateMVC object.
@@ -102,7 +107,7 @@ class ControllerMVC extends StateSetter with StateListener {
   StateListener? afterListener(String key) => _stateMVC?.afterListener(key);
 }
 
-/// Allows you to call 'setState' for the current the State object.
+/// Allows you to call 'setState' from the 'current' the State object.
 class StateSetter with StateSets {
   /// Provide the setState() function to external actors
   void setState(VoidCallback fn) => _stateMVC?.setState(fn);
@@ -405,12 +410,11 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Returns the Controller's unique String identifier.
   @override
   String add(ControllerMVC? c) {
-    if (c == null) {
-      return '';
+    if (c != null) {
+      /// It may have been a listener. Can't be both.
+      removeListener(c);
     }
 
-    /// It may have been a listener. Can't be both.
-    removeListener(c);
     return super.add(c);
   }
 
@@ -1196,24 +1200,26 @@ mixin _ControllerListing {
   /// particular StateMVC object. Returns the Controller's
   /// unique 'key' identifier.
   String add(ControllerMVC? con) {
+    String keyId;
+
     if (con == null) {
-      return '';
+      keyId = '';
+    } else {
+      /// This connects the Controller to this View!
+      con.pushState(_stateMVC);
+
+      /// It's already there?! Return its key.
+      keyId = (contains(con)) ? con._keyId : addConId(con);
+
+      if (!_cons.containsValue(con)) {
+        _cons.addAll({con.runtimeType: con});
+      }
     }
 
-    /// This connects the Controller to this View!
-    con.pushState(_stateMVC);
-
-    final String keyId = (contains(con)) ? con._keyId : addConId(con);
-
-    // ignore: avoid_as
     /// Collects this StateMVC object to the 'main list' of such objects.
-    AppMVC._addStateMVC(this as StateMVC<StatefulWidget>);
+    // ignore: avoid_as
+    AppMVC._addStateMVC(this as StateMVC);
 
-    if (!_cons.containsValue(con)) {
-      _cons.addAll({con.runtimeType: con});
-    }
-
-    /// It's already there?! Return its key.
     return keyId;
   }
 
