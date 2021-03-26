@@ -29,8 +29,10 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 
 void main() => runApp(MyApp(key: const Key('MyApp')));
 
+/// Main or first class to pass to the 'main.dart' file's runApp() function.
 class MyApp extends AppMVC {
-  MyApp({Key? key}) : super(key: key);
+  /// Assign a 'fake' Controller to use in Unit Testing.
+  MyApp({Key? key}) : super(key: key, con: FakeAppController());
 
   /// Merely for testing purposes, supply a class field, home.
   final home = MyHomePage(
@@ -68,14 +70,21 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends StateMVC<MyHomePage> {
   MyHomePageState() : super(Controller()) {
     /// Acquire a reference to the particular Controller.
-    // ignore: avoid_as
     con = controller as Controller;
+
+    /// For Unit testng. Adding a listener object to this State object.
+    final listener = ListenTester();
+    addAfterListener(listener);
+    addBeforeListener(listener);
   }
   late Controller con;
 
   @override
   void initState() {
     super.initState();
+
+    /// Testing the Controller's initState();
+    con.initState();
 
     /// For testing purposes, supply this StateMVC object's unique identifier
     /// to its StatefulWidget.
@@ -112,45 +121,16 @@ class MyHomePageState extends StateMVC<MyHomePage> {
     );
   }
 
+  /// Supply an error handler for Unit Testing.
   @override
-  void didChangeMetrics() {
-    super.didChangeMetrics();
-  }
-
-  @override
-  void didChangeTextScaleFactor() {
-    super.didChangeTextScaleFactor();
-  }
-
-  @override
-  void didChangePlatformBrightness() {
-    super.didChangePlatformBrightness();
-  }
-
-  @override
-  void didChangeLocale(Locale locale) {
-    super.didChangeLocale(locale);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-  }
-
-  @override
-  void didHaveMemoryPressure() {
-    super.didHaveMemoryPressure();
-  }
-
-  @override
-  void didChangeAccessibilityFeatures() {
-    super.didChangeAccessibilityFeatures();
+  void onError(FlutterErrorDetails details){
+    /// Error is now handled.
   }
 }
 
 class Controller extends ControllerMVC {
-  factory Controller() => _this ??= Controller._();
-  Controller._();
+  factory Controller([StateMVC? state]) => _this ??= Controller._(state);
+  Controller._(StateMVC? state) : super(state);
   static Controller? _this;
 
   late _Model _model;
@@ -269,7 +249,9 @@ class ListenTester with StateListener {
 /// A fake StateMVC object for testing purposes.
 class SecondState extends StateMVC<MyHomePage> {
   factory SecondState() => _this ??= SecondState._();
-  SecondState._() : super(Controller());
+
+  /// Pass 'null' to test the Controller with a null State object.
+  SecondState._() : super(Controller(null));
   static SecondState? _this;
 
   @override
@@ -281,4 +263,11 @@ class FakeController extends ControllerMVC {
   factory FakeController() => _this ??= FakeController._();
   FakeController._();
   static FakeController? _this;
+}
+
+/// A fake 'App' Controller object for testing purposes.
+class FakeAppController extends AppConMVC {
+  factory FakeAppController() => _this ??= FakeAppController._();
+  FakeAppController._();
+  static FakeAppController? _this;
 }

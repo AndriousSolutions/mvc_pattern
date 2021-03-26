@@ -1085,15 +1085,15 @@ mixin _StateListeners {
     if (keys == null || keys.isEmpty) {
       return list;
     }
-    set.map((StateListener evt) {
+    for (final listener in set) {
       for (final key in keys) {
-        if (evt._keyId == key) {
-          list.add(evt);
+        if (listener._keyId == key) {
+          list.add(listener);
           keys.remove(key);
           break;
         }
       }
-    });
+    }
     return list;
   }
 
@@ -1402,7 +1402,6 @@ abstract class AppMVC extends StatefulWidget {
   }
 
   /// Create the View!
-  /// Look for an example:
   Widget build(BuildContext context);
 
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.

@@ -1,4 +1,10 @@
 
+
+## 7.1.1
+ March 26, 2021
+- Further Unit Tests
+- Corrected beforeList() & afterList() with for (final listener in set) {
+
 ## 7.1.0
  March 21, 2021
 - **BREAKING CHANGE** addState() returns State object's unique identifier; not the controller's
