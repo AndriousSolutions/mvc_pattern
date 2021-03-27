@@ -1306,19 +1306,23 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
     if (ex == null) {
       return;
     }
-    FlutterError.onError!(FlutterErrorDetails(exception: ex));
+    /// If a tester is running. Don't handle the error.
+    if (WidgetsBinding.instance == null ||
+        WidgetsBinding.instance is WidgetsFlutterBinding) {
+      FlutterError.onError!(FlutterErrorDetails(exception: ex));
+    }
   }
 
   bool inBuilder = false;
   bool setStates = false;
 }
 
-class _InheritedMVC<T extends Object> extends InheritedWidget {
+class _InheritedMVC extends InheritedWidget {
   const _InheritedMVC(
       {Key? key, this.state, this.object, required Widget child})
       : super(key: key, child: child);
   final ViewMVC? state;
-  final T? object;
+  final Object? object;
   @override
   bool updateShouldNotify(_InheritedMVC oldWidget) =>
       state!.setStates && !state!.inBuilder;

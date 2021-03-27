@@ -34,20 +34,50 @@ class MyApp extends AppMVC {
   /// Assign a 'fake' Controller to use in Unit Testing.
   MyApp({Key? key}) : super(key: key, con: FakeAppController());
 
-  /// Merely for testing purposes, supply a class field, home.
-  final home = MyHomePage(
-    key: const Key('MyHomePage'),
-    title: 'MVC Pattern Demo',
+  static String? homeStateKey;
+
+  /// Supply an 'object' to be passed all the way down the Widget tree.
+  @override
+  Widget build(BuildContext context) => const AppView();
+}
+
+class AppView extends StatefulWidget {
+  const AppView({Key? key}) : super(key: key);
+  @override
+
+  State<StatefulWidget> createState() => View();
+}
+
+///
+class View extends ViewMVC<AppView> {
+  factory View() => _this ??= View._();
+  /// Demonstrate passing an 'object' down the Widget tree
+  /// like in the Scoped Model
+  View._()
+      : super(
+    controller: FakeAppController(),
+    object: const Text(
+      'Hello World!',
+      style: TextStyle(color: Colors.red),
+    ),
   );
+  static View? _this;
+  /// Allow for external access to is object.
+  static View? get instance => _this;
+
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        home: home,
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-      );
+  Widget buildApp(BuildContext context) => MaterialApp(
+      home: MyHomePage(
+        key: const Key('MyHomePage'),
+        title: 'MVC Pattern Demo',
+      ));
+
+  /// Supply an error handler for Unit Testing.
+  @override
+  void onError(FlutterErrorDetails details) {
+    /// Error is now handled.
+  }
 }
 
 // ignore: must_be_immutable
@@ -62,8 +92,6 @@ class MyHomePage extends StatefulWidget {
   @override
   // ignore: no_logic_in_create_state
   State createState() => MyHomePageState();
-
-  String? stateKey;
 }
 
 /// The State object is extended by its 'MVC version', StateMVC.
@@ -88,7 +116,7 @@ class MyHomePageState extends StateMVC<MyHomePage> {
 
     /// For testing purposes, supply this StateMVC object's unique identifier
     /// to its StatefulWidget.
-    widget.stateKey = keyId;
+    MyApp.homeStateKey = keyId;
   }
 
   @override
@@ -101,9 +129,14 @@ class MyHomePageState extends StateMVC<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              widget.title,
-            ),
+            SetState(builder: (context, obj) {
+              Widget widget = const SizedBox(height: 5);
+              if (obj is Text) {
+                widget = obj;
+              }
+              return widget;
+            }),
+            const Text('You have pushed the button this many times:'),
             Text(
               '${con.counter}',
               style: Theme.of(context).textTheme.headline4,
@@ -123,7 +156,7 @@ class MyHomePageState extends StateMVC<MyHomePage> {
 
   /// Supply an error handler for Unit Testing.
   @override
-  void onError(FlutterErrorDetails details){
+  void onError(FlutterErrorDetails details) {
     /// Error is now handled.
   }
 }
@@ -270,4 +303,12 @@ class FakeAppController extends AppConMVC {
   factory FakeAppController() => _this ??= FakeAppController._();
   FakeAppController._();
   static FakeAppController? _this;
+
+  /// Supply an error handler for Unit Testing.
+  @override
+  void onError(FlutterErrorDetails details) {
+    super.onError(details);
+
+    /// Error is now handled.
+  }
 }

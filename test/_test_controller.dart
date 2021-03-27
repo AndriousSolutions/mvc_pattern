@@ -23,11 +23,15 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart' show FlutterErrorDetails;
 
-import 'package:mvc_pattern/mvc_pattern.dart';
+import 'package:flutter_test/flutter_test.dart' show expect, isInstanceOf;
 
-import '../example/main.dart';
+import 'package:mvc_pattern/mvc_pattern.dart'
+    show ControllerMVC, StateListener, StateMVC;
+
+import '../example/main.dart'
+    show Controller, FakeAppController, ListenTester, SecondState;
 
 void testsController(StateMVC? stateObj) {
   //
@@ -92,21 +96,6 @@ void testsController(StateMVC? stateObj) {
 
   /// The framework calls this method when removed from the widget tree.
   conObj.deactivate();
-  //
-  // final widget = stateObj?.widget;
-  //
-  // /// Test the Controller's didUpdateWidget() function.
-  // conObj.didUpdateWidget(widget!);
-  //
-  // final context = stateObj?.context;
-  //
-  // final locale = Localizations.localeOf(context!);
-  //
-  // /// Called when the app's Locale changes
-  // conObj.didChangeLocale(locale);
-  //
-  // /// Called when the returning from another app.
-  // conObj.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
   /// Called during development whenever there's a hot reload.
   conObj.reassemble();
@@ -145,4 +134,8 @@ void testsController(StateMVC? stateObj) {
   expect(result, isInstanceOf<bool>());
 
   conObj.addState(state);
+
+  final exception = FlutterErrorDetails(exception: Exception('Error Test!'));
+
+  FakeAppController().onError(exception);
 }

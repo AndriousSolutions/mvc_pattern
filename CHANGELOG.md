@@ -1,4 +1,10 @@
 
+## 7.1.2
+ March 27, 2021
+- class _InheritedMVC with Object? object;
+- catchError() has WidgetsBinding.instance is WidgetsFlutterBinding
+- Unit Tests for class ViewMVC & class _InheritedMVC
+- Separate tests files.
 
 ## 7.1.1
  March 26, 2021

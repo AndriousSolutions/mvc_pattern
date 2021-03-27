@@ -23,13 +23,21 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        AppLifecycleState,
+        FlutterErrorDetails,
+        Localizations,
+        State,
+        StatefulWidget;
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart'
+    show Future, expect, isEmpty, isInstanceOf, isTrue;
 
-import 'package:mvc_pattern/mvc_pattern.dart';
+import 'package:mvc_pattern/mvc_pattern.dart'
+    show ControllerMVC, StateListener, StateMVC;
 
-import '../example/main.dart';
+import '../example/main.dart' show Controller, FakeController, ListenTester;
 
 Future<void> testsStateMVC(StateMVC? stateObj) async {
   //
@@ -60,7 +68,7 @@ Future<void> testsStateMVC(StateMVC? stateObj) async {
 
   /// Return a List of Controllers specified by key id.
   final listCons =
-  _stateMVC?.listControllers([Controller().keyId, FakeController().keyId]);
+      _stateMVC?.listControllers([Controller().keyId, FakeController().keyId]);
 
   expect(listCons, isInstanceOf<List<ControllerMVC?>>());
 
@@ -123,6 +131,13 @@ Future<void> testsStateMVC(StateMVC? stateObj) async {
   var boolean = await stateObj?.initAsync();
 
   expect(boolean, isInstanceOf<bool>());
+
+  /// Call initAsync() function again to test if (futureBuilt) {
+  boolean = await stateObj?.initAsync();
+
+  expect(boolean, isInstanceOf<bool>());
+
+  expect(boolean, isTrue);
 
   /// Usually you would call this function on a subclass of StateMVC
   /// For example, _MyHomePageState would have this function.

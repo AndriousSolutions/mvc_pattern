@@ -23,11 +23,11 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart' show expect, isInstanceOf;
 
-import 'package:mvc_pattern/mvc_pattern.dart';
+import 'package:mvc_pattern/mvc_pattern.dart' show StateListener, StateMVC;
 
-import '../example/main.dart';
+import '../example/main.dart' show ListenTester;
 
 void testsListeners(StateMVC? stateObj) {
   //

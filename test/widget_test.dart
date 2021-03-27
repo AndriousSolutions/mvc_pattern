@@ -22,21 +22,33 @@
 /// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import 'package:flutter/material.dart'
+    show
+        BuildContext,
+        Colors,
+        FlutterErrorDetails,
+        Icons,
+        Key,
+        Text,
+        TextStyle,
+        UniqueKey;
+import 'package:flutter_test/flutter_test.dart'
+    show
+        Future,
+        WidgetTester,
+        expect,
+        find,
+        findsNothing,
+        findsOneWidget,
+        isInstanceOf,
+        testWidgets;
+import 'package:mvc_pattern/mvc_pattern.dart'
+    show AppConMVC, AppMVC, ControllerMVC, StateMVC;
 
-import 'package:flutter/material.dart';
-
-import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mvc_pattern/mvc_pattern.dart';
-
-import '../example/main.dart';
-
-import '_test_listeners.dart';
-
-import '_test_statemvc.dart';
-
-import '_test_controller.dart';
-
+import '../example/main.dart' show MyApp, MyHomePageState, View;
+import '_test_controller.dart' show testsController;
+import '_test_listeners.dart' show testsListeners;
+import '_test_statemvc.dart' show testsStateMVC;
 
 /// A flag to ensure any errors are caught when appropriate.
 bool _inError = false;
@@ -91,6 +103,11 @@ void _testApp(Key key, AppMVC app) {
 
     expect(debugging, isInstanceOf<bool>());
 
+    final exception = FlutterErrorDetails(exception: Exception('Error Test!'));
+
+    /// Test error handling at the 'app level.'
+    appMVC.onError(exception);
+
     /// Test looking up State objects by id.
     /// The unique key identifier for this State object.
     final keyId = MyHomePageState().keyId;
@@ -109,8 +126,8 @@ void _testApp(Key key, AppMVC app) {
     /// to access its unique property, home.
     final MyApp myApp = appMVC as MyApp;
 
-    /// Returns the App's StateMVC object
-    final StateMVC? stateObj = AppMVC.getState(myApp.home.stateKey!);
+    /// Returns the Home Screen's StateMVC object
+    final StateMVC? stateObj = AppMVC.getState(MyApp.homeStateKey!);
 
     expect(stateObj, isInstanceOf<StateMVC>());
 
@@ -135,11 +152,33 @@ void _testApp(Key key, AppMVC app) {
     /// Tests Controller object
     testsController(stateObj);
 
+    expect(find.text('Hello there!'), findsNothing);
+    expect(find.text('Hello World!'), findsOneWidget);
+
+    View.instance!.object = const Text(
+      'Hello there!',
+      style: TextStyle(color: Colors.red),
+    );
+
+    View.instance!.refresh();
+    await tester.pump();
+
+    await tester.tap(find.text('Hello there!'));
+
+    expect(find.text('Hello there!'), findsOneWidget);
+    expect(find.text('Hello World!'), findsNothing);
+
+    /// Another means to 'refresh' the View object
+    View.instance!.setState(() { });
+
+    /// Catch and explicitly handle the error.
+    View.instance!.catchError(null);
+    View.instance!.catchError(Exception('Catch this error!'));
+
     /// Report any errors.
     _reportErrors();
   });
 }
-
 
 /// Record any errors for any try-catch statements.
 void _catchError(Object error) {
