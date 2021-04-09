@@ -24,14 +24,17 @@
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart'
     show
+        AppLifecycleState,
         BuildContext,
         Colors,
         FlutterErrorDetails,
         Icons,
         Key,
+        Localizations,
         Text,
         TextStyle,
         UniqueKey;
+
 import 'package:flutter_test/flutter_test.dart'
     show
         Future,
@@ -42,10 +45,11 @@ import 'package:flutter_test/flutter_test.dart'
         findsOneWidget,
         isInstanceOf,
         testWidgets;
+
 import 'package:mvc_pattern/mvc_pattern.dart'
     show AppConMVC, AppMVC, ControllerMVC, StateMVC;
 
-import '../example/main.dart' show MyApp, MyHomePageState, View;
+import '../example/main.dart' show Controller, MyApp, MyHomePageState, View;
 import '_test_controller.dart' show testsController;
 import '_test_listeners.dart' show testsListeners;
 import '_test_statemvc.dart' show testsStateMVC;
@@ -103,10 +107,11 @@ void _testApp(Key key, AppMVC app) {
 
     expect(debugging, isInstanceOf<bool>());
 
-    final exception = FlutterErrorDetails(exception: Exception('Error Test!'));
+    final errorDetails =
+        FlutterErrorDetails(exception: Exception('Error Test!'));
 
     /// Test error handling at the 'app level.'
-    appMVC.onError(exception);
+    appMVC.onError(errorDetails);
 
     /// Test looking up State objects by id.
     /// The unique key identifier for this State object.
@@ -169,15 +174,79 @@ void _testApp(Key key, AppMVC app) {
     expect(find.text('Hello World!'), findsNothing);
 
     /// Another means to 'refresh' the View object
-    View.instance!.setState(() { });
+    View.instance!.setState(() {});
 
     /// Catch and explicitly handle the error.
     View.instance!.catchError(null);
     View.instance!.catchError(Exception('Catch this error!'));
 
+    /// Call the error handler
+    View.instance!.onError(errorDetails);
+
+    test_rebuildRequested();
+
     /// Report any errors.
     _reportErrors();
   });
+}
+
+void test_rebuildRequested() async {
+  //
+//    await Future<void>.delayed(const Duration(seconds: 1));
+
+  final con = Controller();
+
+  final stateMVC = con.stateMVC!;
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didChangeAppLifecycleState(AppLifecycleState.resumed);
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didPopRoute();
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didPushRoute('/');
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didChangeMetrics();
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didChangeTextScaleFactor();
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didChangePlatformBrightness();
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didChangeLocale(Localizations.localeOf(stateMVC.context));
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didHaveMemoryPressure();
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didChangeAccessibilityFeatures();
+
+  stateMVC.setState(() {});
+  stateMVC.setState(() {});
+
+  stateMVC.didChangeDependencies();
 }
 
 /// Record any errors for any try-catch statements.

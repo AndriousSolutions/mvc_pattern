@@ -145,7 +145,7 @@ mixin StateSets {
       return false;
     }
     if (state == _stateMVC) {
-      return popState();
+      return _popState();
     }
     return _stateMVCSet.remove(state);
   }
@@ -153,8 +153,7 @@ mixin StateSets {
   /// This removes the most recent StateMVC object added
   /// to the Set of StateMVC state objects.
   /// Primarily internal use only: This disconnects the Controller from that StateMVC object.
-  @Deprecated("Will soon not allow you to 'pop' StateMVC objects yourself.")
-  bool popState() {
+  bool _popState() {
     // Don't continue if null.
     if (_stateMVC == null) {
       return false;
@@ -597,7 +596,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     }
     for (final con in _controllerList) {
       // This state's association is severed.
-      con.popState();
+      con._popState();
 
       // Don't call its dispose if it's in other State objects.
       if (con._stateMVCSet.isEmpty) {
@@ -1306,6 +1305,7 @@ abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
     if (ex == null) {
       return;
     }
+
     /// If a tester is running. Don't handle the error.
     if (WidgetsBinding.instance == null ||
         WidgetsBinding.instance is WidgetsFlutterBinding) {
@@ -1399,8 +1399,17 @@ abstract class AppMVC extends StatefulWidget {
   /// Most recent BuildContext/Element
   BuildContext? get context {
     BuildContext? context;
-    if (_states.isNotEmpty) {
-      context = _states.last.values.last.context;
+    while (_states.isNotEmpty) {
+      try {
+        context = _states.last.values.last.context;
+        break;
+      } catch (ex) {
+        if (ex is FlutterError && ex.message.contains('unmounted')) {
+          _states.remove(_states.last);
+        } else {
+          break;
+        }
+      }
     }
     return context;
   }
@@ -1494,9 +1503,9 @@ abstract class AppMVC extends StatefulWidget {
   static bool _removeStateMVC(StateMVC? state) {
     var removed = state != null;
     if (removed) {
-      final Map<String, StateMVC> map = {};
-      map[state!._keyId] = state;
-      removed = _states.remove(map);
+      final int length = _states.length;
+      _states.removeWhere((element) => state!._keyId == element.keys.first);
+      removed = _states.length < length;
     }
     return removed;
   }

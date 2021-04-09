@@ -44,31 +44,31 @@ class MyApp extends AppMVC {
 class AppView extends StatefulWidget {
   const AppView({Key? key}) : super(key: key);
   @override
-
   State<StatefulWidget> createState() => View();
 }
 
 ///
 class View extends ViewMVC<AppView> {
   factory View() => _this ??= View._();
+
   /// Demonstrate passing an 'object' down the Widget tree
   /// like in the Scoped Model
   View._()
       : super(
-    controller: FakeAppController(),
-    object: const Text(
-      'Hello World!',
-      style: TextStyle(color: Colors.red),
-    ),
-  );
+          controller: FakeAppController(),
+          object: const Text(
+            'Hello World!',
+            style: TextStyle(color: Colors.red),
+          ),
+        );
   static View? _this;
+
   /// Allow for external access to is object.
   static View? get instance => _this;
 
-
   @override
   Widget buildApp(BuildContext context) => MaterialApp(
-      home: MyHomePage(
+          home: MyHomePage(
         key: const Key('MyHomePage'),
         title: 'MVC Pattern Demo',
       ));
@@ -100,7 +100,7 @@ class MyHomePageState extends StateMVC<MyHomePage> {
     /// Acquire a reference to the particular Controller.
     con = controller as Controller;
 
-    /// For Unit testng. Adding a listener object to this State object.
+    /// For Unit testing. Adding a listener object to this State object.
     final listener = ListenTester();
     addAfterListener(listener);
     addBeforeListener(listener);

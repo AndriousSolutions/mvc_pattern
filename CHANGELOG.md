@@ -1,4 +1,10 @@
 
+## 7.1.3
+ March 30, 2021
+- Corrected _removeStateMVC(StateMVC? state)
+- Enhanced BuildContext? get context
+- Removed deprecated function, popState().
+
 ## 7.1.2
  March 27, 2021
 - class _InheritedMVC with Object? object;
