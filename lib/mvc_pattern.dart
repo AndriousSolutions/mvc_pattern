@@ -487,7 +487,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     for (final listener in _beforeList) {
       await listener.initAsync();
     }
-    bool after = true;
     // Built if nothing to run.
     if (_controllerList.isEmpty) {
       futureBuilt = true;
@@ -495,13 +494,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     for (final con in _controllerList) {
       futureBuilt = await con.initAsync();
       if (!futureBuilt) {
-        // It's to continue but in error.
-        futureBuilt = true;
-        after = false;
         break;
       }
     }
-    if (after) {
+    if (futureBuilt) {
       for (final listener in _afterList) {
         await listener.initAsync();
       }

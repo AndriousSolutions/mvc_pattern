@@ -1,4 +1,8 @@
 
+## 7.1.4
+ April 19, 2021
+- Don't continue app if !con.initAsync();
+
 ## 7.1.3
  March 30, 2021
 - Corrected _removeStateMVC(StateMVC? state)
