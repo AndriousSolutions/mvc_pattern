@@ -1,4 +1,8 @@
 
+## 7.2.0
+ May 01, 2021
+- _inTester = WidgetsBinding.instance is TestWidgetsFlutterBinding;
+
 ## 7.1.4
  April 19, 2021
 - Don't continue app if !con.initAsync();

@@ -183,14 +183,14 @@ void _testApp(Key key, AppMVC app) {
     /// Call the error handler
     View.instance!.onError(errorDetails);
 
-    test_rebuildRequested();
+    await test_RebuildRequested();
 
     /// Report any errors.
     _reportErrors();
   });
 }
 
-void test_rebuildRequested() async {
+Future<void> test_RebuildRequested() async {
   //
 //    await Future<void>.delayed(const Duration(seconds: 1));
 

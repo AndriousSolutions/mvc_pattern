@@ -36,6 +36,8 @@ library mvc_pattern;
 
 import 'dart:async' show Future;
 import 'dart:math' show Random;
+import 'package:flutter_test/flutter_test.dart'
+    show TestWidgetsFlutterBinding;
 import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
 import 'package:flutter/material.dart'
     show
@@ -372,11 +374,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// With an optional Controller parameter, this constructor imposes its own Error Handler.
   StateMVC([this._controller]) : currentErrorFunc = FlutterError.onError {
     /// If a tester is running. Don't switch out its error handler.
-    /// WidgetsBinding.instance is LiveTestWidgetsFlutterBinding
+    /// WidgetsBinding.instance is WidgetsFlutterBinding
     if (WidgetsBinding.instance == null ||
         WidgetsBinding.instance is WidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       FlutterError.onError = onError;
+    } else {
+      _inTester = WidgetsBinding.instance is TestWidgetsFlutterBinding;
     }
 
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
@@ -469,6 +473,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// A flag indicating initAsync was called
   bool futureBuilt = false;
 
+  /// Running in a tester instead of production.
+  bool _inTester = false;
+
   /// Initialize any 'time-consuming' operations at the beginning.
   /// Initialize asynchronous items essential to the Mobile Applications.
   /// Typically called within a FutureBuilder() widget.
@@ -479,6 +486,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     if (futureBuilt) {
       return futureBuilt;
     }
+    futureBuilt = true;
 
     /// This will call any and all Controllers that need asynchronous operations
     /// completed before continuing.
@@ -487,16 +495,15 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     for (final listener in _beforeList) {
       await listener.initAsync();
     }
-    // Built if nothing to run.
-    if (_controllerList.isEmpty) {
-      futureBuilt = true;
-    }
+
     for (final con in _controllerList) {
       futureBuilt = await con.initAsync();
+      // Don't continue if there's an error.
       if (!futureBuilt) {
         break;
       }
     }
+    // ignore: invariant_booleans
     if (futureBuilt) {
       for (final listener in _afterList) {
         await listener.initAsync();
@@ -673,7 +680,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.didChangeAppLifecycleState(state);
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -712,7 +719,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       await listener.didPopRoute();
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -747,7 +754,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       await listener.didPushRoute(route);
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -785,7 +792,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.didChangeMetrics();
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -822,7 +829,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.didChangeTextScaleFactor();
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -847,7 +854,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.didChangePlatformBrightness();
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -877,7 +884,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.didChangeLocale(locale);
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -906,7 +913,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.didHaveMemoryPressure();
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -934,7 +941,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.didChangeAccessibilityFeatures();
     }
     _rebuildAllowed = true;
-    if (_rebuildRequested) {
+    if (_rebuildRequested || _inTester) {
       _rebuildRequested = false;
 
       /// Perform a 'rebuild' if requested.
@@ -1056,7 +1063,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         handled = false;
       }
     }
-    _rebuildAllowed = false;
+    _rebuildAllowed = true;
     return handled;
   }
 }
