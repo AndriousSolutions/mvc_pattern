@@ -36,8 +36,7 @@ library mvc_pattern;
 
 import 'dart:async' show Future;
 import 'dart:math' show Random;
-import 'package:flutter_test/flutter_test.dart'
-    show TestWidgetsFlutterBinding;
+import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
 import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
 import 'package:flutter/material.dart'
     show
@@ -169,6 +168,20 @@ mixin StateSets {
       _stateMVC = _stateMVCSet.last;
     }
     return removed;
+  }
+
+  /// Retrieve the State object by type
+  /// Returns null if not found
+  T? ofState<T extends State>() {
+    State? state;
+    if (_stateMVCSet.isEmpty) {
+      state = null;
+    } else {
+      final stateList = _stateMVCSet.toList(growable: false);
+      state = stateList.firstWhere((item) => item is T);
+    }
+    // ignore: avoid_as
+    return state == null ? null : state as T;
   }
 
   /// Return a 'copy' of the Set of State objects.

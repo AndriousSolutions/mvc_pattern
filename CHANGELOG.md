@@ -1,4 +1,8 @@
 
+## 7.3.0
+ June 11, 2021
+- Introduced ofState() in mixin StateSets
+
 ## 7.2.0
  May 01, 2021
 - _inTester = WidgetsBinding.instance is TestWidgetsFlutterBinding;
