@@ -1028,8 +1028,20 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     if (_rebuildAllowed) {
       _rebuildAllowed = false;
 
-      /// Call the State object's setState() function.
-      super.setState(fn);
+      // Don't bother if the State object is disposed of.
+      if (mounted) {
+        /// Refresh the interface by 'rebuilding' the Widget Tree
+        /// Call the State object's setState() function.
+        super.setState(fn);
+      }
+      // else {
+      //   // Don't recall why this if statement if not mounted?
+      //   if (WidgetsBinding.instance == null ||
+      //       WidgetsBinding.instance is WidgetsFlutterBinding) {
+      //     /// Refresh the interface by 'rebuilding' the Widget Tree
+      //     super.setState(fn);
+      //   }
+      // }
       _rebuildAllowed = true;
     } else {
       /// Can't rebuild at this moment but at least make the request.
@@ -1038,18 +1050,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   }
 
   /// Allows the user to call setState() within the Controller.
-  void refresh() {
-    if (mounted) {
-      /// Refresh the interface by 'rebuilding' the Widget Tree
-      setState(() {});
-    } else {
-      if (WidgetsBinding.instance == null ||
-          WidgetsBinding.instance is WidgetsFlutterBinding) {
-        /// Refresh the interface by 'rebuilding' the Widget Tree
-        setState(() {});
-      }
-    }
-  }
+  void refresh() => setState(() {});
 
   /// Supply an 'error handler' routine to fire when an error occurs.
   /// Allows the user to define their own with each Controller.

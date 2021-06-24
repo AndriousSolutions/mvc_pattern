@@ -1,4 +1,8 @@
 
+## 7.3.1
+ June 24, 2021
+- setState() only if (mounted) {
+
 ## 7.3.0+2
  June 11, 2021
 - Introduced ofState() in mixin StateSets
