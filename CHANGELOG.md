@@ -1,4 +1,9 @@
 
+
+## 7.3.2
+ June 24, 2021
+- _stateMVCSet.retainWhere((state) => state.mounted);
+
 ## 7.3.1
  June 24, 2021
 - setState() only if (mounted) {

@@ -128,6 +128,7 @@ class StateSetter with StateSets {
 mixin StateSets {
   StateMVC? _stateMVC;
   final Set<StateMVC> _stateMVCSet = {};
+  bool _statePushed = false;
 
   /// Push the StateMVC object to a Set of such objects
   /// Internal use only: This connects the Controller to this View!
@@ -135,6 +136,7 @@ mixin StateSets {
     if (state == null) {
       return false;
     }
+    _statePushed = true;
     _stateMVC = state;
     return _stateMVCSet.add(state);
   }
@@ -159,15 +161,26 @@ mixin StateSets {
     if (_stateMVC == null) {
       return false;
     }
-    // Remove the 'current' state
-    final removed = _stateMVCSet.remove(_stateMVC);
-    // Reassign the last state object.
-    if (_stateMVCSet.isEmpty) {
-      _stateMVC = null;
+    bool pop;
+    // Another state was already pushed on the Set.
+    if (_statePushed) {
+      _statePushed = false;
+      pop = false;
     } else {
-      _stateMVC = _stateMVCSet.last;
+      // Remove all that have been disposed of.
+      _stateMVCSet.retainWhere((state) => state.mounted);
+
+      if (_stateMVCSet.isEmpty) {
+        //
+        _stateMVC = null;
+        pop = false;
+      } else {
+        //
+        _stateMVC = _stateMVCSet.last;
+        pop = true;
+      }
     }
-    return removed;
+    return pop;
   }
 
   /// Retrieve the State object by type
