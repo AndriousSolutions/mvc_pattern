@@ -65,7 +65,7 @@ import 'package:flutter/material.dart'
 class ModelMVC extends StateSetter {
   //
   ModelMVC([StateMVC? state]) : super() {
-    pushState(state);
+    _pushState(state);
   }
 }
 
@@ -132,7 +132,10 @@ mixin StateSets {
 
   /// Push the StateMVC object to a Set of such objects
   /// Internal use only: This connects the Controller to this View!
-  bool pushState(StateMVC? state) {
+  @Deprecated('Too intrusive method to manages State objects.')
+  bool pushState(StateMVC? state) => _pushState(state);
+
+  bool _pushState(StateMVC? state) {
     if (state == null) {
       return false;
     }
@@ -143,26 +146,29 @@ mixin StateSets {
 
   /// Remove the specified StateMVC object to a Set of such objects
   /// Internal use only: This disconnects the Controller to this View!
+  @Deprecated("Too unpredictable! Can disrupt the 'state' of things.")
   bool removeState(StateMVC? state) {
     if (state == null) {
       return false;
     }
-    if (state == _stateMVC) {
-      return _popState();
-    }
-    return _stateMVCSet.remove(state);
+    final remove = _stateMVCSet.remove(state);
+    _popState();
+    return remove;
   }
 
   /// This removes the most recent StateMVC object added
   /// to the Set of StateMVC state objects.
   /// Primarily internal use only: This disconnects the Controller from that StateMVC object.
-  bool _popState() {
-    // Don't continue if null.
-    if (_stateMVC == null) {
-      return false;
-    }
+  bool _popState([StateMVC? state]) {
     bool pop;
-    // Another state was already pushed on the Set.
+
+    // Remove if the current state
+    if (state != null && state == _stateMVC) {
+      _statePushed = false;
+      _stateMVCSet.remove(state);
+    }
+
+    // Another state object was already pushed onto the Set.
     if (_statePushed) {
       _statePushed = false;
       pop = false;
@@ -177,6 +183,7 @@ mixin StateSets {
       } else {
         //
         _stateMVC = _stateMVCSet.last;
+        // A replacement was found.
         pop = true;
       }
     }
@@ -625,7 +632,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     }
     for (final con in _controllerList) {
       // This state's association is severed.
-      con._popState();
+      con._popState(this);
 
       // Don't call its dispose if it's in other State objects.
       if (con._stateMVCSet.isEmpty) {
@@ -1235,7 +1242,7 @@ mixin _ControllerListing {
       keyId = '';
     } else {
       /// This connects the Controller to this View!
-      con.pushState(_stateMVC);
+      con._pushState(_stateMVC);
 
       /// It's already there?! Return its key.
       keyId = (contains(con)) ? con._keyId : addConId(con);
@@ -1258,7 +1265,7 @@ mixin _ControllerListing {
     final con = _map[keyId];
     final there = con != null;
     if (there) {
-      con!.removeState(_stateMVC);
+      con!._popState(_stateMVC);
       _map.remove(keyId);
     }
     return there;

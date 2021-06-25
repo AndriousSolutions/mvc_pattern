@@ -1,4 +1,7 @@
 
+## 7.3.3
+ June 24, 2021
+- if (_statePushed) { // Retain the 'right' State object.
 
 ## 7.3.2
  June 24, 2021
