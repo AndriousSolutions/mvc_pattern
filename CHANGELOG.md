@@ -1,4 +1,8 @@
 
+## 7.4.0
+ July 08, 2021
+- StateMVC.of<T>(context);
+
 ## 7.3.3
  June 24, 2021
 - if (_statePushed) { // Retain the 'right' State object.

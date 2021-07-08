@@ -66,8 +66,6 @@ And so, in this case, add this to your package's pubspec.yaml file instead:
 dependencies:
   mvc_pattern:^7.0.0
 ```
-For more information on this topic, read the article, [The importance of semantic versioning](https://medium.com/@xabaras/the-importance-of-semantic-versioning-9b78e8e59bba).
-
 **Usage**
 
 Let’s demonstrate its usage with the ol’ ‘Counter app’ created every time you

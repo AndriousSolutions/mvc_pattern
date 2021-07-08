@@ -509,6 +509,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Running in a tester instead of production.
   bool _inTester = false;
 
+  /// Supply the 'latest' StateMVC object from the widget tree.
+  static T? of<T extends StateMVC>(BuildContext context) {
+    assert(context != null);
+    return context.findAncestorStateOfType<T>();
+  }
+
   /// Initialize any 'time-consuming' operations at the beginning.
   /// Initialize asynchronous items essential to the Mobile Applications.
   /// Typically called within a FutureBuilder() widget.
