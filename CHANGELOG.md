@@ -1,4 +1,16 @@
 
+## 8.0.0
+ October 30, 2021
+- Remove deprecated function, removeState()
+- Removed from mixin StateListener: initAsync() & onAsyncError()
+- Renamed ViewMVC to AppStateMVC
+- Renamed AppConMVC to AppControllerMVC
+- AppControllerMVC is now a mixin
+- Renamed AppMVC to AppStatefulWidgetMVC
+- Nullify ControllerMVC? get controller => _controller ??= firstCon;
+- Nullify ControllerMVC? get firstCon => _asList.first;
+- Rewritten class _InheritedMVC extends StatefulWidget {
+
 ## 7.4.0
  July 08, 2021
 - StateMVC.of<T>(context);

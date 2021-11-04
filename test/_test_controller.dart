@@ -23,15 +23,15 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/material.dart' show FlutterErrorDetails;
+/// The 'show' clause is not essential. Merely for your reference.
 
 import 'package:flutter_test/flutter_test.dart' show expect, isInstanceOf;
 
-import 'package:mvc_pattern/mvc_pattern.dart'
-    show ControllerMVC, StateListener, StateMVC;
+/// The 'show' clause is not essential. Merely for your reference.
 
-import '../example/main.dart'
-    show Controller, FakeAppController, ListenTester, SecondState;
+import 'package:mvc_pattern/mvc_pattern.dart' show ControllerMVC, StateMVC;
+
+import '../example/main.dart' show Controller, AnotherController;
 
 void testsController(StateMVC? stateObj) {
   //
@@ -51,9 +51,9 @@ void testsController(StateMVC? stateObj) {
   /// Retrieve it by 'type'
   /// This controller exists but not with this State object
   /// but with the AppMVC (the App's State object)
-  final appController = stateObj?.controllerByType<FakeAppController>();
+  final appController = stateObj?.controllerByType<AnotherController>();
 
-  expect(appController, isInstanceOf<FakeAppController>());
+  expect(appController, isInstanceOf<AnotherController>());
 
   /// This Controller will be found in this State object's listing.
   var conObj = stateObj?.controllerByType<Controller>();
@@ -73,23 +73,6 @@ void testsController(StateMVC? stateObj) {
   final listCons = conObj.listControllers([conId!]);
 
   expect(listCons, isInstanceOf<List<ControllerMVC?>>());
-
-  /// This listener object has a factory constructor and so
-  /// has already been instantiated. It's here to provide
-  /// its unique key identifier.
-  final listener = ListenTester();
-
-  /// Retrieve the 'before' listener by its unique key.
-  /// The very same listener instantiated above.
-  var listenerObj = conObj.beforeListener(listener.keyId);
-
-  expect(listenerObj, isInstanceOf<StateListener?>());
-
-  /// Retrieve the 'before' listener by its unique key.
-  /// The very same listener instantiated above.
-  listenerObj = conObj.afterListener(listener.keyId);
-
-  expect(listenerObj, isInstanceOf<StateListener?>());
 
   /// Only when the [StateMVC] object is first created.
   conObj.initState();
@@ -116,26 +99,4 @@ void testsController(StateMVC? stateObj) {
   final Set<StateMVC> states = conObj.states;
 
   expect(states, isInstanceOf<Set<StateMVC>>());
-
-  /// The current StateMVC object.
-  final state = conObj.stateMVC;
-
-  /// Remove the specified StateMVC object to a Set of such objects
-  var result = conObj.removeState(state);
-
-  expect(result, isInstanceOf<bool>());
-
-  result = conObj.removeState(SecondState());
-
-  expect(result, isInstanceOf<bool>());
-
-  result = conObj.pushState(state);
-
-  expect(result, isInstanceOf<bool>());
-
-  conObj.addState(state);
-
-  final exception = FlutterErrorDetails(exception: Exception('Error Test!'));
-
-  FakeAppController().onError(exception);
 }

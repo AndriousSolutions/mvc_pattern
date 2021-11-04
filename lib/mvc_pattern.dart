@@ -33,11 +33,16 @@ library mvc_pattern;
 /// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+///
+/// NOTE: Full overview of mvc_pattern package can be found in this article:
+/// https://medium.com/follow-flutter/flutter-mvc-at-last-275a0dc1e730
 
 import 'dart:async' show Future;
+
 import 'dart:math' show Random;
-import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
+
 import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
+
 import 'package:flutter/material.dart'
     show
         AppLifecycleState,
@@ -45,9 +50,11 @@ import 'package:flutter/material.dart'
         FlutterError,
         FlutterErrorDetails,
         WidgetsFlutterBinding,
+        InheritedElement,
         InheritedWidget,
         Key,
         Locale,
+        mustCallSuper,
         Navigator,
         State,
         StatefulWidget,
@@ -59,6 +66,8 @@ import 'package:flutter/material.dart'
         WidgetsBindingObserver,
         mustCallSuper,
         protected;
+
+import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
 
 /// This class is to be concerned with the data
 /// It is accessed by the Controller but can call setState() as well.
@@ -144,18 +153,6 @@ mixin StateSets {
     return _stateMVCSet.add(state);
   }
 
-  /// Remove the specified StateMVC object to a Set of such objects
-  /// Internal use only: This disconnects the Controller to this View!
-  @Deprecated("Too unpredictable! Can disrupt the 'state' of things.")
-  bool removeState(StateMVC? state) {
-    if (state == null) {
-      return false;
-    }
-    final remove = _stateMVCSet.remove(state);
-    _popState();
-    return remove;
-  }
-
   /// This removes the most recent StateMVC object added
   /// to the Set of StateMVC state objects.
   /// Primarily internal use only: This disconnects the Controller from that StateMVC object.
@@ -198,7 +195,11 @@ mixin StateSets {
       state = null;
     } else {
       final stateList = _stateMVCSet.toList(growable: false);
-      state = stateList.firstWhere((item) => item is T);
+      try {
+        state = stateList.firstWhere((item) => item is T);
+      } catch (_) {
+        state = null;
+      }
     }
     // ignore: avoid_as
     return state == null ? null : state as T;
@@ -214,20 +215,9 @@ mixin StateListener {
   String get keyId => _keyId;
   final String _keyId = Uuid().generateV4();
 
-  /// Initialize any 'time-consuming' operations at the beginning.
-  /// Initialize asynchronous items essential to the Mobile Applications.
-  /// Typically called within a FutureBuilder() widget.
-  Future<bool> initAsync() async => true;
-
-  /// Supply an 'error handler' routine if something goes wrong
-  /// in the corresponding initAsync() routine.
-  /// Returns true if the error was properly handled.
-  bool onAsyncError(FlutterErrorDetails details) {
-    return false;
-  }
-
   /// The framework will call this method exactly once.
   /// Only when the [StateMVC] object is first created.
+  @mustCallSuper
   void initState() {
     /// Override this method to perform initialization that depends on the
     /// location at which this object was inserted into the tree.
@@ -437,7 +427,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
   /// Provide the 'main' controller to this 'State View.'
   /// If _controller == null, get the 'first assigned' controller.
-  ControllerMVC get controller => _controller ??= firstCon;
+  ControllerMVC? get controller => _controller ??= firstCon;
 
   /// Retrieve a Controller by its a unique String identifier.
   ControllerMVC? controllerById(String keyId) => super._con(keyId);
@@ -492,7 +482,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     // ignore: avoid_as
     U? con = _cons[_type<U>()] as U?;
     // ignore: avoid_as
-    return con ??= AppMVC._controllers[_type<U>()] as U?;
+    return con ??= AppStatefulWidgetMVC._controllers[_type<U>()] as U?;
   }
 
   Type _type<U>() => U;
@@ -510,47 +500,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   bool _inTester = false;
 
   /// Supply the 'latest' StateMVC object from the widget tree.
-  static T? of<T extends StateMVC>(BuildContext context) {
+  static T? of<T extends StateMVC>(BuildContext? context) {
     assert(context != null);
-    return context.findAncestorStateOfType<T>();
-  }
-
-  /// Initialize any 'time-consuming' operations at the beginning.
-  /// Initialize asynchronous items essential to the Mobile Applications.
-  /// Typically called within a FutureBuilder() widget.
-  @override
-  @mustCallSuper
-  Future<bool> initAsync() async {
-    /// It's been done. Don't run again.
-    if (futureBuilt) {
-      return futureBuilt;
-    }
-    futureBuilt = true;
-
-    /// This will call any and all Controllers that need asynchronous operations
-    /// completed before continuing.
-    /// No 'setState()' functions are allowed to fully function at this point.
-    _rebuildAllowed = false;
-    for (final listener in _beforeList) {
-      await listener.initAsync();
-    }
-
-    for (final con in _controllerList) {
-      futureBuilt = await con.initAsync();
-      // Don't continue if there's an error.
-      if (!futureBuilt) {
-        break;
-      }
-    }
-    // ignore: invariant_booleans
-    if (futureBuilt) {
-      for (final listener in _afterList) {
-        await listener.initAsync();
-      }
-    }
-    _rebuildAllowed = true;
-    // Set the flag
-    return futureBuilt;
+    return context!.findAncestorStateOfType<T>();
   }
 
   /// The framework will call this method exactly once.
@@ -666,7 +618,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     // Return the original error routine.
     FlutterError.onError = currentErrorFunc;
 
-    AppMVC._removeStateMVC(this);
+    AppStatefulWidgetMVC._removeStateMVC(this);
 
     super.dispose();
   }
@@ -1079,33 +1031,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   void refresh() => setState(() {});
 
   /// Supply an 'error handler' routine to fire when an error occurs.
-  /// Allows the user to define their own with each Controller.
+  /// Allows the user to define their own with each StateMVC object.
   // details.exception, details.stack
   @protected
   void onError(FlutterErrorDetails details) => currentErrorFunc!(details);
-
-  /// Supply an 'error handler' routine if something goes wrong
-  /// in the corresponding initAsync() routine.
-  @override
-  bool onAsyncError(FlutterErrorDetails details) {
-    /// This will call any and all Controllers
-    /// that may have ran asynchronous operations.
-    bool handled = true;
-
-    /// No 'setState()' functions are allowed to fully function at this point.
-    _rebuildAllowed = false;
-    for (final con in _controllerList) {
-      try {
-        if (!con.onAsyncError(details)) {
-          handled = false;
-        }
-      } catch (ex) {
-        handled = false;
-      }
-    }
-    _rebuildAllowed = true;
-    return handled;
-  }
 }
 
 /// Add, List, and Remove Listeners.
@@ -1259,8 +1188,7 @@ mixin _ControllerListing {
     }
 
     /// Collects this StateMVC object to the 'main list' of such objects.
-    // ignore: avoid_as
-    AppMVC._addStateMVC(this as StateMVC);
+    AppStatefulWidgetMVC._addStateMVC(this as StateMVC);
 
     return keyId;
   }
@@ -1278,7 +1206,7 @@ mixin _ControllerListing {
   }
 
   /// Returns 'the first' Controller associated with this StateMVC object.
-  ControllerMVC get firstCon => _asList.first;
+  ControllerMVC? get firstCon => _asList.first;
 
   /// Returns true if the specified 'Controller' is associated with this StateMVC object.
   bool contains(ControllerMVC con) => _map.containsValue(con);
@@ -1296,145 +1224,16 @@ mixin _ControllerListing {
   final Map<Type, ControllerMVC> _cons = {};
 }
 
-/// The StatMVC object at the 'app level.' Used to effect the whole app.
-abstract class ViewMVC<T extends StatefulWidget> extends StateMVC<T> {
-  ViewMVC({
-    ControllerMVC? controller,
-    this.controllers,
-    this.object,
-  }) : super(controller) {
-    addList(controllers?.toList());
-  }
-  final List<ControllerMVC>? controllers;
-
-  /// This is of type Object allowing you
-  /// to propagate any class object you wish down the widget tree.
-  Object? object;
-
-  /// Implement this function to compose the App's View.
-  /// Override to impose your own WidgetsApp (like CupertinoApp or MaterialApp)
-  Widget buildApp(BuildContext context);
-
-  /// The App's View's true build function called the
-  /// abstract function, buildApp, but also implements a
-  /// InheritedWidget allowing you to pass down the Widget
-  /// tree any 'object' you wish.
-  @override
-  Widget build(BuildContext context) =>
-      _InheritedMVC(state: this, object: object, child: buildApp(context));
-
-  /// Calls the State object's setState() function if not
-  /// already in the SetState.builder() function (see class SetState below).
-  @override
-  void setState(VoidCallback fn) {
-    if (!inBuilder) {
-      super.setState(fn);
-    }
-  }
-
-  /// Calls the State object's refresh() function if not
-  /// already in the SetState.builder() function (see class SetState below).
-  /// The refresh() function is just another name used to call
-  /// the State object's setState() function.
-  @override
-  void refresh() {
-    if (!inBuilder) {
-      super.refresh();
-    }
-  }
-
-  /// Catch and explicitly handle the error.
-  void catchError(Exception? ex) {
-    if (ex == null) {
-      return;
-    }
-
-    /// If a tester is running. Don't handle the error.
-    if (WidgetsBinding.instance == null ||
-        WidgetsBinding.instance is WidgetsFlutterBinding) {
-      FlutterError.onError!(FlutterErrorDetails(exception: ex));
-    }
-  }
-
-  bool inBuilder = false;
-  bool setStates = false;
-}
-
-class _InheritedMVC extends InheritedWidget {
-  const _InheritedMVC(
-      {Key? key, this.state, this.object, required Widget child})
-      : super(key: key, child: child);
-  final ViewMVC? state;
-  final Object? object;
-  @override
-  bool updateShouldNotify(_InheritedMVC oldWidget) =>
-      state!.setStates && !state!.inBuilder;
-}
-
-///  Used like the function, setState(), to 'spontaneously' call
-///  build() functions here and there in your app. Much like the Scoped
-///  Model's ScopedModelDescendant() class.
-///  More information:
-///  https://medium.com/flutter-community/shrine-in-mvc-7984e08d8e6b#488c
-@protected
-class SetState extends StatelessWidget {
-  const SetState({Key? key, required this.builder}) : super(key: key);
-  final BuilderWidget builder;
-
-  /// Calls the required Function object:
-  /// Function(BuildContext context, T? object)
-  /// and passes along the InheritWidget's custom 'object'
-  ///
-  @override
-  Widget build(BuildContext context) {
-    /// Go up the widget tree and obtain the closest 'View'
-    final _InheritedMVC? inheritWidget =
-        context.dependOnInheritedWidgetOfExactType<_InheritedMVC>();
-    final ViewMVC? state = inheritWidget?.state;
-    if (state != null) {
-      state
-        ..setStates = true
-        ..inBuilder = true
-        .._rebuildAllowed = false;
-    }
-    final Object? object = inheritWidget?.object;
-    final Widget widget = builder(context, object);
-    if (state != null) {
-      state
-        .._rebuildAllowed = true
-        ..inBuilder = false;
-    }
-    return widget;
-  }
-}
-
-/// The 'type of function' required by the class, SetState.
-typedef BuilderWidget<T extends Object> = Widget Function(
-    BuildContext context, T? object);
-
-/// A Controller for the 'app level' to influence the whole app.
-/// Full overview of mvc_pattern can be found in this article:
-/// https://medium.com/follow-flutter/flutter-mvc-at-last-275a0dc1e730
-class AppConMVC extends ControllerMVC {
-  AppConMVC([StateMVC? state]) : super(state);
-
-  /// Initialize any immediate 'none time-consuming' operations at the very beginning.
-  void initApp() {}
-
-  /// Override if you like to customize your error handling.
-  void onError(FlutterErrorDetails details) => stateMVC?.onError(details);
-}
-
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 /// AppStatefulWidget is its subclass.
-abstract class AppMVC extends StatefulWidget {
-  /// Simple constructor. Calls the initApp() function.
-  AppMVC({this.con, Key? key})
-      : _appState = _AppState(con),
-        super(key: key);
-  final AppConMVC? con;
+abstract class AppStatefulWidgetMVC extends StatefulWidget {
+  const AppStatefulWidgetMVC({Key? key, this.con}) : super(key: key);
 
-  final _AppState _appState;
+  final AppControllerMVC? con;
+
+  /// You create the App's State object.
+  @override
+  AppStateMVC createState();
 
   /// Get the controller if any
   ControllerMVC? get controller => con;
@@ -1457,18 +1256,10 @@ abstract class AppMVC extends StatefulWidget {
     return context;
   }
 
-  /// Create the View!
-  Widget build(BuildContext context);
-
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.
   @mustCallSuper
+  @Deprecated('No need to replace the initState() function. Use initState()')
   void initApp() => con?.initApp();
-
-  /// Initialize any 'time-consuming' operations at the beginning.
-  /// Initialize items essential to the Mobile Applications.
-  /// Called by the MVCApp.init() function.
-  @mustCallSuper
-  Future<bool> initAsync() => _appState.initAsync();
 
   /// Called in State object.
   /// Called when this [State] object will never build again.
@@ -1483,15 +1274,16 @@ abstract class AppMVC extends StatefulWidget {
 
   static final Set<Map<String, StateMVC>> _states = {};
 
-  /// Override if you like to customize your error handling.
-  void onError(FlutterErrorDetails details) {
-    if (con != null) {
-      con!.onError(details);
-    } else {
-      // Call the State object's Exception handler
-      _appState.currentErrorFunc!(details);
-    }
-  }
+  //todo: onError() can't be called in the StatefulWidget
+  // /// Override if you like to customize your error handling.
+  // void onError(FlutterErrorDetails details) {
+  //   if (con != null) {
+  //     con!.onError(details);
+  //   } else {
+  //     // Call the State object's Exception handler
+  //     appState.currentErrorFunc!(details);
+  //   }
+  // }
 
   /// Determines if running in an IDE or in production.
   /// Returns true if the App is under in the Debugger and not production.
@@ -1552,18 +1344,163 @@ abstract class AppMVC extends StatefulWidget {
     }
     return removed;
   }
+}
 
-  /// Programmatically creates the App's State object.
+/// The StatMVC object at the 'app level.' Used to effect the whole app.
+abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
+    extends _AppStateMVC<T> {
+  //
+  AppStateMVC({
+    ControllerMVC? controller,
+    this.controllers,
+    Object? object,
+  }) : super(controller) {
+    _dataObj = object;
+    addList(controllers?.toList());
+  }
+  final List<ControllerMVC>? controllers;
+
+  /// This is of type Object allowing you
+  /// to propagate any class object you wish down the widget tree.
+  Object? get dataObject => _dataObj;
+  Object? _dataObj;
+
+  set dataObject(Object? object) {
+    // Never explicitly set to null
+    if (object != null) {
+      //
+      _dataObj = object;
+      // If there's a SetState class out there being used.
+      if (_setStates) {
+        // Call inherited widget to 'rebuild' the dependencies
+        _InheritedMVC.setState(() {});
+      }
+    }
+  }
+
+  /// Implement this function to compose the App's View.
+  /// Override to impose your own WidgetsApp (like CupertinoApp or MaterialApp)
+  Widget buildApp(BuildContext context);
+
+  /// The App's View's build function calls the
+  /// abstract function, buildApp, but also implements a
+  /// InheritedWidget allowing for spontaneous rebuilds of dependencies.
   @override
-  // ignore: no_logic_in_create_state
-  State createState() => _appState;
+  Widget build(BuildContext context) =>
+      _InheritedMVC(state: this, child: buildApp(context));
+
+  /// Link a widget to InheritedWidget
+  ///
+  static void inheritWidget(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
+
+  /// Call the build() functions of all the widgets 'linked' to the Inherited widget.
+  void setStatesInherited([Object? object]) {
+    dataObject = object;
+    _buildInherited = true;
+    _InheritedMVC.setState(() {});
+  }
+
+  /// Calls the State object's setState() function if not
+  /// already in the SetState.builder() function (see class SetState below).
+  @override
+  void setState(VoidCallback fn) {
+    if (!_inBuilder) {
+      super.setState(fn);
+    }
+  }
+
+  /// Calls the State object's refresh() function if not
+  /// already in the SetState.builder() function (see class SetState below).
+  /// The refresh() function is just another name used to call
+  /// the State object's setState() function.
+  @override
+  void refresh() {
+    if (!_inBuilder) {
+      super.refresh();
+    }
+  }
+
+  /// Catch and explicitly handle the error.
+  void catchError(Exception? ex) {
+    if (ex == null) {
+      return;
+    }
+
+    /// If a tester is running. Don't handle the error.
+    if (WidgetsBinding.instance == null ||
+        WidgetsBinding.instance is WidgetsFlutterBinding) {
+      FlutterError.onError!(FlutterErrorDetails(exception: ex));
+    }
+  }
+
+  bool _buildInherited = false;
+  bool _inBuilder = false;
+  bool _setStates = false;
 }
 
 /// The App's first State object.
 /// It brings in the first State object
-class _AppState extends StateMVC<AppMVC> {
+abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
+    extends StateMVC<T> {
   //
-  _AppState(ControllerMVC? con) : super(con);
+  _AppStateMVC(ControllerMVC? con) : super(con);
+
+  /// Initialize any 'time-consuming' operations at the beginning.
+  /// Initialize asynchronous items essential to the Mobile Applications.
+  /// Typically called within a FutureBuilder() widget.
+  @mustCallSuper
+  Future<bool> initAsync() async {
+    /// It's been done. Don't run again.
+    if (futureBuilt) {
+      return futureBuilt;
+    }
+    futureBuilt = true;
+
+    /// This will call any and all Controllers that need asynchronous operations
+    /// completed before continuing.
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+
+    for (final con in _controllerList) {
+      if (con is! AppControllerMVC) {
+        continue;
+      }
+      futureBuilt = await con.initAsync();
+      // Don't continue if there's an error.
+      if (!futureBuilt) {
+        break;
+      }
+    }
+    _rebuildAllowed = true;
+    // Set the flag
+    return futureBuilt;
+  }
+
+  /// Supply an 'error handler' routine if something goes wrong
+  /// in the corresponding initAsync() routine.
+  bool onAsyncError(FlutterErrorDetails details) {
+    /// This will call any and all Controllers
+    /// that may have ran asynchronous operations.
+    bool handled = true;
+
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+    for (final con in _controllerList) {
+      if (con is! AppControllerMVC) {
+        continue;
+      }
+      try {
+        if (!con.onAsyncError(details)) {
+          handled = false;
+        }
+      } catch (ex) {
+        handled = false;
+      }
+    }
+    _rebuildAllowed = true;
+    return handled;
+  }
 
   /// Calls the Flutter App's object (AppMVC) own initApp() function.
   /// It's where non-synchronous operations are performed when the app is starting up.
@@ -1573,19 +1510,10 @@ class _AppState extends StateMVC<AppMVC> {
     widget.initApp();
   }
 
-  /// The underlying App state should not be rebuilt.
-  @override
-  // ignore: avoid_returning_null_for_void
-  void setState(VoidCallback fn) => null;
-
-  /// This State object calls the StatefulWidgets (AppMVC) own abstract function,
-  /// build().
-  @override
-  Widget build(BuildContext context) => widget.build(context);
-
-  /// Call the StatefulWidget's error routine;
-  @override
-  void onError(FlutterErrorDetails details) => widget.onError(details);
+  //todo: Look at the State object's error routine.
+  // /// Call the StatefulWidget's error routine;
+  // @override
+  // void onError(FlutterErrorDetails details) => widget.onError(details);
 
   /// Dispose the 'StateView(s)' that may be running.
   @protected
@@ -1595,6 +1523,143 @@ class _AppState extends StateMVC<AppMVC> {
     widget.dispose();
     super.dispose();
   }
+}
+
+/// Builds a [InheritedWidget].
+///
+/// It's instantiated in a standalone widget
+/// so its setState() call will **only** rebuild
+/// [InheritedWidget] and consequently any of its dependents,
+/// instead of rebuilding the app's entire widget tree.
+class _InheritedMVC extends StatefulWidget {
+  const _InheritedMVC({Key? key, required this.state, required this.child})
+      : super(key: key);
+  final AppStateMVC state;
+  final Widget child;
+
+  /// Allows for the static setState() function defined in this StatefulWidget
+  static final _inheritedState = _InheritedMVCState();
+
+  @override
+  //ignore: no_logic_in_create_state
+  State createState() => _inheritedState;
+
+  /// Calls the build() function in this Widget's State object.
+  static void setState(VoidCallback fn) => _inheritedState.setState(fn);
+}
+
+class _InheritedMVCState extends State<_InheritedMVC> {
+  /// Introduce an Inherited widget and simply passing through a 'child' widget.
+  /// When the Inherited Widget is rebuilt only this build() function is called.
+  /// i.e. The rest of the widget tree, widget.child, is left alone.
+  @override
+  Widget build(BuildContext context) => _InheritedWidget(
+        state: widget.state,
+        object: widget.state.dataObject,
+        child: widget.child,
+      );
+
+  /// Override again merely to prevent the warning message:
+  /// The member 'setState' can only be used within instance members of
+  /// subclasses of 'package:flutter/src/widgets/framework.dart'.
+  @override
+  void setState(VoidCallback fn) => super.setState(fn);
+}
+
+class _InheritedWidget extends InheritedWidget {
+  ///
+  const _InheritedWidget({
+    Key? key,
+    required this.state,
+    required this.object,
+    required Widget child,
+  }) : super(key: key, child: child);
+  final AppStateMVC state;
+  final Object? object;
+
+  /// Included temporarily for demonstration purposes.
+  /// Place a breakpoint to see this function execute
+  @override
+  InheritedElement createElement() => InheritedElement(this);
+
+  ///
+  @override
+  bool updateShouldNotify(_InheritedWidget oldWidget) {
+    bool notify = false;
+    // Flag all dependencies to rebuild
+    if (state._buildInherited) {
+      // Turn it off right away
+      state._buildInherited = false;
+      notify = true;
+      // If the SetState class is being used and there's an object passed down the widget tree.
+    } else if (state._setStates && object != null && !state._inBuilder) {
+      notify = oldWidget.object != object;
+    }
+    return notify;
+  }
+}
+
+///  Used like the function, setState(), to 'spontaneously' call
+///  build() functions here and there in your app. Much like the Scoped
+///  Model's ScopedModelDescendant() class.
+///  More information:
+///  https://medium.com/flutter-community/shrine-in-mvc-7984e08d8e6b#488c
+@protected
+class SetState extends StatelessWidget {
+  const SetState({Key? key, required this.builder}) : super(key: key);
+  final BuilderWidget builder;
+
+  /// Calls the required Function object:
+  /// Function(BuildContext context, T? object)
+  /// and passes along the InheritWidget's custom 'object'
+  ///
+  @override
+  Widget build(BuildContext context) {
+    /// Go up the widget tree and link to the App's inherited widget, _InheritedWidget
+    final inheritWidget =
+        context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
+    final AppStateMVC? state = inheritWidget?.state;
+    if (state != null) {
+      state
+        .._setStates = true
+        .._inBuilder = true
+        .._rebuildAllowed = false;
+    }
+    final Object? object = inheritWidget?.object;
+    final Widget widget = builder(context, object);
+    if (state != null) {
+      state
+        .._rebuildAllowed = true
+        .._inBuilder = false;
+    }
+    return widget;
+  }
+}
+
+/// The 'type of function' required by the class, SetState.
+typedef BuilderWidget<T extends Object> = Widget Function(
+    BuildContext context, T? object);
+
+/// A Mixin to make a Controller for the 'app level' to influence the whole app.
+mixin AppControllerMVC on ControllerMVC {
+//  AppControllerMVC([StateMVC? state]) : super(state);
+
+  /// Initialize any immediate 'none time-consuming' operations at the very beginning.
+  @Deprecated('No need to replace the initState() function. Use initState()')
+  void initApp() {}
+
+  /// Initialize any 'time-consuming' operations at the beginning.
+  /// Initialize asynchronous items essential to the Mobile Applications.
+  /// Typically called within a FutureBuilder() widget.
+  Future<bool> initAsync() async => true;
+
+  /// Supply an 'error handler' routine if something goes wrong
+  /// in the corresponding initAsync() routine.
+  /// Returns true if the error was properly handled.
+  bool onAsyncError(FlutterErrorDetails details) => false;
+
+  /// Override if you like to customize your error handling.
+  void onError(FlutterErrorDetails details) => stateMVC?.onError(details);
 }
 
 // Uuid

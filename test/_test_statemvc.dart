@@ -23,125 +23,53 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/material.dart'
-    show
-        AppLifecycleState,
-        FlutterErrorDetails,
-        Localizations,
-        State,
-        StatefulWidget;
+/// The 'show' clause is not essential. Merely for your reference.
+import 'package:flutter/material.dart' show AppLifecycleState, Localizations;
 
+/// The 'show' clause is not essential. Merely for your reference.
 import 'package:flutter_test/flutter_test.dart'
-    show Future, expect, isEmpty, isInstanceOf, isTrue;
+    show Future, expect, isNotEmpty, isInstanceOf;
 
+/// The 'show' clause is not essential. Merely for your reference.
 import 'package:mvc_pattern/mvc_pattern.dart'
-    show ControllerMVC, StateListener, StateMVC;
+    show ControllerMVC, StateMVC, AppControllerMVC;
 
-import '../example/main.dart' show Controller, FakeController, ListenTester;
+/// The 'show' clause is not essential. Merely for your reference.
+import '../example/main.dart' show Controller, MyHomePageState;
 
 Future<void> testsStateMVC(StateMVC? stateObj) async {
   //
-  expect(stateObj, isInstanceOf<StateMVC>());
+  expect(stateObj, isInstanceOf<MyHomePageState>());
 
-  var con = stateObj?.controller;
+  final con = stateObj?.controller;
 
-  expect(con, isInstanceOf<ControllerMVC>());
+  expect(con, isInstanceOf<Controller>());
 
   /// The StateMVC object.
   final _stateMVC = con?.stateMVC;
 
-  expect(_stateMVC, isInstanceOf<State<StatefulWidget>>());
+  expect(_stateMVC, isInstanceOf<MyHomePageState>());
 
   /// The State object. (con.state as StateMVC will work!)
   final _state = con?.state!;
 
-  expect(_state, isInstanceOf<State>());
+  expect(_state, isInstanceOf<MyHomePageState>());
 
-  /// Test adding null. Should return an empty string.
-  var id = _stateMVC?.add(null);
-
-  expect(id, isInstanceOf<String>());
-
-  expect(id, isEmpty);
-
-  _stateMVC?.add(FakeController());
-
-  /// Return a List of Controllers specified by key id.
-  final listCons =
-      _stateMVC?.listControllers([Controller().keyId, FakeController().keyId]);
-
-  expect(listCons, isInstanceOf<List<ControllerMVC?>>());
-
-  final map = _stateMVC?.map;
-
-  expect(map, isInstanceOf<Map<String, ControllerMVC>>());
-
-  final remove = _stateMVC?.remove(FakeController().keyId);
-
-  expect(remove, isInstanceOf<bool>());
-
-  con = _stateMVC?.firstCon;
-
-  expect(con, isInstanceOf<ControllerMVC>());
-
-  /// Controller's unique identifier.
-  id = con?.keyId;
+  /// Test for the unique identifier assigned to every Controller.
+  var id = _stateMVC?.add(TestingController());
 
   expect(id, isInstanceOf<String>());
 
-  /// The StateView's unique identifier.
-  final svId = _stateMVC?.keyId;
-
-  expect(svId, isInstanceOf<String>());
-
-  /// Will get an error because its unmounted.
-  // /// Current context.
-  // final context = _stateMVC?.context;
-  //
-  // expect(context, isInstanceOf<BuildContext>());
+  expect(id, isNotEmpty);
 
   /// Is the widget mounted?
   final mounted = _stateMVC?.mounted;
 
   expect(mounted, isInstanceOf<bool>());
 
-  // /// The StatefulWidget.
-  // final widget = _stateMVC?.widget;
-  //
-  // expect(widget, isInstanceOf<StatefulWidget>());
-
-  final listenId = ListenTester().keyId;
-
-  var add = _stateMVC?.addBeforeListener(ListenTester());
-
-  expect(add, isInstanceOf<bool>());
-
-  add = _stateMVC?.addBeforeListener(ListenTester());
-
-  expect(add, isInstanceOf<bool>());
-
-  var list = _stateMVC?.beforeList([listenId]);
-
-  expect(list, isInstanceOf<List<StateListener>>());
-
-  list = _stateMVC?.afterList([listenId]);
-
-  expect(list, isInstanceOf<List<StateListener>>());
-
-  var boolean = await stateObj?.initAsync();
-
-  expect(boolean, isInstanceOf<bool>());
-
-  /// Call initAsync() function again to test if (futureBuilt) {
-  boolean = await stateObj?.initAsync();
-
-  expect(boolean, isInstanceOf<bool>());
-
-  expect(boolean, isTrue);
-
   /// Usually you would call this function on a subclass of StateMVC
   /// For example, _MyHomePageState would have this function.
-  boolean = await stateObj?.didPopRoute();
+  bool? boolean = await stateObj?.didPopRoute();
 
   expect(boolean, isInstanceOf<bool>());
 
@@ -173,19 +101,16 @@ Future<void> testsStateMVC(StateMVC? stateObj) async {
 
   stateObj?.didChangePlatformBrightness();
 
-//  stateObj?.didChangeLocale(locale);
-
-//  stateObj?.didChangeAppLifecycleState(state);
-
   stateObj?.didHaveMemoryPressure();
 
   stateObj?.didChangeAccessibilityFeatures();
 
   stateObj?.refresh();
+}
 
-  final exception = FlutterErrorDetails(exception: Exception('Error Test!'));
-
-  stateObj?.onError(exception);
-
-  stateObj?.onAsyncError(exception);
+/// Merely a 'tester' Controller used in the function above.
+class TestingController extends ControllerMVC with AppControllerMVC {
+  factory TestingController() => _this ??= TestingController._();
+  TestingController._();
+  static TestingController? _this;
 }
