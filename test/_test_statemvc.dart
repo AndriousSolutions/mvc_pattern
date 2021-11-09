@@ -46,7 +46,7 @@ Future<void> testsStateMVC(StateMVC? stateObj) async {
   expect(con, isInstanceOf<Controller>());
 
   /// The StateMVC object.
-  final _stateMVC = con?.stateMVC;
+  final _stateMVC = con?.state;
 
   expect(_stateMVC, isInstanceOf<MyHomePageState>());
 

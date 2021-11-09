@@ -165,7 +165,7 @@ class Controller extends ControllerMVC {
   @override
   void initState() {
     super.initState();
-    _model = _Model(stateMVC);
+    _model = _Model(state);
   }
 
   /// Note, the count comes from a separate class, _Model.

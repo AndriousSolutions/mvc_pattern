@@ -1,4 +1,9 @@
 
+## 8.1.0
+ November 04, 2021
+- StateMVC? get state => _stateMVC; replaces getter, stateMVC
+- pedantic 1.11.1 (discontinued replaced by lints)
+
 ## 8.0.0
  October 30, 2021
 - Remove deprecated function, removeState()

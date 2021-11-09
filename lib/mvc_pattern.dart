@@ -101,10 +101,7 @@ class ControllerMVC extends StateSetter with StateListener {
   }
 
   /// The current StateMVC object.
-  StateMVC? get stateMVC => _stateMVC;
-
-  /// The current State object.
-  State? get state => _stateMVC;
+  StateMVC? get state => _stateMVC;
 
   /// Return a List of Controllers specified by key id.
   List<ControllerMVC?> listControllers(List<String> keys) =>
@@ -450,9 +447,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     if (list == null) {
       return;
     }
-
-    /// It may have been a listener. Can't be both.
-//    list.forEach((ControllerMVC con) => removeListener(con));
+    // Associate a list of 'Controllers' to this StateMVC object at one time.
     return super.addList(list);
   }
 
@@ -488,7 +483,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   Type _type<U>() => U;
 
   /// May be set false to prevent unnecessary 'rebuilds'.
-  bool _rebuildAllowed = true;
+  static bool _rebuildAllowed = true;
 
   /// May be set true to request a 'rebuild.'
   bool _rebuildRequested = false;
@@ -1371,7 +1366,7 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
       //
       _dataObj = object;
       // If there's a SetState class out there being used.
-      if (_setStates) {
+      if (_setStates && StateMVC._rebuildAllowed) {
         // Call inherited widget to 'rebuild' the dependencies
         _InheritedMVC.setState(() {});
       }
@@ -1460,7 +1455,7 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
     /// This will call any and all Controllers that need asynchronous operations
     /// completed before continuing.
     /// No 'setState()' functions are allowed to fully function at this point.
-    _rebuildAllowed = false;
+    StateMVC._rebuildAllowed = false;
 
     for (final con in _controllerList) {
       if (con is! AppControllerMVC) {
@@ -1472,7 +1467,7 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
         break;
       }
     }
-    _rebuildAllowed = true;
+    StateMVC._rebuildAllowed = true;
     // Set the flag
     return futureBuilt;
   }
@@ -1485,7 +1480,7 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
     bool handled = true;
 
     /// No 'setState()' functions are allowed to fully function at this point.
-    _rebuildAllowed = false;
+    StateMVC._rebuildAllowed = false;
     for (final con in _controllerList) {
       if (con is! AppControllerMVC) {
         continue;
@@ -1498,7 +1493,7 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
         handled = false;
       }
     }
-    _rebuildAllowed = true;
+    StateMVC._rebuildAllowed = true;
     return handled;
   }
 
@@ -1622,15 +1617,14 @@ class SetState extends StatelessWidget {
     if (state != null) {
       state
         .._setStates = true
-        .._inBuilder = true
-        .._rebuildAllowed = false;
+        .._inBuilder = true;
+      StateMVC._rebuildAllowed = false;
     }
     final Object? object = inheritWidget?.object;
     final Widget widget = builder(context, object);
     if (state != null) {
-      state
-        .._rebuildAllowed = true
-        .._inBuilder = false;
+      StateMVC._rebuildAllowed = true;
+      state._inBuilder = false;
     }
     return widget;
   }
@@ -1642,8 +1636,6 @@ typedef BuilderWidget<T extends Object> = Widget Function(
 
 /// A Mixin to make a Controller for the 'app level' to influence the whole app.
 mixin AppControllerMVC on ControllerMVC {
-//  AppControllerMVC([StateMVC? state]) : super(state);
-
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.
   @Deprecated('No need to replace the initState() function. Use initState()')
   void initApp() {}
@@ -1659,7 +1651,7 @@ mixin AppControllerMVC on ControllerMVC {
   bool onAsyncError(FlutterErrorDetails details) => false;
 
   /// Override if you like to customize your error handling.
-  void onError(FlutterErrorDetails details) => stateMVC?.onError(details);
+  void onError(FlutterErrorDetails details) => state?.onError(details);
 }
 
 // Uuid
