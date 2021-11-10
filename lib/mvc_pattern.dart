@@ -1554,11 +1554,13 @@ class _InheritedMVCState extends State<_InheritedMVC> {
         child: widget.child,
       );
 
-  /// Override again merely to prevent the warning message:
-  /// The member 'setState' can only be used within instance members of
-  /// subclasses of 'package:flutter/src/widgets/framework.dart'.
+  /// Don't if the widget is not in the widget tree.
   @override
-  void setState(VoidCallback fn) => super.setState(fn);
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
 }
 
 class _InheritedWidget extends InheritedWidget {

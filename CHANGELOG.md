@@ -1,4 +1,9 @@
 
+## 8.1.1
+ November 10, 2021
+-    // Don't if the widget is not in the widget tree.
+-    if (mounted) {
+
 ## 8.1.0
  November 04, 2021
 - StateMVC? get state => _stateMVC; replaces getter, stateMVC
