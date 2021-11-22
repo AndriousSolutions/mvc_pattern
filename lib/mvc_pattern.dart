@@ -553,7 +553,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     for (final listener in _beforeList) {
       listener.deactivate();
     }
-    for (final con in _beforeList) {
+    for (final con in _controllerList) {
       con.deactivate();
     }
     for (final listener in _beforeList) {
