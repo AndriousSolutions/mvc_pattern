@@ -1389,8 +1389,11 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
   static void inheritWidget(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
 
+  @Deprecated('Replaced with a more recognizable name, inheritedNeedsBuild()')
+  void setStatesInherited([Object? object]) => inheritedNeedsBuild(object);
+
   /// Call the build() functions of all the widgets 'linked' to the Inherited widget.
-  void setStatesInherited([Object? object]) {
+  void inheritedNeedsBuild([Object? object]) {
     dataObject = object;
     _buildInherited = true;
     _InheritedMVC.setState(() {});

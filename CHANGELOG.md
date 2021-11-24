@@ -1,4 +1,8 @@
 
+## 8.2.0
+ November 24, 2021
+- Replaced setStatesInherited with inheritedNeedsBuild();
+
 ## 8.1.2
  November 22, 2021
 - In void deactivate() { for (final con in _beforeList) {
