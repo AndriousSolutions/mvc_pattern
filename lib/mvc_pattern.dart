@@ -497,7 +497,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Supply the 'latest' StateMVC object from the widget tree.
   static T? of<T extends StateMVC>(BuildContext? context) {
     assert(context != null);
-    return context!.findAncestorStateOfType<T>();
+    return context?.findAncestorStateOfType<T>();
   }
 
   /// The framework will call this method exactly once.

@@ -1,4 +1,8 @@
 
+## 8.2.1
+ December 10, 2021
+- context?.findAncestorStateOfType<T>();
+
 ## 8.2.0
  November 24, 2021
 - Replaced setStatesInherited with inheritedNeedsBuild();
