@@ -293,7 +293,7 @@ mixin StateListener {
   /// This method exposes the `popRoute` notification from
   // ignore: comment_references
   /// [SystemChannels.navigation].
-  Future<bool> didPopRoute() async => true;
+  Future<bool> didPopRoute() async => false;
 
   /// Called when the host tells the app to push a new route onto the
   /// navigator.
@@ -305,7 +305,7 @@ mixin StateListener {
   /// This method exposes the `pushRoute` notification from
   // ignore: comment_references
   /// [SystemChannels.navigation].
-  Future<bool> didPushRoute(String route) async => true;
+  Future<bool> didPushRoute(String route) async => false;
 
   /// Called when the application's dimensions change. For example,
   /// when a phone is rotated.
