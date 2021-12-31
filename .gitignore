@@ -1,6 +1,10 @@
 # Good to keep this file with the code.
 #.gitignore
 
+## Github Action Workflow for Continuous Integration Testing
+# https://medium.com/mobile-development-group/github-actions-for-flutter-cf02923d7b5d
+# .github
+
 # Ignore except for application packages
 #pubspec.lock
 

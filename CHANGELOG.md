@@ -1,7 +1,13 @@
 
+
+## 8.2.2.+02
+ December 31, 2021
+- Update .github/workflows/
+
 ## 8.2.2
  December 25, 2021
 - Future<bool> didPopRoute() async => false; Future<bool> didPushRoute(String route) async => false;
+
 ## 8.2.1
  December 10, 2021
 - context?.findAncestorStateOfType<T>();

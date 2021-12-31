@@ -43,10 +43,22 @@ jobs:
       - run: flutter format .
 
       # Analyze our Dart code
-#      - run: flutter analyze
-      
+      - run: flutter analyze . --preamble --no-fatal-infos --no-fatal-warnings
+
       # Run our tests
-      - run: flutter test --coverage      
+      - run: flutter test --coverage
+
+      # Build an Android APK.
+      - run: flutter build apk
+
+      # Finally, upload our generated app-release.apk for our workflow to the artifacts.
+      # For this, we will be using actions/upload-artifact.
+      - uses: actions/upload-artifact@v1
+        with:
+          # Name of the command/step.
+          name: release-apk
+          # Path to the release apk.
+          path: build/app/outputs/apk/release/app-release.apk
 
       # Upload to codecov
       - uses: codecov/codecov-action@v1.0.2
