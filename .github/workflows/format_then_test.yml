@@ -48,20 +48,21 @@ jobs:
       # Run our tests
       - run: flutter test --coverage
 
-      # Build an Android APK.
-      - run: flutter build apk
-
-      # Finally, upload our generated app-release.apk for our workflow to the artifacts.
-      # For this, we will be using actions/upload-artifact.
-      - uses: actions/upload-artifact@v1
-        with:
-          # Name of the command/step.
-          name: release-apk
-          # Path to the release apk.
-          path: build/app/outputs/apk/release/app-release.apk
-
       # Upload to codecov
       - uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage/lcov.info
+
+      # Create a Release up on Github
+      - uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: CHANGELOG.md
+#          body: |
+#            See CHANGELOG.md
+          draft: false
+          prerelease: false
