@@ -1,30 +1,6 @@
-/// Note: This license has also been called the "Simplified BSD License" and the "FreeBSD License".
-/// See also the 2-clause BSD License.
-///
-/// Copyright 2018 www.andrioussolutions.com
-///
-/// Redistribution and use in source and binary forms, with or without modification,
-/// are permitted provided that the following conditions are met:
-///
-/// 1. Redistributions of source code must retain the above copyright notice,
-/// this list of conditions and the following disclaimer.
-///
-/// 2. Redistributions in binary form must reproduce the above copyright notice,
-/// this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-///
-/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-/// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-/// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-/// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-/// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-/// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-/// The 'show' clause is not essential. Merely for your reference.
-import 'package:flutter/material.dart' show BuildContext, Icons, Key, UniqueKey;
+// Copyright 2018 Andrious Solutions Ltd. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 /// The 'show' clause is not essential. Merely for your reference.
 import 'package:flutter_test/flutter_test.dart'
@@ -37,23 +13,26 @@ import 'package:flutter_test/flutter_test.dart'
         isInstanceOf,
         testWidgets;
 
-/// The 'show' clause is not essential. Merely for your reference.
-import 'package:mvc_pattern/mvc_pattern.dart'
-    show AppControllerMVC, AppStatefulWidgetMVC, ControllerMVC, StateMVC;
+//ignore: avoid_relative_lib_imports
+import '../example/lib/src/app/view/my_app.dart';
 
-import '../example/main.dart'
-    show AnotherController, MyApp, MyHomePageState, View;
+//ignore: avoid_relative_lib_imports
+import '../example/lib/src/home/controller/another_controller.dart';
+
+//ignore: avoid_relative_lib_imports
+import '../example/lib/src/home/view/my_home_page.dart';
+
+//ignore: avoid_relative_lib_imports
+import '../example/lib/src/view.dart';
 
 import '_test_controller.dart' show testsController;
-
-/// The 'show' clause is not essential. Merely for your reference.
 
 import '_test_statemvc.dart' show testsStateMVC;
 
 void main() {
   // Use a key to locate the widget you need to test
   final Key key = UniqueKey();
-  _testApp(key, MyApp(key: key));
+  _testApp(key, MyApp(key: key) as AppStatefulWidgetMVC);
 }
 
 void _testApp(Key key, AppStatefulWidgetMVC app) {
@@ -98,10 +77,10 @@ void _testApp(Key key, AppStatefulWidgetMVC app) {
 
     /// Test looking up State objects by id.
     /// The unique key identifier for this State object.
-    final keyId = MyHomePageState().keyId;
+    final keyId = stateObj?.keyId;
 
     /// Returns a Map of StateView objects using unique String identifiers.
-    final map = AppStatefulWidgetMVC.getStates([keyId]);
+    final map = AppStatefulWidgetMVC.getStates([keyId!]);
 
     expect(map, isInstanceOf<Map<String, StateMVC>>());
 
@@ -129,25 +108,27 @@ void _testApp(Key key, AppStatefulWidgetMVC app) {
     expect(find.text('1'), findsOneWidget);
 
     /// Tests StateMVC object again!
-    await testsStateMVC(stateObj);
+//    await testsStateMVC(stateObj);
 
     /// Tests Controller object
-    testsController(stateObj);
+//    testsController(stateObj);
 
     expect(find.text('Hello there!'), findsNothing);
 
     // Retrieve the 'View' State object linked to this Controller.
-    final View? vw = con!.ofState<View>();
+    final MyAppState? vw = con!.rootState as MyAppState?;
+
+//    final state = con.stateOf<MyApp>();
 
     /// The first Controller added to the App's first State object
-    final firstCon = vw!.firstCon;
+    final firstCon = (vw as StateMVC).firstCon;
 
     expect(firstCon, isInstanceOf<AnotherController>());
 
-    vw.dataObject = 'Hello there!';
+    (vw as StateMVC).dataObject = 'Hello there!';
 
     /// Another means to 'refresh' the View object
-    vw.refresh();
+    (vw as StateMVC).refresh();
     await tester.pump();
 
     expect(find.text('Hello there!'), findsOneWidget);

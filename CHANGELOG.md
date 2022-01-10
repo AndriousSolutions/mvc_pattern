@@ -1,4 +1,13 @@
 
+## 8.3.0
+ January 09, 2022
+- New example app
+- Map<Type, Object> _controllers = {} to Set<ControllerMVC> _controllers = {};
+- futureBuilt to _futureBuilt
+- final controllers = AppStatefulWidgetMVC._controllers.toList();
+- mixin _RootStateMixin
+- StateMVC? stateOf<T extends StatefulWidget>()
+- Working on test
 
 ## 8.2.2.+03
  December 31, 2021

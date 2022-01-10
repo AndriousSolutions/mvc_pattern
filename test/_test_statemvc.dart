@@ -1,46 +1,22 @@
-/// Note: This license has also been called the "Simplified BSD License" and the "FreeBSD License".
-/// See also the 2-clause BSD License.
-///
-/// Copyright 2018 www.andrioussolutions.com
-///
-/// Redistribution and use in source and binary forms, with or without modification,
-/// are permitted provided that the following conditions are met:
-///
-/// 1. Redistributions of source code must retain the above copyright notice,
-/// this list of conditions and the following disclaimer.
-///
-/// 2. Redistributions in binary form must reproduce the above copyright notice,
-/// this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-///
-/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-/// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-/// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-/// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-/// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-/// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-/// The 'show' clause is not essential. Merely for your reference.
-import 'package:flutter/material.dart' show AppLifecycleState, Localizations;
+// Copyright 2018 Andrious Solutions Ltd. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 /// The 'show' clause is not essential. Merely for your reference.
 import 'package:flutter_test/flutter_test.dart'
     show Future, expect, isNotEmpty, isInstanceOf;
 
-/// The 'show' clause is not essential. Merely for your reference.
-import 'package:mvc_pattern/mvc_pattern.dart'
-    show ControllerMVC, StateMVC, AppControllerMVC;
+//ignore: avoid_relative_lib_imports
+import '../example/lib/src/home/controller/controller.dart';
 
-/// The 'show' clause is not essential. Merely for your reference.
-import '../example/main.dart' show Controller, MyHomePageState;
+//ignore: avoid_relative_lib_imports
+import '../example/lib/src/home/view/my_home_page.dart';
+
+//ignore: avoid_relative_lib_imports
+import '../example/lib/src/view.dart';
 
 Future<void> testsStateMVC(StateMVC? stateObj) async {
   //
-  expect(stateObj, isInstanceOf<MyHomePageState>());
-
   final con = stateObj?.controller;
 
   expect(con, isInstanceOf<Controller>());
@@ -48,12 +24,12 @@ Future<void> testsStateMVC(StateMVC? stateObj) async {
   /// The StateMVC object.
   final _stateMVC = con?.state;
 
-  expect(_stateMVC, isInstanceOf<MyHomePageState>());
+  expect(_stateMVC, isInstanceOf<StateMVC>());
 
   /// The State object. (con.state as StateMVC will work!)
   final _state = con?.state!;
 
-  expect(_state, isInstanceOf<MyHomePageState>());
+  expect(_state, isInstanceOf<State>());
 
   /// Test for the unique identifier assigned to every Controller.
   var id = _stateMVC?.add(TestingController());

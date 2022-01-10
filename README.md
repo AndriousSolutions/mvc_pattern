@@ -11,13 +11,17 @@ Note, the Framework package, [mvc_application](https://pub.dev/packages/mvc_appl
 The package, [mvc_application](https://pub.dev/packages/mvc_application), allows for easier and, dare I say, faster development and better maintenability. No 're-inventing of the wheel' with already built-in capabilities and features. Accommodating and Intergrated features:
 * Error Handling
 * System Preferences
-* App Notifications
+* Notifications
 * Date picker
 * App Color picker
 * Dialog Box
 * Customizable Bottom Bar
 * Loading Screen
 * Time Zones
+* Localization
+
+The package, [mvc_web](https://pub.dev/packages/mvc_web), uses [mvc_application](https://pub.dev/packages/mvc_application), but for the Web.
+
 
 ##### The "Kiss" of Flutter Frameworks
 

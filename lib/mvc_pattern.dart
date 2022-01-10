@@ -2,10 +2,10 @@
 /// separating the app's 'interface' from its 'business logic' and from its 'data source' if any.
 ///
 /// Code samples can be found in the following links:
-/// https://github.com/AndriousSolutions/mvc_pattern/tree/master/test
-/// https://github.com/AndriousSolutions/mvc_pattern/blob/master/example/lib/main.dart
+/// https://github.com/AndriousSolutions/mvc_pattern/blob/master/example/main.dart
+/// https://github.com/AndriousSolutions/mvc_pattern/blob/master/test/widget_test.dart
 ///
-/// https://github.com/AndriousSolutions/mvc_pattern
+/// https://github.com/AndriousSolutions/mvc_pattern/
 ///
 library mvc_pattern;
 
@@ -34,13 +34,14 @@ library mvc_pattern;
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 /// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
-/// NOTE: Full overview of mvc_pattern package can be found in this article:
+/// NOTE: For an overview of the package, read the free medium article:
 /// https://medium.com/follow-flutter/flutter-mvc-at-last-275a0dc1e730
 
 import 'dart:async' show Future;
 
 import 'dart:math' show Random;
 
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
 
 import 'package:flutter/material.dart'
@@ -50,12 +51,12 @@ import 'package:flutter/material.dart'
         FlutterError,
         FlutterErrorDetails,
         WidgetsFlutterBinding,
-        InheritedElement,
         InheritedWidget,
         Key,
         Locale,
         mustCallSuper,
         Navigator,
+        RouteInformation,
         State,
         StatefulWidget,
         StatelessWidget,
@@ -64,14 +65,13 @@ import 'package:flutter/material.dart'
         WidgetsApp,
         WidgetsBinding,
         WidgetsBindingObserver,
-        mustCallSuper,
         protected;
 
 import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
 
 /// This class is to be concerned with the data
 /// It is accessed by the Controller but can call setState() as well.
-class ModelMVC extends StateSetter {
+class ModelMVC extends StateSetter with _RootStateMixin {
   //
   ModelMVC([StateMVC? state]) : super() {
     _pushState(state);
@@ -80,7 +80,7 @@ class ModelMVC extends StateSetter {
 
 /// Your 'working' class most concerned with the app's functionality.
 /// Add it to a 'StateMVC' object to associate it with that State object.
-class ControllerMVC extends StateSetter with StateListener {
+class ControllerMVC extends StateSetter with StateListener, _RootStateMixin {
   //
   ControllerMVC([StateMVC? state]) : super() {
     addState(state);
@@ -115,7 +115,7 @@ class ControllerMVC extends StateSetter with StateListener {
 }
 
 /// Allows you to call 'setState' from the 'current' the State object.
-class StateSetter with StateSets {
+class StateSetter with _StateSets {
   /// Provide the setState() function to external actors
   void setState(VoidCallback fn) => _stateMVC?.setState(fn);
 
@@ -127,19 +127,25 @@ class StateSetter with StateSets {
 
   /// For those accustom to the 'Provider' approach.
   void notifyListeners() => refresh();
+
+  /// Retrieve the State object by its StatefulWidget.Returns null if not found
+  StateMVC? stateOf<T extends StatefulWidget>() =>
+      _stateWidgetMap.isEmpty ? null : _stateWidgetMap[_type<T>()];
 }
 
 /// Record in a Set any previous State objects
 /// and the current State object being used.
-mixin StateSets {
+mixin _StateSets {
   StateMVC? _stateMVC;
   final Set<StateMVC> _stateMVCSet = {};
+  final Map<Type, StateMVC> _stateWidgetMap = {};
   bool _statePushed = false;
 
-  /// Push the StateMVC object to a Set of such objects
-  /// Internal use only: This connects the Controller to this View!
-  @Deprecated('Too intrusive method to manages State objects.')
-  bool pushState(StateMVC? state) => _pushState(state);
+  void _addState(StateMVC state) {
+    if (_statePushed && _stateMVC != null && _stateMVC == state) {
+      _stateWidgetMap.addAll({state.widget.runtimeType: state});
+    }
+  }
 
   bool _pushState(StateMVC? state) {
     if (state == null) {
@@ -159,6 +165,7 @@ mixin StateSets {
     // Remove if the current state
     if (state != null && state == _stateMVC) {
       _statePushed = false;
+      _stateWidgetMap.removeWhere((key, value) => value == state);
       _stateMVCSet.remove(state);
     }
 
@@ -167,8 +174,9 @@ mixin StateSets {
       _statePushed = false;
       pop = false;
     } else {
-      // Remove all that have been disposed of.
+      // Remove all Stat objects that have been disposed of.
       _stateMVCSet.retainWhere((state) => state.mounted);
+      _stateWidgetMap.removeWhere((key, value) => !value.mounted);
 
       if (_stateMVCSet.isEmpty) {
         //
@@ -198,13 +206,14 @@ mixin StateSets {
         state = null;
       }
     }
-    // ignore: avoid_as
     return state == null ? null : state as T;
   }
 
   /// Return a 'copy' of the Set of State objects.
   Set<StateMVC> get states => Set.from(_stateMVCSet.whereType<StateMVC>());
 }
+
+Type _type<U>() => U;
 
 /// Responsible for the event handling in all the Controllers, Listeners and Views.
 mixin StateListener {
@@ -244,26 +253,23 @@ mixin StateListener {
     /// by this object (e.g., stop any active animations).
   }
 
-  // ignore: comment_references
-  /// Override this method to respond when the [widget] changes (e.g., to start
-  /// implicit animations).
+  /// Override this method to respond when the [StatefulWidget] is recreated.
   void didUpdateWidget(StatefulWidget oldWidget) {
-    /// Override this method to respond when the [widget] changes (e.g., to start
-    /// implicit animations).
-    /// The framework always calls [build] after calling [didUpdateWidget], which
+    /// The framework always calls build() after calling [didUpdateWidget], which
     /// means any calls to [setState] in [didUpdateWidget] are redundant.
   }
 
-  /// Called when a dependency of this [StateMVC] object changes.
+  /// Called when this [StateMVC] object is first created immediately after [initState].
+  /// Otherwise called only if this [State] object's Widget
+  /// is a dependency of [InheritedWidget].
   void didChangeDependencies() {
-    /// Called when a dependency of this [State] object changes.
     ///
-    /// For example, if the previous call to [build] referenced an
-    /// [InheritedWidget] that later changed, the framework would call this
-    /// method to notify this object about the change.
-    ///
-    /// This method is also called immediately after [initState]. It is safe to
-    /// call [BuildContext.inheritFromWidgetOfExactType] from this method.
+    /// if a State object's [build] references an [InheritedWidget] with
+    /// [context.dependOnInheritedWidgetOfExactType]
+    /// its Widget is now a 'dependency' of that that InheritedWidget.
+    /// Later, if that InheritedWidget's build() function is called, all its dependencies
+    /// build() functions are also called but not before this method again.
+    /// Subclasses rarely use this method, but its an option if needed.
   }
 
   /// Called whenever the application is reassembled during debugging, for
@@ -306,6 +312,22 @@ mixin StateListener {
   // ignore: comment_references
   /// [SystemChannels.navigation].
   Future<bool> didPushRoute(String route) async => false;
+
+  /// Called when the host tells the application to push a new
+  /// [RouteInformation] and a restoration state onto the router.
+  ///
+  /// Observers are expected to return true if they were able to
+  /// handle the notification. Observers are notified in registration
+  /// order until one returns true.
+  ///
+  /// This method exposes the `popRoute` notification from
+  // ignore: comment_references
+  /// [SystemChannels.navigation].
+  ///
+  /// The default implementation is to call the [didPushRoute] directly with the
+  /// [RouteInformation.location].
+  Future<bool> didPushRouteInformation(RouteInformation routeInformation) =>
+      didPushRoute(routeInformation.location!);
 
   /// Called when the application's dimensions change. For example,
   /// when a phone is rotated.
@@ -388,13 +410,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         // ignore: prefer_mixin
         WidgetsBindingObserver,
         _ControllerListing,
-        _StateListeners
+        _StateListeners,
+        _RootStateMixin
     implements
         StateListener {
   /// With an optional Controller parameter, this constructor imposes its own Error Handler.
   StateMVC([this._controller]) : currentErrorFunc = FlutterError.onError {
     /// If a tester is running. Don't switch out its error handler.
-    /// WidgetsBinding.instance is WidgetsFlutterBinding
     if (WidgetsBinding.instance == null ||
         WidgetsBinding.instance is WidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
@@ -437,7 +459,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       /// It may have been a listener. Can't be both.
       removeListener(c);
     }
-
     return super.add(c);
   }
 
@@ -472,15 +493,23 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 //  }
 
   /// Retrieve a Controller in the MVC framework by type.
-  U? controllerByType<U extends ControllerMVC?>() {
+  U? controllerByType<U extends ControllerMVC>() {
     // Look in this State objects list of Controllers.  Maybe not?
-    // ignore: avoid_as
-    U? con = _cons[_type<U>()] as U?;
-    // ignore: avoid_as
-    return con ??= AppStatefulWidgetMVC._controllers[_type<U>()] as U?;
-  }
 
-  Type _type<U>() => U;
+    U? con = _cons[_type<U>()] as U?;
+
+    //con ??= AppStatefulWidgetMVC._controllers[_type<U>()] as U?;
+    if (con == null) {
+      final controllers = AppStatefulWidgetMVC._controllers.toList();
+      for (final cont in controllers) {
+        if (cont.runtimeType == _type<U>()) {
+          con = cont as U?;
+          break;
+        }
+      }
+    }
+    return con;
+  }
 
   /// May be set false to prevent unnecessary 'rebuilds'.
   static bool _rebuildAllowed = true;
@@ -489,12 +518,14 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   bool _rebuildRequested = false;
 
   /// A flag indicating initAsync was called
-  bool futureBuilt = false;
+  bool get futureBuilt => _futureBuilt;
+  bool _futureBuilt = false;
 
   /// Running in a tester instead of production.
   bool _inTester = false;
 
-  /// Supply the 'latest' StateMVC object from the widget tree.
+  /// Supply the StateMVC object from the widget tree.
+  @Deprecated('ill-conceived capability')
   static T? of<T extends StateMVC>(BuildContext? context) {
     assert(context != null);
     return context?.findAncestorStateOfType<T>();
@@ -528,6 +559,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.initState();
     }
     for (final con in _controllerList) {
+      // Add this to the _StateSets Map
+      con._addState(this);
       con.initState();
     }
     for (final listener in _afterList) {
@@ -554,7 +587,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.deactivate();
     }
     for (final con in _controllerList) {
-      con.deactivate();
+      // This state's association is severed.
+      con._popState(this);
+
+      // Don't call its deactivate if it's in other State objects.
+      if (con._stateMVCSet.isEmpty) {
+        con.deactivate();
+      }
     }
     for (final listener in _beforeList) {
       listener.deactivate();
@@ -568,12 +607,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   }
 
   /// The framework calls this method when this [StateMVC] object will never
-  /// build again.
+  /// build again and will be disposed of.
   @protected
   @override
   @mustCallSuper
   void dispose() {
-    /// The [State] object's lifecycle is terminated.
+    /// The State object's lifecycle is terminated.
     /// Subclasses should override this method to release any resources retained
     /// by this object (e.g., stop any active animations).
 
@@ -613,23 +652,20 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     // Return the original error routine.
     FlutterError.onError = currentErrorFunc;
 
+    // Remove the State object from a static reference.
     AppStatefulWidgetMVC._removeStateMVC(this);
 
     super.dispose();
   }
 
-  /// Override this method to respond when the [widget] changes (e.g., to start
-  /// implicit animations).
+  /// Override this method to respond when its [StatefulWidget] is re-created.
+  /// The framework always calls [build] after calling [didUpdateWidget], which
+  /// means any calls to [setState] in [didUpdateWidget] are redundant.
   @protected
   @override
   @mustCallSuper
   void didUpdateWidget(StatefulWidget oldWidget) {
-    /// The framework always calls [build] after calling [didUpdateWidget], which
-    /// means any calls to [setState] in [didUpdateWidget] are redundant.
-
     /// No 'setState()' functions are allowed
-    /// The framework always calls build after calling didUpdateWidget,
-    /// which means any calls to setState in didUpdateWidget are redundant.
     _rebuildAllowed = false;
     for (final listener in _beforeList) {
       listener.didUpdateWidget(oldWidget);
@@ -695,11 +731,18 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     ///
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
+
+    /// Set if a Controller successfully 'handles' the notification.
+    bool handled = false;
+
     for (final listener in _beforeList) {
       await listener.didPopRoute();
     }
     for (final con in _controllerList) {
-      await con.didPopRoute();
+      final didPop = await con.didPopRoute();
+      if (didPop) {
+        handled = true;
+      }
     }
     for (final listener in _afterList) {
       await listener.didPopRoute();
@@ -712,7 +755,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       refresh();
     }
     // Return false to pop out
-    return false;
+    return handled;
   }
 
   /// Called when the host tells the app to push a new route onto the
@@ -730,11 +773,18 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
+
+    /// Set if a Controller successfully 'handles' the notification.
+    bool handled = false;
+
     for (final listener in _beforeList) {
       await listener.didPushRoute(route);
     }
     for (final con in _controllerList) {
-      await con.didPushRoute(route);
+      final didPush = await con.didPushRoute(route);
+      if (didPush) {
+        handled = true;
+      }
     }
     for (final listener in _afterList) {
       await listener.didPushRoute(route);
@@ -746,7 +796,53 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       /// Perform a 'rebuild' if requested.
       refresh();
     }
-    return false;
+    return handled;
+  }
+
+  /// Called when the host tells the application to push a new
+  /// [RouteInformation] and a restoration state onto the router.
+  ///
+  /// Observers are expected to return true if they were able to
+  /// handle the notification. Observers are notified in registration
+  /// order until one returns true.
+  ///
+  /// This method exposes the `pushRouteInformation` notification from
+  // ignore: comment_references
+  /// [SystemChannels.navigation].
+  ///
+  /// The default implementation is to call the [didPushRoute] directly with the
+  /// [RouteInformation.location].
+  @protected
+  @override
+  @mustCallSuper
+  Future<bool> didPushRouteInformation(
+      RouteInformation routeInformation) async {
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+
+    /// Set if a Controller successfully 'handles' the notification.
+    bool handled = false;
+
+    for (final listener in _beforeList) {
+      await listener.didPushRouteInformation(routeInformation);
+    }
+    for (final con in _controllerList) {
+      final didPush = await con.didPushRouteInformation(routeInformation);
+      if (didPush) {
+        handled = true;
+      }
+    }
+    for (final listener in _afterList) {
+      await listener.didPushRouteInformation(routeInformation);
+    }
+    _rebuildAllowed = true;
+    if (_rebuildRequested || _inTester) {
+      _rebuildRequested = false;
+
+      /// Perform a 'rebuild' if requested.
+      refresh();
+    }
+    return handled;
   }
 
   /// Called when the application's dimensions change. For example,
@@ -938,12 +1034,19 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// A flag indicating this is the very first build.
   bool _firstBuild = true;
 
-  /// Called when a dependency of this [State] object changes.
   /// This method is also called immediately after [initState].
+  /// Otherwise called only if this [State] object's Widget
+  /// is a dependency of [InheritedWidget].
+  /// When a InheritedWidget's build() funciton is called
+  /// it's dependencies' build() function are also called but not before
+  /// their didChangeDependencies() function. Subclasses rarely use this method.
   @protected
   @override
   @mustCallSuper
   void didChangeDependencies() {
+    // Important to 'markNeedsBuild()' first
+    super.didChangeDependencies();
+
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
     for (final listener in _beforeList) {
@@ -1194,7 +1297,7 @@ mixin _ControllerListing {
     final con = _map[keyId];
     final there = con != null;
     if (there) {
-      con!._popState(_stateMVC);
+      con._popState(_stateMVC);
       _map.remove(keyId);
     }
     return there;
@@ -1211,7 +1314,7 @@ mixin _ControllerListing {
   /// Adds a 'Controller' to be associated with this StateMVC object
   /// and returns Controller's the unique 'key' identifier assigned to it.
   String addConId(ControllerMVC con) {
-    final keyId = con.keyId; //_addKeyId(con);
+    final keyId = con.keyId;
     _map[keyId] = con;
     return keyId;
   }
@@ -1222,9 +1325,13 @@ mixin _ControllerListing {
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 /// AppStatefulWidget is its subclass.
 abstract class AppStatefulWidgetMVC extends StatefulWidget {
-  const AppStatefulWidgetMVC({Key? key, this.con}) : super(key: key);
+  AppStatefulWidgetMVC({Key? key, this.con}) : super(key: key) {
+    if (con != null) {
+      _controllers.add(con!);
+    }
+  }
 
-  final AppControllerMVC? con;
+  final ControllerMVC? con;
 
   /// You create the App's State object.
   @override
@@ -1234,6 +1341,7 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
   ControllerMVC? get controller => con;
 
   /// Most recent BuildContext/Element
+  @Deprecated('Replaced by the getter, lastContext')
   BuildContext? get context {
     BuildContext? context;
     while (_states.isNotEmpty) {
@@ -1251,10 +1359,16 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
     return context;
   }
 
+  BuildContext? get lastContext => context;
+
   /// Initialize any immediate 'none time-consuming' operations at the very beginning.
   @mustCallSuper
   @Deprecated('No need to replace the initState() function. Use initState()')
-  void initApp() => con?.initApp();
+  void initApp() {
+    if (con != null && con is AppControllerMVC) {
+      (con as AppControllerMVC).initApp();
+    }
+  }
 
   /// Called in State object.
   /// Called when this [State] object will never build again.
@@ -1265,7 +1379,7 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
     _states.clear();
   }
 
-  static final Map<Type, Object> _controllers = {};
+  static final Set<ControllerMVC> _controllers = {};
 
   static final Set<Map<String, StateMVC>> _states = {};
 
@@ -1282,6 +1396,7 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
 
   /// Determines if running in an IDE or in production.
   /// Returns true if the App is under in the Debugger and not production.
+  @Deprecated('This static getter is replaced by a instance getter')
   static bool get inDebugger {
     var inDebugMode = false;
     // assert is removed in production.
@@ -1319,25 +1434,98 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
     return getStates(keys).values.toList();
   }
 
-  /// This is 'privatized' as it is an critical method and not for public access.
+  /// This is 'privatized' function as it is an critical method and not for public access.
   /// This contains the 'main list' of StateMVC objects present in the app!
   static void _addStateMVC(StateMVC state) {
     final Map<String, StateMVC> map = {};
     map[state._keyId] = state;
     _states.add(map);
-    for (final con in state._controllerList) {
-      _controllers.addAll({con.runtimeType: con});
-    }
+    // for (final con in state._controllerList) {
+    //   _controllers.add(con);
+    // }
+    state._controllerList.forEach(_controllers.add);
   }
 
+  /// Remove the specified State object from static Set object.
   static bool _removeStateMVC(StateMVC? state) {
     var removed = state != null;
     if (removed) {
       final int length = _states.length;
-      _states.removeWhere((element) => state!._keyId == element.keys.first);
+      _states.removeWhere((map) => state._keyId == map.keys.first);
       removed = _states.length < length;
     }
     return removed;
+  }
+
+  /// This is 'privatized' function returning the 'last' StateMVC and not for public access.
+  static StateMVC? _lastStateMVC() {
+    StateMVC? state;
+    while (_states.isNotEmpty) {
+      try {
+        state = _states.last.values.last;
+        break;
+      } catch (ex) {
+        if (ex is FlutterError && ex.message.contains('unmounted')) {
+          _states.remove(_states.last);
+        } else {
+          state = null;
+          break;
+        }
+      }
+    }
+    return state;
+  }
+}
+
+mixin _RootStateMixin {
+  ///Record the 'root' StateMVC object
+  void setRootStateMVC(StateMVC state) {
+    if (_rootStateMVC == null && state is AppStateMVC) {
+      _rootStateMVC = state;
+    }
+  }
+
+  static AppStateMVC? _rootStateMVC;
+
+  /// Returns the 'first' StateMVC object
+  AppStateMVC? get rootState => _rootStateMVC;
+
+  /// Returns the 'latest' context
+  BuildContext? get lastContext =>
+      AppStatefulWidgetMVC._lastStateMVC()?.context;
+
+  /// Link a widget to InheritedWidget
+  void inheritWidget(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
+
+  /// Call the build() functions of all the widgets 'linked' to the Inherited widget.
+  void inheritBuild([Object? object]) =>
+      _rootStateMVC?.inheritedNeedsBuild(object);
+
+  /// This is of type Object allowing you
+  /// to propagate any class object you wish down the widget tree.
+  Object? get dataObject => _rootStateMVC?._dataObj;
+
+  set dataObject(Object? object) {
+    // Never explicitly set to null
+    if (object != null) {
+      //
+      _rootStateMVC?._dataObj = object;
+      // If there's a SetState class out there being used.
+      if (_rootStateMVC!._setStates && StateMVC._rebuildAllowed) {
+        // Call inherited widget to 'rebuild' the dependencies
+        _InheritedMVC.setState(() {});
+      }
+    }
+  }
+
+  /// Determines if running in an IDE or in production.
+  /// Returns true if the App is under in the Debugger and not production.
+  bool get inDebugger {
+    var inDebugMode = false;
+    // assert is removed in production.
+    assert(inDebugMode = true);
+    return inDebugMode;
   }
 }
 
@@ -1350,28 +1538,15 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     this.controllers,
     Object? object,
   }) : super(controller) {
+    //Record this as the 'root' State object.
+    setRootStateMVC(this);
     _dataObj = object;
     addList(controllers?.toList());
   }
   final List<ControllerMVC>? controllers;
 
-  /// This is of type Object allowing you
-  /// to propagate any class object you wish down the widget tree.
-  Object? get dataObject => _dataObj;
+  /// The 'data object' available to the framework.
   Object? _dataObj;
-
-  set dataObject(Object? object) {
-    // Never explicitly set to null
-    if (object != null) {
-      //
-      _dataObj = object;
-      // If there's a SetState class out there being used.
-      if (_setStates && StateMVC._rebuildAllowed) {
-        // Call inherited widget to 'rebuild' the dependencies
-        _InheritedMVC.setState(() {});
-      }
-    }
-  }
 
   /// Implement this function to compose the App's View.
   /// Override to impose your own WidgetsApp (like CupertinoApp or MaterialApp)
@@ -1384,17 +1559,18 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
   Widget build(BuildContext context) =>
       _InheritedMVC(state: this, child: buildApp(context));
 
-  /// Link a widget to InheritedWidget
-  ///
-  static void inheritWidget(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
+  // /// Link a widget to InheritedWidget
+  // static void inheritWidget(BuildContext context) =>
+  //     context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
 
   @Deprecated('Replaced with a more recognizable name, inheritedNeedsBuild()')
   void setStatesInherited([Object? object]) => inheritedNeedsBuild(object);
 
   /// Call the build() functions of all the widgets 'linked' to the Inherited widget.
   void inheritedNeedsBuild([Object? object]) {
-    dataObject = object;
+    if (object != null) {
+      dataObject = object;
+    }
     _buildInherited = true;
     _InheritedMVC.setState(() {});
   }
@@ -1433,8 +1609,8 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
   }
 
   bool _buildInherited = false;
-  bool _inBuilder = false;
   bool _setStates = false;
+  bool _inBuilder = false;
 }
 
 /// The App's first State object.
@@ -1450,29 +1626,31 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
   @mustCallSuper
   Future<bool> initAsync() async {
     /// It's been done. Don't run again.
-    if (futureBuilt) {
-      return futureBuilt;
+    if (_futureBuilt) {
+      return _futureBuilt;
     }
-    futureBuilt = true;
+    _futureBuilt = true;
 
     /// This will call any and all Controllers that need asynchronous operations
     /// completed before continuing.
     /// No 'setState()' functions are allowed to fully function at this point.
     StateMVC._rebuildAllowed = false;
 
-    for (final con in _controllerList) {
+//    for (final con in _controllerList) {
+    final controllers = AppStatefulWidgetMVC._controllers.toList();
+    for (final con in controllers) {
       if (con is! AppControllerMVC) {
         continue;
       }
-      futureBuilt = await con.initAsync();
+      _futureBuilt = await con.initAsync();
       // Don't continue if there's an error.
-      if (!futureBuilt) {
+      if (!_futureBuilt) {
         break;
       }
     }
     StateMVC._rebuildAllowed = true;
     // Set the flag
-    return futureBuilt;
+    return _futureBuilt;
   }
 
   /// Supply an 'error handler' routine if something goes wrong
@@ -1576,11 +1754,6 @@ class _InheritedWidget extends InheritedWidget {
   }) : super(key: key, child: child);
   final AppStateMVC state;
   final Object? object;
-
-  /// Included temporarily for demonstration purposes.
-  /// Place a breakpoint to see this function execute
-  @override
-  InheritedElement createElement() => InheritedElement(this);
 
   ///
   @override

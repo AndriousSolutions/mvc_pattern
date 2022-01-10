@@ -7,8 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
-#  pull_request:
-#    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -42,7 +42,7 @@ jobs:
       # Check for any formatting issues in the code.
       - run: flutter format .
 
-      # Analyze our Dart code
+      # Analyze our Dart code, but don't fail with there are issues.
       - run: flutter analyze . --preamble --no-fatal-infos --no-fatal-warnings
 
       # Run our tests
@@ -54,15 +54,22 @@ jobs:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage/lcov.info
 
+      # Parse a tag from the commit message
+      - id: get-tag
+        run: |
+          id=$(echo ${{github.event.head_commit.message}} | cut -d' ' -f1)
+          echo "::set-output name=tag::$id"
+
       # Create a Release up on Github
+      if: !contains('${{ steps.get-tag.outputs.TAG }}', '+')
       - uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body_path: CHANGELOG.md
-#          body: |
-#            See CHANGELOG.md
+          tag_name: ${{ steps.get-tag.outputs.TAG }}
+          release_name: Release ${{ steps.get-tag.outputs.TAG }}
+#          body_path: CHANGELOG.md
+          body: |
+            See CHANGELOG.md
           draft: false
           prerelease: false
