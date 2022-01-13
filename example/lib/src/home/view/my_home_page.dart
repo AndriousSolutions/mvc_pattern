@@ -36,9 +36,12 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
     /// Retrieve the 'app level' State object
     appState = rootState!;
 
-    /// By the way, when necessary, you can retrieve
-    /// a State object's many Controllers as well.
-    final con = appState.controllerByType<AppController>();
+    /// You're able to retrieve the Controller(s) from other State objects.
+    var con = appState.controller;
+
+    con = appState.controllerByType<AppController>();
+
+    con = appState.controllerById(con?.keyId);
 
     /// For testing purposes, supply this StateMVC object's unique identifier
     /// to its StatefulWidget.
@@ -58,11 +61,11 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               /// Display the App's data object if it has something to display
-              if (appState.dataObject != null && appState.dataObject is String)
+              if (con.dataObject != null && con.dataObject is String)
                 Padding(
                   padding: const EdgeInsets.all(30),
                   child: Text(
-                    appState.dataObject as String,
+                    con.dataObject as String,
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: Theme.of(context).textTheme.headline4!.fontSize,
@@ -88,12 +91,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
         ),
         floatingActionButton: FloatingActionButton(
           /// Refresh only the Text widget containing the counter.
-          onPressed: () {
-            con.incrementCounter();
-
-            /// Only calls only 'SetState' widgets
-            inheritBuild();
-          },
+          onPressed: () => con.incrementCounter(),
 
           /// The traditional approach calling the State object's setState() function.
           // onPressed: () {

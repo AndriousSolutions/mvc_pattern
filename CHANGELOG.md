@@ -1,4 +1,11 @@
 
+## 8.4.0
+ January 12, 2022
+- Privatize properties in the example app
+- AppStatefulWidgetMVC({Key? key, this.con}) to this.controller
+- ControllerMVC? controllerById(String? keyId) =>
+- this.controllers to List<ControllerMVC>? controllers in AppStateMVC
+
 ## 8.3.0
  January 09, 2022
 - New example app

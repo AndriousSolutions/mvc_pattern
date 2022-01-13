@@ -15,23 +15,25 @@ class Controller extends ControllerMVC {
 
   final Model _model;
 
-  /// Retrieve the 'App State' object
-  MyAppState get appState =>
-      _appState ??= StateMVC.of<MyAppState>(state!.context)!;
-  MyAppState? _appState;
-
   /// Note, the count comes from a separate class, _Model.
   int get count => _model.counter;
 
-  // The Controller knows how to 'talk to' the Model.
+  // The Controller knows how to 'talk to' the Model and to the View (interface).
   void incrementCounter() {
     //
     _model.incrementCounter();
 
-    /// If divisible by 5
-    if (_model.counter % 5 == 0) {
+    /// Only calls only 'SetState' widgets
+    /// or widgets that called the inheritWidget(context) function
+    inheritBuild();
+
+    /// Retrieve a particular State object.
+    final homeState = stateOf<MyHomePage>();
+
+    /// If working with a particular State object and if divisible by 5
+    if (homeState != null && _model.counter % 5 == 0) {
       //
-      appState.dataObject = _model.sayHello();
+      dataObject = _model.sayHello();
       setState(() {});
     }
   }

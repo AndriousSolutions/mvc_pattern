@@ -15,7 +15,6 @@ class Model extends ModelMVC {
 
   int incrementCounter() => ++_counter;
 
-  int index = 0;
   final words = [
     'Hello There!',
     'How are you?',
@@ -23,12 +22,13 @@ class Model extends ModelMVC {
     'All the best.',
     'Bye for now.'
   ];
+  int _index = 0;
 
   String sayHello() {
     String say;
-    if (index < words.length) {
-      say = words[index];
-      index++;
+    if (_index < words.length) {
+      say = words[_index];
+      _index++;
     } else {
       say = '';
     }

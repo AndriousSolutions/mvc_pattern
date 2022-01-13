@@ -68,7 +68,7 @@ Instead, always go up to the '**major**' semantic version number when installing
 And so, in this case, add this to your package's pubspec.yaml file instead:
 ```javascript
 dependencies:
-  mvc_pattern:^7.0.0
+  mvc_pattern:^8.0.0
 ```
 **Usage**
 

@@ -17,7 +17,9 @@ class Page2 extends StatefulWidget {
   State createState() => _Page2State();
 
   void onPressed() {
+    //
     final state = con.ofState<_Page2State>()!;
+
     state.setState(() {
       con.incrementCounter();
     });

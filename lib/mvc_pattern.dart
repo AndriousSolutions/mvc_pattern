@@ -201,7 +201,13 @@ mixin _StateSets {
     } else {
       final stateList = _stateMVCSet.toList(growable: false);
       try {
-        state = stateList.firstWhere((item) => item is T);
+        for (final item in stateList) {
+          if (item is T) {
+            state = item;
+            break;
+          }
+        }
+//        state = stateList.firstWhere((item) => item is T);
       } catch (_) {
         state = null;
       }
@@ -449,7 +455,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   ControllerMVC? get controller => _controller ??= firstCon;
 
   /// Retrieve a Controller by its a unique String identifier.
-  ControllerMVC? controllerById(String keyId) => super._con(keyId);
+  ControllerMVC? controllerById(String? keyId) => super._con(keyId);
 
   /// Add a specific Controller to this View.
   /// Returns the Controller's unique String identifier.
@@ -1325,20 +1331,20 @@ mixin _ControllerListing {
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 /// AppStatefulWidget is its subclass.
 abstract class AppStatefulWidgetMVC extends StatefulWidget {
-  AppStatefulWidgetMVC({Key? key, this.con}) : super(key: key) {
-    if (con != null) {
-      _controllers.add(con!);
+  AppStatefulWidgetMVC({Key? key, this.controller}) : super(key: key) {
+    if (controller != null) {
+      _controllers.add(controller!);
     }
   }
 
-  final ControllerMVC? con;
+  final ControllerMVC? controller;
 
   /// You create the App's State object.
   @override
   AppStateMVC createState();
 
   /// Get the controller if any
-  ControllerMVC? get controller => con;
+//  ControllerMVC? get controller => _controller;
 
   /// Most recent BuildContext/Element
   @Deprecated('Replaced by the getter, lastContext')
@@ -1365,8 +1371,8 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
   @mustCallSuper
   @Deprecated('No need to replace the initState() function. Use initState()')
   void initApp() {
-    if (con != null && con is AppControllerMVC) {
-      (con as AppControllerMVC).initApp();
+    if (controller != null && controller is AppControllerMVC) {
+      (controller as AppControllerMVC).initApp();
     }
   }
 
@@ -1535,7 +1541,7 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
   //
   AppStateMVC({
     ControllerMVC? controller,
-    this.controllers,
+    List<ControllerMVC>? controllers,
     Object? object,
   }) : super(controller) {
     //Record this as the 'root' State object.
@@ -1543,7 +1549,6 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     _dataObj = object;
     addList(controllers?.toList());
   }
-  final List<ControllerMVC>? controllers;
 
   /// The 'data object' available to the framework.
   Object? _dataObj;

@@ -36,7 +36,7 @@ class _Page3State extends StateMVC<Page3> {
   int count = 0;
 
   @override
-  Widget build(BuildContext context) => buildPage3(
+  Widget build(BuildContext context) => _buildPage3(
         count: count,
         newKey: () => rootState?.setState(() {}),
         counter: widget.onPressed,
@@ -48,7 +48,7 @@ class _Page3State extends StateMVC<Page3> {
         },
       );
 
-  Widget buildPage3({
+  Widget _buildPage3({
     int count = 0,
     required void Function() counter,
     required void Function() newKey,

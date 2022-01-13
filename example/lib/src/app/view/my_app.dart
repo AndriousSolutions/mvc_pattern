@@ -9,30 +9,34 @@ import 'package:example/src/controller.dart';
 /// To be passed to the runApp() function.
 /// This is the app's first StatefulWidget.
 class MyApp extends AppStatefulWidgetMVC {
-  MyApp({Key? key}) : super(key: key, con: AppController());
+  MyApp({Key? key}) : super(key: key);
 
   /// For testing purposes, supply this StatefulWidget its State object's unique identifier
   static String? homeStateKey;
 
   /// This is the App's State object
   @override
-  AppStateMVC createState() => MyAppState();
+  AppStateMVC createState() => _MyAppState();
 }
 
 ///
-class MyAppState extends AppStateMVC<MyApp> {
-  factory MyAppState() => _this ??= MyAppState._();
+class _MyAppState extends AppStateMVC<MyApp> {
+  factory _MyAppState() => _this ??= _MyAppState._();
 
-  MyAppState._()
+  _MyAppState._()
       : super(
-          controller: AnotherController(),
-          controllers: [YetAnotherController()],
+          controller: AppController(),
+          controllers: [
+            Controller(),
+            AnotherController(),
+            YetAnotherController(),
+          ],
 
           /// Demonstrate passing an 'object' down the Widget tree much like
           /// in the Scoped Model
           object: 'Hello!',
         );
-  static MyAppState? _this;
+  static _MyAppState? _this;
 
   /// Optionally you can is the framework's buildApp() function
   /// instead of its build() function and allows for the InheritWidget feature

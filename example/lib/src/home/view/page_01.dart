@@ -17,7 +17,9 @@ class Page1 extends StatefulWidget {
   State createState() => _Page1State();
 
   void onPressed() {
+    //
     final state = con.ofState<_Page1State>()!;
+
     state.setState(() {
       state.count++;
     });
@@ -41,12 +43,16 @@ class _Page1State extends StateMVC<Page1> {
   int count = 0;
 
   @override
-  Widget build(_) => buildPage1(
-      count: count,
-      counter: () {
-        count++;
-        con.setState(() {});
-      });
+  Widget build(_) {
+//    inheritWidget(context);
+    return buildPage1(
+        count: count,
+        counter: () {
+          count++;
+          con.setState(() {});
+//          inheritBuild();
+        });
+  }
 }
 
 Widget buildPage1({

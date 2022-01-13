@@ -55,7 +55,7 @@ void _testApp(Key key, AppStatefulWidgetMVC app) {
 
     /// A Controller for the 'app level' to influence the whole app.
     /// Its a special Controller of type 'AppControllerMVC?.'
-    final con = appMVC.con;
+    final con = appMVC.controller;
 
     expect(con, isInstanceOf<AppControllerMVC?>());
 
@@ -116,7 +116,7 @@ void _testApp(Key key, AppStatefulWidgetMVC app) {
     expect(find.text('Hello there!'), findsNothing);
 
     // Retrieve the 'View' State object linked to this Controller.
-    final MyAppState? vw = con!.rootState as MyAppState?;
+    final vw = con!.rootState;
 
 //    final state = con.stateOf<MyApp>();
 
