@@ -1,4 +1,8 @@
 
+## 8.5.0+01
+ January 15, 2022
+- Include pubspec.yaml in example app
+
 ## 8.5.0
  January 15, 2022
 - bool _pushState(StateMVC? state) assign only if not already pushed
