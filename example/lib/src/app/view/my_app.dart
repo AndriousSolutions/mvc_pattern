@@ -9,10 +9,13 @@ import 'package:example/src/controller.dart';
 /// To be passed to the runApp() function.
 /// This is the app's first StatefulWidget.
 class MyApp extends AppStatefulWidgetMVC {
-  MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key})
+      : appState = _MyAppState(),
+        super(key: key);
 
-  /// For testing purposes, supply this StatefulWidget its State object's unique identifier
-  static String? homeStateKey;
+  /// Exposed merely for testing.
+  /// Otherwise should be private.
+  final AppStateMVC appState;
 
   /// This is the App's State object
   @override

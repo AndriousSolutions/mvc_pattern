@@ -74,6 +74,7 @@ import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
 class ModelMVC extends StateSetter with _RootStateMixin {
   //
   ModelMVC([StateMVC? state]) : super() {
+    /// Assign as 'current' StateMVC for this object
     _pushState(state);
   }
 }
@@ -147,13 +148,18 @@ mixin _StateSets {
     }
   }
 
+  /// Add to a Set object and assigned to as the 'current' StateMVC
+  /// However, if was already previously added, it's not added
+  /// again to a Set object and certainly not set the 'current' StateMVC.
   bool _pushState(StateMVC? state) {
     if (state == null) {
       return false;
     }
-    _statePushed = true;
-    _stateMVC = state;
-    return _stateMVCSet.add(state);
+    _statePushed = _stateMVCSet.add(state);
+    if (_statePushed) {
+      _stateMVC = state;
+    }
+    return _statePushed;
   }
 
   /// This removes the most recent StateMVC object added
@@ -432,8 +438,12 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     }
 
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
-    /// Any subsequent calls to add() will be assigned, stateMVC.
     _stateMVC = this;
+
+    /// Collects this StateMVC object to the 'main list' of such objects.
+    rootState?._addStateMVC(this);
+
+    /// Any subsequent calls to add() will be assigned to stateMVC.
     add(_controller);
   }
   ControllerMVC? _controller;
@@ -470,9 +480,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
   /// Add a list of 'Controllers' to be associated with this StatMVC object.
   @override
-  void addList(List<ControllerMVC>? list) {
+  List<String> addList(List<ControllerMVC>? list) {
     if (list == null) {
-      return;
+      return <String>[];
     }
     // Associate a list of 'Controllers' to this StateMVC object at one time.
     return super.addList(list);
@@ -486,18 +496,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   @override
   final String _keyId = Uuid().generateV4();
 
-  /// Retrieve a Controller in the widget tree by type.
-  //  T controllerByType<T extends ControllerMVC>(
-//      [BuildContext context, bool listen = true]) {
-//    T con;
-//    if (context != null && listen) {
-//      _InheritedMVC<Object> w =
-//          context.dependOnInheritedWidgetOfExactType<_InheritedMVC<Object>>();
-//      con = w?.object;
-//    }
-//    return con ?? _cons[_type<T>()];
-//  }
-
   /// Retrieve a Controller in the MVC framework by type.
   U? controllerByType<U extends ControllerMVC>() {
     // Look in this State objects list of Controllers.  Maybe not?
@@ -506,11 +504,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     //con ??= AppStatefulWidgetMVC._controllers[_type<U>()] as U?;
     if (con == null) {
-      final controllers = AppStatefulWidgetMVC._controllers.toList();
-      for (final cont in controllers) {
-        if (cont.runtimeType == _type<U>()) {
-          con = cont as U?;
-          break;
+      final controllers = rootState?._controllers.toList();
+      if (controllers == null) {
+        for (final cont in controllers!) {
+          if (cont.runtimeType == _type<U>()) {
+            con = cont as U?;
+            break;
+          }
         }
       }
     }
@@ -658,8 +658,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     // Return the original error routine.
     FlutterError.onError = currentErrorFunc;
 
-    // Remove the State object from a static reference.
-    AppStatefulWidgetMVC._removeStateMVC(this);
+    // Remove the State object from a collection.
+    rootState?._removeStateMVC(this);
 
     super.dispose();
   }
@@ -1244,17 +1244,24 @@ mixin _ControllerListing {
   }
 
   /// Associate a list of 'Controllers' to this StateMVC object at one time.
-  void addList(List<ControllerMVC> list) => list.forEach(add);
+  List<String> addList(List<ControllerMVC> list) {
+    //list.forEach(add);
+    final List<String> keyIds = [];
+    for (final con in list) {
+      keyIds.add(add(con));
+    }
+    return keyIds;
+  }
 
   /// Returns the list of 'Controllers' associated with this StateMVC object.
   List<ControllerMVC?> listControllers(List<String> keys) =>
-      _controllers(keys).values.toList();
+      _controllersMap(keys).values.toList();
 
   /// Never supply a public list of Controllers. User must know the key identifier(s).
   List<ControllerMVC> get _controllerList => _asList; //_controllers.asList;
 
   /// Returns a specific 'Controller' by looking up its unique 'key' identifier.
-  Map<String, ControllerMVC?> _controllers(List<String> keys) {
+  Map<String, ControllerMVC?> _controllersMap(List<String> keys) {
     final Map<String, ControllerMVC?> controllers = {};
 
     for (final key in keys) {
@@ -1290,10 +1297,6 @@ mixin _ControllerListing {
         _cons.addAll({con.runtimeType: con});
       }
     }
-
-    /// Collects this StateMVC object to the 'main list' of such objects.
-    AppStatefulWidgetMVC._addStateMVC(this as StateMVC);
-
     return keyId;
   }
 
@@ -1309,8 +1312,11 @@ mixin _ControllerListing {
     return there;
   }
 
+  @Deprecated("For consistency, use 'rootCon' instead.")
+  ControllerMVC? get firstCon => rootCon;
+
   /// Returns 'the first' Controller associated with this StateMVC object.
-  ControllerMVC? get firstCon => _asList.first;
+  ControllerMVC? get rootCon => _asList.first;
 
   /// Returns true if the specified 'Controller' is associated with this StateMVC object.
   bool contains(ControllerMVC con) => _map.containsValue(con);
@@ -1331,203 +1337,16 @@ mixin _ControllerListing {
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
 /// AppStatefulWidget is its subclass.
 abstract class AppStatefulWidgetMVC extends StatefulWidget {
-  AppStatefulWidgetMVC({Key? key, this.controller}) : super(key: key) {
-    if (controller != null) {
-      _controllers.add(controller!);
-    }
-  }
-
-  final ControllerMVC? controller;
+  const AppStatefulWidgetMVC({Key? key}) : super(key: key);
 
   /// You create the App's State object.
   @override
   AppStateMVC createState();
 
-  /// Get the controller if any
-//  ControllerMVC? get controller => _controller;
-
-  /// Most recent BuildContext/Element
-  @Deprecated('Replaced by the getter, lastContext')
-  BuildContext? get context {
-    BuildContext? context;
-    while (_states.isNotEmpty) {
-      try {
-        context = _states.last.values.last.context;
-        break;
-      } catch (ex) {
-        if (ex is FlutterError && ex.message.contains('unmounted')) {
-          _states.remove(_states.last);
-        } else {
-          break;
-        }
-      }
-    }
-    return context;
-  }
-
-  BuildContext? get lastContext => context;
-
-  /// Initialize any immediate 'none time-consuming' operations at the very beginning.
-  @mustCallSuper
-  @Deprecated('No need to replace the initState() function. Use initState()')
-  void initApp() {
-    if (controller != null && controller is AppControllerMVC) {
-      (controller as AppControllerMVC).initApp();
-    }
-  }
-
-  /// Called in State object.
-  /// Called when this [State] object will never build again.
-  /// Note: THERE IS NO GUARANTEE THIS METHOD WILL RUN in the Framework.
-  @mustCallSuper
-  void dispose() {
-    _controllers.clear();
-    _states.clear();
-  }
-
-  static final Set<ControllerMVC> _controllers = {};
-
-  static final Set<Map<String, StateMVC>> _states = {};
-
-  //todo: onError() can't be called in the StatefulWidget
-  // /// Override if you like to customize your error handling.
-  // void onError(FlutterErrorDetails details) {
-  //   if (con != null) {
-  //     con!.onError(details);
-  //   } else {
-  //     // Call the State object's Exception handler
-  //     appState.currentErrorFunc!(details);
-  //   }
-  // }
-
   /// Determines if running in an IDE or in production.
   /// Returns true if the App is under in the Debugger and not production.
   @Deprecated('This static getter is replaced by a instance getter')
   static bool get inDebugger {
-    var inDebugMode = false;
-    // assert is removed in production.
-    assert(inDebugMode = true);
-    return inDebugMode;
-  }
-
-  /// Returns a StateView object using a unique String identifier.
-  // There's a better way. Just too tired now.
-  static StateMVC? getState(String keyId) {
-    StateMVC? sv;
-    for (final map in _states) {
-      if (map.containsKey(keyId)) {
-        sv = map[keyId];
-        break;
-      }
-    }
-    return sv;
-  }
-
-  /// Returns a Map of StateView objects using unique String identifiers.
-  static Map<String, StateMVC> getStates(List<String> keys) {
-    final Map<String, StateMVC> map = {};
-    for (final key in keys) {
-      final sv = getState(key);
-      if (sv != null) {
-        map[key] = sv;
-      }
-    }
-    return map;
-  }
-
-  /// Returns a List of StateView objects using unique String identifiers.
-  static List<StateMVC> listStates(List<String> keys) {
-    return getStates(keys).values.toList();
-  }
-
-  /// This is 'privatized' function as it is an critical method and not for public access.
-  /// This contains the 'main list' of StateMVC objects present in the app!
-  static void _addStateMVC(StateMVC state) {
-    final Map<String, StateMVC> map = {};
-    map[state._keyId] = state;
-    _states.add(map);
-    // for (final con in state._controllerList) {
-    //   _controllers.add(con);
-    // }
-    state._controllerList.forEach(_controllers.add);
-  }
-
-  /// Remove the specified State object from static Set object.
-  static bool _removeStateMVC(StateMVC? state) {
-    var removed = state != null;
-    if (removed) {
-      final int length = _states.length;
-      _states.removeWhere((map) => state._keyId == map.keys.first);
-      removed = _states.length < length;
-    }
-    return removed;
-  }
-
-  /// This is 'privatized' function returning the 'last' StateMVC and not for public access.
-  static StateMVC? _lastStateMVC() {
-    StateMVC? state;
-    while (_states.isNotEmpty) {
-      try {
-        state = _states.last.values.last;
-        break;
-      } catch (ex) {
-        if (ex is FlutterError && ex.message.contains('unmounted')) {
-          _states.remove(_states.last);
-        } else {
-          state = null;
-          break;
-        }
-      }
-    }
-    return state;
-  }
-}
-
-mixin _RootStateMixin {
-  ///Record the 'root' StateMVC object
-  void setRootStateMVC(StateMVC state) {
-    if (_rootStateMVC == null && state is AppStateMVC) {
-      _rootStateMVC = state;
-    }
-  }
-
-  static AppStateMVC? _rootStateMVC;
-
-  /// Returns the 'first' StateMVC object
-  AppStateMVC? get rootState => _rootStateMVC;
-
-  /// Returns the 'latest' context
-  BuildContext? get lastContext =>
-      AppStatefulWidgetMVC._lastStateMVC()?.context;
-
-  /// Link a widget to InheritedWidget
-  void inheritWidget(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
-
-  /// Call the build() functions of all the widgets 'linked' to the Inherited widget.
-  void inheritBuild([Object? object]) =>
-      _rootStateMVC?.inheritedNeedsBuild(object);
-
-  /// This is of type Object allowing you
-  /// to propagate any class object you wish down the widget tree.
-  Object? get dataObject => _rootStateMVC?._dataObj;
-
-  set dataObject(Object? object) {
-    // Never explicitly set to null
-    if (object != null) {
-      //
-      _rootStateMVC?._dataObj = object;
-      // If there's a SetState class out there being used.
-      if (_rootStateMVC!._setStates && StateMVC._rebuildAllowed) {
-        // Call inherited widget to 'rebuild' the dependencies
-        _InheritedMVC.setState(() {});
-      }
-    }
-  }
-
-  /// Determines if running in an IDE or in production.
-  /// Returns true if the App is under in the Debugger and not production.
-  bool get inDebugger {
     var inDebugMode = false;
     // assert is removed in production.
     assert(inDebugMode = true);
@@ -1545,10 +1364,16 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     Object? object,
   }) : super(controller) {
     //Record this as the 'root' State object.
-    setRootStateMVC(this);
+    _setRootStateMVC(this);
     _dataObj = object;
     addList(controllers?.toList());
   }
+  final Set<ControllerMVC> _controllers = {};
+  final Set<Map<String, StateMVC>> _states = {};
+
+  bool _buildInherited = false;
+  bool _setStates = false;
+  bool _inBuilder = false;
 
   /// The 'data object' available to the framework.
   Object? _dataObj;
@@ -1563,6 +1388,18 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
   @override
   Widget build(BuildContext context) =>
       _InheritedMVC(state: this, child: buildApp(context));
+
+  /// Clean up memory
+  /// Unlike dispose, this function is liekly to always fire.
+  @protected
+  @mustCallSuper
+  @override
+  void deactivate() {
+    _controllers.clear();
+    _states.clear();
+    _clearRootStateMVC();
+    super.deactivate();
+  }
 
   // /// Link a widget to InheritedWidget
   // static void inheritWidget(BuildContext context) =>
@@ -1613,9 +1450,77 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     }
   }
 
-  bool _buildInherited = false;
-  bool _setStates = false;
-  bool _inBuilder = false;
+  /// Returns a StateView object using a unique String identifier.
+  // There's a better way. Just too tired now.
+  StateMVC? getState(String keyId) {
+    StateMVC? sv;
+    for (final map in _states) {
+      if (map.containsKey(keyId)) {
+        sv = map[keyId];
+        break;
+      }
+    }
+    return sv;
+  }
+
+  /// Returns a Map of StateView objects using unique String identifiers.
+  Map<String, StateMVC> getStates(List<String> keys) {
+    final Map<String, StateMVC> map = {};
+    for (final key in keys) {
+      final sv = getState(key);
+      if (sv != null) {
+        map[key] = sv;
+      }
+    }
+    return map;
+  }
+
+  /// Returns a List of StateView objects using unique String identifiers.
+  List<StateMVC> listStates(List<String> keys) {
+    return getStates(keys).values.toList();
+  }
+
+  /// This is 'privatized' function as it is an critical method and not for public access.
+  /// This contains the 'main list' of StateMVC objects present in the app!
+  void _addStateMVC(StateMVC state) {
+    final Map<String, StateMVC> map = {};
+    map[state._keyId] = state;
+    _states.add(map);
+    // for (final con in state._controllerList) {
+    //   _controllers.add(con);
+    // }
+    state._controllerList.forEach(_controllers.add);
+  }
+
+  /// Remove the specified State object from static Set object.
+  bool _removeStateMVC(StateMVC? state) {
+    var removed = state != null;
+    if (removed) {
+      final int length = _states.length;
+      _states.removeWhere((map) => state._keyId == map.keys.first);
+      removed = _states.length < length;
+    }
+    return removed;
+  }
+
+  /// This is 'privatized' function returning the 'last' StateMVC and not for public access.
+  StateMVC? _lastStateMVC() {
+    StateMVC? state;
+    while (_states.isNotEmpty) {
+      try {
+        state = _states.last.values.last;
+        break;
+      } catch (ex) {
+        if (ex is FlutterError && ex.message.contains('unmounted')) {
+          _states.remove(_states.last);
+        } else {
+          state = null;
+          break;
+        }
+      }
+    }
+    return state;
+  }
 }
 
 /// The App's first State object.
@@ -1642,7 +1547,7 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
     StateMVC._rebuildAllowed = false;
 
 //    for (final con in _controllerList) {
-    final controllers = AppStatefulWidgetMVC._controllers.toList();
+    final controllers = rootState!._controllers.toList();
     for (final con in controllers) {
       if (con is! AppControllerMVC) {
         continue;
@@ -1683,27 +1588,10 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
     return handled;
   }
 
-  /// Calls the Flutter App's object (AppMVC) own initApp() function.
-  /// It's where non-synchronous operations are performed when the app is starting up.
-  @override
-  void initState() {
-    super.initState();
-    widget.initApp();
-  }
-
   //todo: Look at the State object's error routine.
   // /// Call the StatefulWidget's error routine;
   // @override
   // void onError(FlutterErrorDetails details) => widget.onError(details);
-
-  /// Dispose the 'StateView(s)' that may be running.
-  @protected
-  @mustCallSuper
-  @override
-  void dispose() {
-    widget.dispose();
-    super.dispose();
-  }
 }
 
 /// Builds a [InheritedWidget].
@@ -1816,6 +1704,66 @@ class SetState extends StatelessWidget {
 /// The 'type of function' required by the class, SetState.
 typedef BuilderWidget<T extends Object> = Widget Function(
     BuildContext context, T? object);
+
+mixin _RootStateMixin {
+  ///Record the 'root' StateMVC object
+  void _setRootStateMVC(StateMVC state) {
+    if (_rootStateMVC == null && state is AppStateMVC) {
+      _rootStateMVC = state;
+
+      /// Special case: It must now add itself to the list.
+      _rootStateMVC!._addStateMVC(state);
+    }
+  }
+
+  /// Clear the static reference.
+  void _clearRootStateMVC() => _rootStateMVC = null;
+
+  /// Retain the value across all instances of
+  /// StateMVC objects, ControllerMVC objects and Model objects
+  static AppStateMVC? _rootStateMVC;
+
+  /// Returns the 'first' StateMVC object
+  AppStateMVC? get rootState => _rootStateMVC;
+
+  /// Returns the 'latest' context
+  BuildContext? get lastContext => _rootStateMVC?._lastStateMVC()?.context;
+
+  /// Link a widget to InheritedWidget
+  void inheritWidget(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
+
+  /// Call the build() functions of all the widgets 'linked' to the Inherited widget.
+  void inheritBuild([Object? object]) =>
+      _rootStateMVC?.inheritedNeedsBuild(object);
+
+  /// This is of type Object allowing you
+  /// to propagate any class object you wish down the widget tree.
+  Object? get dataObject => _rootStateMVC?._dataObj;
+
+  set dataObject(Object? object) {
+    // Never explicitly set to null
+    if (object != null) {
+      //
+      if (_rootStateMVC?._dataObj != null) {}
+      _rootStateMVC?._dataObj = object;
+      // If there's a SetState class out there being used.
+      if (_rootStateMVC!._setStates && StateMVC._rebuildAllowed) {
+        // Call inherited widget to 'rebuild' the dependencies
+        _InheritedMVC.setState(() {});
+      }
+    }
+  }
+
+  /// Determines if running in an IDE or in production.
+  /// Returns true if the App is under in the Debugger and not production.
+  bool get inDebugger {
+    var inDebugMode = false;
+    // assert is removed in production.
+    assert(inDebugMode = true);
+    return inDebugMode;
+  }
+}
 
 /// A Mixin to make a Controller for the 'app level' to influence the whole app.
 mixin AppControllerMVC on ControllerMVC {

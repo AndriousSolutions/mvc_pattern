@@ -48,29 +48,35 @@ class _Page2State extends StateMVC<Page2> {
         count: con.count,
         counter: widget.onPressed,
         row: (context) => [
-          ElevatedButton(
-            style: flatButtonStyle,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Page 1',
+          Flexible(
+            child: ElevatedButton(
+              key: const Key('Page 1'),
+              style: flatButtonStyle,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Page 1',
+              ),
             ),
           ),
-          ElevatedButton(
-            style: flatButtonStyle,
-            onPressed: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                      builder: (BuildContext context) => Page3()));
+          Flexible(
+            child: ElevatedButton(
+              key: const Key('Page 3'),
+              style: flatButtonStyle,
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                        builder: (BuildContext context) => Page3()));
 
-              /// A good habit to get into. Refresh the screen again.
-              /// In this case, to show the count may have changed.
-              setState(() {});
-            },
-            child: const Text(
-              'Page 3',
+                /// A good habit to get into. Refresh the screen again.
+                /// In this case, to show the count may have changed.
+                setState(() {});
+              },
+              child: const Text(
+                'Page 3',
+              ),
             ),
           ),
         ],
@@ -79,6 +85,7 @@ class _Page2State extends StateMVC<Page2> {
         ],
         persistentFooterButtons: <Widget>[
           ElevatedButton(
+            key: const Key('Page 1 Counter'),
             style: flatButtonStyle,
             onPressed: Page1().onPressed,
             child: const Text('Page 1 Counter'),

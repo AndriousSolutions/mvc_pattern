@@ -1,4 +1,19 @@
 
+## 8.5.0
+ January 15, 2022
+- bool _pushState(StateMVC? state) assign only if not already pushed
+- addList(List<ControllerMVC>? list) returns a List of keyId's
+- mixin _ControllerListing._controllers renamed _controllersMap
+- get firstCon renamed rootCon for consistency with rootState
+- Removed parameter controller from class AppStatefulWidgetMVC
+- Removed get context from class AppStatefulWidgetMVC
+- Removed static getState() from class AppStatefulWidgetMVC
+- Removed initApp() from class AppStatefulWidgetMVC
+- Clean up memory in AppStateMVC.deactivate()
+- Reduced to one state reference: AppStateMVC? _rootStateMVC;
+- Replaced package:pedantic in analysis_options.yaml
+- Incorporated example app to widget_test.dart
+
 ## 8.4.0
  January 12, 2022
 - Privatize properties in the example app

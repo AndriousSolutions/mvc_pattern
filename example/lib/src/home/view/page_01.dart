@@ -66,6 +66,7 @@ Widget buildPage1({
       row: (BuildContext context) => [
         const SizedBox(),
         ElevatedButton(
+          key: const Key('Page 2'),
           onPressed: () {
             Navigator.push(
               context,

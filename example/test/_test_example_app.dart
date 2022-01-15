@@ -1,0 +1,129 @@
+// Copyright 2022 Andrious Solutions Ltd. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:example/src/view.dart';
+
+testExampleApp(WidgetTester tester) async {
+  //
+  const location = '========================== test_example_app.dart';
+
+  const count = 9;
+
+  // Verify that our counter starts at 0.
+  expect(find.text('0'), findsOneWidget, reason: location);
+
+  /// Increment the counter
+  for (int cnt = 0; cnt <= count; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('+')));
+    await tester.pumpAndSettle();
+  }
+
+  // Successfully incremented.
+  expect(find.text('0'), findsNothing, reason: location);
+
+  expect(find.text(count.toString()), findsOneWidget, reason: location);
+
+  await tester.tap(find.byKey(const Key('Page 2')));
+  await tester.pumpAndSettle();
+
+  /// Increment the counter
+  for (int cnt = 0; cnt < count; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('+')));
+    await tester.pumpAndSettle();
+  }
+
+  /// Increment the counter
+  for (int cnt = 0; cnt < count; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('Page 1 Counter')));
+    await tester.pumpAndSettle();
+  }
+
+  await tester.tap(find.byKey(const Key('Page 1')));
+  await tester.pumpAndSettle();
+
+  expect(find.text((count * 2).toString()), findsOneWidget, reason: location);
+
+  await tester.tap(find.byKey(const Key('Page 2')));
+  await tester.pumpAndSettle();
+
+  await tester.tap(find.byKey(const Key('Page 3')));
+  await tester.pumpAndSettle();
+
+  /// Increment the counter
+  for (int cnt = 0; cnt < count; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('+')));
+    await tester.pumpAndSettle();
+  }
+
+  expect(find.text((count).toString()), findsOneWidget, reason: location);
+
+  expect(find.byKey(const Key('New Key')), findsOneWidget, reason: location);
+  // Tapping doesn't seem to work, and so I'll grab the State object itself.
+  await tester.tap(find.byKey(const Key('New Key')));
+  await tester.pumpAndSettle();
+
+  // Find its StatefulWidget first then the 'type' of State object.
+  AppStateMVC rootState = tester.firstState<AppStateMVC>(find.byType(MyApp));
+  rootState.setState(() {});
+  await tester.pumpAndSettle();
+
+  await tester.tap(find.byKey(const Key('Page 1')));
+  await tester.pumpAndSettle();
+
+  expect(find.text('0'), findsOneWidget, reason: location);
+
+  await testHomePageApp(tester);
+}
+
+testHomePageApp(WidgetTester tester) async {
+  //
+  await tester.tap(find.byKey(const Key('Page 2')));
+  await tester.pumpAndSettle();
+
+  await tester.tap(find.byKey(const Key('Page 3')));
+  await tester.pumpAndSettle();
+
+  // Again, this tap doesn't seem to work, and so I go to the Navigator.
+  await tester.tap(find.byKey(const Key('Hello! example')));
+  await tester.pumpAndSettle();
+
+  expect(find.text('Hello!'), findsOneWidget);
+
+  const count = 5;
+
+  /// Increment the counter
+  for (int cnt = 0; cnt <= count; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('+')));
+    await tester.pumpAndSettle();
+  }
+
+  expect(find.text('How are you?'), findsOneWidget);
+
+  /// Increment the counter
+  for (int cnt = 0; cnt <= count; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('+')));
+    await tester.pumpAndSettle();
+  }
+
+  expect(find.text('Are you good?'), findsOneWidget);
+
+  /// Increment the counter
+  for (int cnt = 0; cnt <= count; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('+')));
+    await tester.pumpAndSettle();
+  }
+
+  expect(find.text('All the best.'), findsOneWidget);
+}

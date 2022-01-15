@@ -38,7 +38,9 @@ class _Page3State extends StateMVC<Page3> {
   @override
   Widget build(BuildContext context) => _buildPage3(
         count: count,
-        newKey: () => rootState?.setState(() {}),
+        newKey: () {
+          rootState?.setState(() {});
+        },
         counter: widget.onPressed,
         page1counter: () {
           Page1().onPressed();
@@ -61,45 +63,60 @@ class _Page3State extends StateMVC<Page3> {
         counter: counter,
         column: (_) => [
           Row(children: [
-            const SizedBox(width: 5),
-            ElevatedButton(
-              onPressed: newKey,
-              child: const Text('New Key for Page 1'),
+            const Flexible(child: SizedBox(width: 5)),
+            Flexible(
+              child: ElevatedButton(
+                key: const Key('New Key'),
+                onPressed: newKey,
+                child: const Text('New Key for Page 1'),
+              ),
             ),
-            const SizedBox(width: 5),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    lastContext!,
-                    MaterialPageRoute<void>(
-                        builder: (BuildContext context) => const MyHomePage()));
-              },
-              child: const Text("object:'Hello!' example"),
+            const Flexible(child: SizedBox(width: 5)),
+            Flexible(
+              child: ElevatedButton(
+                key: const Key('Hello! example'),
+                onPressed: () {
+                  Navigator.push(
+                      lastContext!,
+                      MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const MyHomePage()));
+                },
+                child: const Text("object:'Hello!' example"),
+              ),
             ),
           ]),
         ],
         row: (BuildContext context) => [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context)
-                ..pop()
-                ..pop();
-            },
-            child: const Text('Page 1'),
+          Flexible(
+            child: ElevatedButton(
+              key: const Key('Page 1'),
+              onPressed: () {
+                Navigator.of(context)
+                  ..pop()
+                  ..pop();
+              },
+              child: const Text('Page 1'),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Page 2'),
+          Flexible(
+            child: ElevatedButton(
+              key: const Key('Page 2'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Page 2'),
+            ),
           ),
         ],
         persistentFooterButtons: <Widget>[
           ElevatedButton(
+            key: const Key('Page 1 Counter'),
             onPressed: page1counter,
             child: const Text('Page 1 Counter'),
           ),
           ElevatedButton(
+            key: const Key('Page 2 Counter'),
             onPressed: page2counter,
             child: const Text('Page 2 Counter'),
           ),

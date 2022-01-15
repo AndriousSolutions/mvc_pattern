@@ -42,10 +42,6 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
     con = appState.controllerByType<AppController>();
 
     con = appState.controllerById(con?.keyId);
-
-    /// For testing purposes, supply this StateMVC object's unique identifier
-    /// to its StatefulWidget.
-    MyApp.homeStateKey = keyId;
   }
 
   late AppStateMVC appState;
@@ -66,6 +62,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
                   padding: const EdgeInsets.all(30),
                   child: Text(
                     con.dataObject as String,
+                    key: const Key('greetings'),
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: Theme.of(context).textTheme.headline4!.fontSize,
@@ -90,6 +87,8 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          key: const Key('+'),
+
           /// Refresh only the Text widget containing the counter.
           onPressed: () => con.incrementCounter(),
 

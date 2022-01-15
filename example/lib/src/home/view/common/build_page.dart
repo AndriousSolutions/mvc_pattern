@@ -31,51 +31,52 @@ class BuildPage extends StatelessWidget {
         ),
         persistentFooterButtons: persistentFooterButtons,
         floatingActionButton: FloatingActionButton(
+          key: const Key('+'),
           onPressed: counter,
           child: const Icon(Icons.add),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Column(children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.only(top: 100),
-                  child: Text("You're on page:"),
-                ),
-                Text(
-                  label,
-                  style: const TextStyle(fontSize: 48),
-                ),
-              ]),
-              Column(children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.only(top: 100),
-                  child: Text(
-                    'You have pushed the button this many times:',
-                  ),
-                ),
-                Text(
-                  '$count',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-              ]),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 100),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: row(context),
-                ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.only(top: 100),
+              child: Text("You're on page:"),
+            ),
+            Flexible(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 48),
               ),
-              if (column == null)
-                Container()
-              else
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: column!(context),
-                ),
-            ],
-          ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(top: 100),
+              child: Text(
+                'You have pushed the button this many times:',
+              ),
+            ),
+            Flexible(
+              child: Text(
+                '$count',
+                style: Theme.of(context).textTheme.headline4,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 100),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: row(context),
+              ),
+            ),
+            if (column == null)
+              const Flexible(child: SizedBox())
+            else
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: column!(context),
+              ),
+          ],
         ),
       );
 }
