@@ -1,7 +1,8 @@
 
-## 8.5.0+01
+## 8.5.0+02
  January 15, 2022
 - Include pubspec.yaml in example app
+- flutter_test in dev_dependencies and dependencies
 
 ## 8.5.0
  January 15, 2022
