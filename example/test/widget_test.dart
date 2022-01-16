@@ -30,7 +30,8 @@ void testApp(MyApp app) {
 
     /// Explicitly provide what's intentionally should be accessible
     /// but is made accessible for 'internal testing' of this framework.
-    StateMVC stateObj = app.appState;
+    // Find its StatefulWidget first then the 'type' of State object.
+    StateMVC stateObj = tester.firstState<AppStateMVC>(find.byType(MyApp));
 
     /// Tests StateMVC object again!
     await testsStateMVC(stateObj);

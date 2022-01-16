@@ -1,4 +1,8 @@
 
+## 8.5.1
+ January 16, 2022
+- Resolved 'no_logic_in_create_state' issue in 'Root StatefulWidget'
+
 ## 8.5.0+02
  January 15, 2022
 - Include pubspec.yaml in example app
