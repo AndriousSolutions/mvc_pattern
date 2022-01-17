@@ -1,4 +1,11 @@
 
+## 8.5.1+01
+ January 17, 2022
+- integration_test: in mvc_pattern
+- Introduced test_listener.dart
+- isInstanceOf is isA
+- import 'package:integration_test/integration_test.dart';
+
 ## 8.5.1
  January 16, 2022
 - Resolved 'no_logic_in_create_state' issue in 'Root StatefulWidget'

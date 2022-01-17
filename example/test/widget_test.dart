@@ -4,20 +4,25 @@
 
 /// The 'show' clause is not essential. Merely for your reference.
 
-import 'package:example/src/view.dart';
+import 'package:example/src/view.dart' show MyApp, UniqueKey;
+
+import '../integration_test/_test_example_app.dart' show integrationTesting;
+
+import '_unit_testing.dart' show unitTesting;
 
 import 'package:flutter_test/flutter_test.dart';
 
-import '_test_controller.dart';
+import 'package:integration_test/integration_test.dart';
 
-import '_test_statemvc.dart';
+void main() => testMyApp();
 
-import '_test_example_app.dart';
-
-void main() => testApp(MyApp(key: UniqueKey()));
-
-void testApp(MyApp app) {
+/// Also called in package's own testing file, test/widget_test.dart
+void testMyApp() {
   //
+  final app = MyApp(key: UniqueKey());
+
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
   testWidgets('test mvc_pattern', (WidgetTester tester) async {
     // Tells the tester to build a UI based on the widget tree passed to it
     await tester.pumpWidget(app);
@@ -28,18 +33,10 @@ void testApp(MyApp app) {
     /// pumpAndSettle() waits for all animations to complete.
     await tester.pumpAndSettle();
 
-    /// Explicitly provide what's intentionally should be accessible
-    /// but is made accessible for 'internal testing' of this framework.
-    // Find its StatefulWidget first then the 'type' of State object.
-    StateMVC stateObj = tester.firstState<AppStateMVC>(find.byType(MyApp));
+    /// Preform integration first to set up
+    /// WidgetsBinding.instance is IntegrationTestWidgetsFlutterBinding
+    await integrationTesting(tester);
 
-    /// Tests StateMVC object again!
-    await testsStateMVC(stateObj);
-
-    /// Tests Controller object
-    testsController(stateObj);
-
-    /// Test the example app accompanying the package
-    await testExampleApp(tester);
+    await unitTesting(tester);
   });
 }

@@ -2,13 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
-
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:example/src/view.dart';
 
-testExampleApp(WidgetTester tester) async {
+Future<void> integrationTesting(WidgetTester tester) async {
   //
   const location = '========================== test_example_app.dart';
 
@@ -18,7 +16,7 @@ testExampleApp(WidgetTester tester) async {
   expect(find.text('0'), findsOneWidget, reason: location);
 
   /// Increment the counter
-  for (int cnt = 0; cnt <= count; cnt++) {
+  for (int cnt = 0; cnt <= count - 1; cnt++) {
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byKey(const Key('+')));
     await tester.pumpAndSettle();
@@ -33,14 +31,14 @@ testExampleApp(WidgetTester tester) async {
   await tester.pumpAndSettle();
 
   /// Increment the counter
-  for (int cnt = 0; cnt < count; cnt++) {
+  for (int cnt = 0; cnt <= count - 1; cnt++) {
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byKey(const Key('+')));
     await tester.pumpAndSettle();
   }
 
   /// Increment the counter
-  for (int cnt = 0; cnt < count; cnt++) {
+  for (int cnt = 0; cnt <= count - 1; cnt++) {
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byKey(const Key('Page 1 Counter')));
     await tester.pumpAndSettle();
@@ -58,7 +56,7 @@ testExampleApp(WidgetTester tester) async {
   await tester.pumpAndSettle();
 
   /// Increment the counter
-  for (int cnt = 0; cnt < count; cnt++) {
+  for (int cnt = 0; cnt <= count - 1; cnt++) {
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byKey(const Key('+')));
     await tester.pumpAndSettle();
@@ -84,7 +82,7 @@ testExampleApp(WidgetTester tester) async {
   await testHomePageApp(tester);
 }
 
-testHomePageApp(WidgetTester tester) async {
+Future<void> testHomePageApp(WidgetTester tester) async {
   //
   await tester.tap(find.byKey(const Key('Page 2')));
   await tester.pumpAndSettle();
@@ -101,7 +99,16 @@ testHomePageApp(WidgetTester tester) async {
   const count = 5;
 
   /// Increment the counter
-  for (int cnt = 0; cnt <= count; cnt++) {
+  for (int cnt = 0; cnt <= count - 1; cnt++) {
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byKey(const Key('+')));
+    await tester.pumpAndSettle();
+  }
+
+  expect(find.text('Hello There!'), findsOneWidget);
+
+  /// Increment the counter
+  for (int cnt = 0; cnt <= count - 1; cnt++) {
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byKey(const Key('+')));
     await tester.pumpAndSettle();
@@ -110,20 +117,11 @@ testHomePageApp(WidgetTester tester) async {
   expect(find.text('How are you?'), findsOneWidget);
 
   /// Increment the counter
-  for (int cnt = 0; cnt <= count; cnt++) {
+  for (int cnt = 0; cnt <= count - 1; cnt++) {
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byKey(const Key('+')));
     await tester.pumpAndSettle();
   }
 
   expect(find.text('Are you good?'), findsOneWidget);
-
-  /// Increment the counter
-  for (int cnt = 0; cnt <= count; cnt++) {
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byKey(const Key('+')));
-    await tester.pumpAndSettle();
-  }
-
-  expect(find.text('All the best.'), findsOneWidget);
 }

@@ -1,4 +1,4 @@
-// Copyright 2018 Andrious Solutions Ltd. All rights reserved.
+// Copyright 2022 Andrious Solutions Ltd. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -8,9 +8,14 @@ import 'package:example/src/controller.dart';
 
 import 'package:example/src/view.dart';
 
-void testsController(StateMVC? stateObj) {
+void testsController(WidgetTester tester) {
   //
-  expect(stateObj!.widget, isInstanceOf<MyApp>());
+  /// Explicitly provide what's intentionally should be accessible
+  /// but is made accessible for 'internal testing' of this framework.
+  // Find its StatefulWidget first then the 'type' of State object.
+  StateMVC stateObj = tester.firstState<AppStateMVC>(find.byType(MyApp));
+
+  expect(stateObj.widget, isA<MyApp>());
 
   /// Returns the unique identifier assigned to the Controller object.
   /// Unnecessary. Merely demonstrating an alternative to 'adding' a
@@ -18,12 +23,16 @@ void testsController(StateMVC? stateObj) {
   /// In fact, it's already there and will merely return its assigned id.
   String conId = stateObj.add(Controller());
 
-  expect(conId, isInstanceOf<String>(), reason: 'The unique key identifier.');
+  expect(conId, isA<String>(), reason: 'The unique key identifier.');
 
   Controller con = stateObj.controllerById(conId) as Controller;
 
-  expect(con, isInstanceOf<Controller>(),
-      reason: 'Supply the id to other developers');
+  expect(con, isA<Controller>(), reason: 'Supply the id to other developers');
+
+  /// null testing
+  conId = stateObj.add(null);
+
+  expect(conId, isEmpty);
 
   AppStateMVC appState = con.rootState!;
 
@@ -34,7 +43,7 @@ void testsController(StateMVC? stateObj) {
 
   con = appState.controllerById(keyId) as Controller;
 
-  expect(con, isInstanceOf<Controller>());
+  expect(con, isA<Controller>());
 
   List<String> keyIds = stateObj.addList([Controller()]);
 
@@ -42,17 +51,14 @@ void testsController(StateMVC? stateObj) {
 
   con = stateObj.controllerById(keyIds[0]) as Controller;
 
-  expect(con, isInstanceOf<Controller>(),
-      reason: 'Supply the id to other developers');
+  expect(con, isA<Controller>(), reason: 'Supply the id to other developers');
 
   appState = stateObj.rootState!;
 
-  expect(appState.widget, isInstanceOf<MyApp>());
+  expect(appState.widget, isA<MyApp>());
 
-  /// The first Controller added to the App's first State object
-  final rootCon = appState.rootCon;
-
-  expect(rootCon, isInstanceOf<AppController>());
+  /// Test AppController class
+  _testAppController(tester);
 
   /// This State object 'contains' this Controller.
   AnotherController another = appState.controllerByType<AnotherController>()!;
@@ -61,7 +67,7 @@ void testsController(StateMVC? stateObj) {
 
   another = appState.controllerById(keyId) as AnotherController;
 
-  expect(another, isInstanceOf<AnotherController>());
+  expect(another, isA<AnotherController>());
 
   /// This State object 'contains' this Controller.
   YetAnotherController andAnother =
@@ -71,7 +77,7 @@ void testsController(StateMVC? stateObj) {
 
   andAnother = appState.controllerById(keyId) as YetAnotherController;
 
-  expect(andAnother, isInstanceOf<YetAnotherController>());
+  expect(andAnother, isA<YetAnotherController>());
 
   /// Another way to retrieve its Controller from a list of Controllers
   /// Retrieve it by 'type'
@@ -79,12 +85,12 @@ void testsController(StateMVC? stateObj) {
   /// but with the AppMVC (the App's State object)
   another = stateObj.controllerByType<AnotherController>()!;
 
-  expect(another, isInstanceOf<AnotherController>());
+  expect(another, isA<AnotherController>());
 
   /// This Controller will be found in this State object's listing.
   con = stateObj.controllerByType<Controller>()!;
 
-  expect(con, isInstanceOf<Controller>());
+  expect(con, isA<Controller>());
 
   conId = con.keyId;
 
@@ -92,14 +98,14 @@ void testsController(StateMVC? stateObj) {
   /// Retrieve it by its key id Note the casting.
   con = stateObj.controllerById(conId) as Controller;
 
-  expect(con, isInstanceOf<Controller>());
+  expect(con, isA<Controller>());
 
   /// Return a List of Controllers specified by key id.
   final listCons = con.listControllers([conId]);
 
-  expect(listCons, isInstanceOf<List<ControllerMVC?>>());
+  expect(listCons, isA<List<ControllerMVC?>>());
 
-  expect(listCons[0], isInstanceOf<Controller>());
+  expect(listCons[0], isA<Controller>());
 
   /// Only when the [StateMVC] object is first created.
   con.initState();
@@ -151,5 +157,39 @@ void testsController(StateMVC? stateObj) {
   /// Return a 'copy' of the Set of State objects.
   final Set<StateMVC>? states = con.states;
 
-  expect(states, isInstanceOf<Set<StateMVC>>());
+  expect(states, isA<Set<StateMVC>>());
+}
+
+bool _testAppController(WidgetTester tester) {
+  bool tested = false;
+
+  /// Explicitly provide what's intentionally should be accessible
+  /// but is made accessible for 'internal testing' of this framework.
+  // Find its StatefulWidget first then the 'type' of State object.
+  StateMVC appState = tester.firstState<AppStateMVC>(find.byType(MyApp));
+
+  /// The first Controller added to the App's first State object
+  final controller = appState.rootCon;
+
+  expect(controller, isA<AppController>());
+
+  final rootCon = controller as AppController;
+
+  /// Deprecated but still tested.
+  expect(rootCon.initAsync(), isA<Future<bool>>());
+
+  final errorDetails = FlutterErrorDetails(
+    exception: Exception('Pretend Error'),
+    context: ErrorDescription('Created merely for testing purposes.'),
+    library: 'widget_test',
+  );
+
+  expect(rootCon.onAsyncError(errorDetails), isA<bool>());
+
+  rootCon.onError(errorDetails);
+
+  // Take in any Exception so not to 'fail' the running test
+  tester.takeException();
+
+  return tested;
 }
