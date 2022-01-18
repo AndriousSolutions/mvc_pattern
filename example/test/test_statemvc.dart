@@ -82,24 +82,18 @@ Future<void> testsStateMVC(WidgetTester tester) async {
   if (context.widget is Page1) {
     /// Page 1 is currently being displayed.
     expect(context.widget, isA<Page1>(), reason: location);
-
-    /// We know Controller's current State object is _Page1State
-    stateObj = con.state!;
-
-    /// This is confirmed by testing for its StatefulWidget
-    expect(stateObj.widget, isA<Page1>(), reason: location);
   }
 
   if (context.widget is MyHomePage) {
     /// MyHomePage is currently being displayed.
     expect(context.widget, isA<MyHomePage>(), reason: location);
-
-    /// We know Controller's current State object is _MyHomePageState
-    stateObj = con.state!;
-
-    /// This is confirmed by testing for its StatefulWidget
-    expect(stateObj.widget, isA<MyApp>(), reason: location);
   }
+
+  /// We know Controller's current State object is _MyHomePageState
+  stateObj = con.state!;
+
+  /// This is confirmed by testing for its StatefulWidget
+  expect(stateObj.widget, isA<MyApp>(), reason: location);
 
   /// If the State object has 'added' it, you can retrieve one of its
   /// Controllers by type.
@@ -180,6 +174,13 @@ Future<void> testsStateMVC(WidgetTester tester) async {
   /// The member 'xxxxxxx' can only be used within instance members
   /// of subclasses of 'package:mvc_pattern/mvc_pattern.dart'.
   bool? boolean = await stateObj.didPopRoute();
+
+  expect(boolean, isA<bool>(), reason: location);
+
+  String path = WidgetsBinding.instance!.window.defaultRouteName;
+
+  boolean =
+      await stateObj.didPushRouteInformation(RouteInformation(location: path));
 
   expect(boolean, isA<bool>(), reason: location);
 

@@ -35,7 +35,9 @@ Future<void> testsStateListener(WidgetTester tester) async {
 
   final id = listener.keyId;
 
-  state.addBeforeListener(listener);
+  var added = state.addBeforeListener(listener);
+
+  expect(added, isTrue, reason: location);
 
   var contains = state.beforeContains(listener);
 
@@ -49,11 +51,19 @@ Future<void> testsStateListener(WidgetTester tester) async {
 
   final add = state.addListener(listener);
 
-  expect(add, isFalse);
+  expect(add, isFalse, reason: location);
 
   var stateListener = state.beforeListener(id);
 
   stateListener = state.afterListener(id)!;
+
+  expect(stateListener, isA<TesterStateListener>(), reason: location);
+
+  stateListener = con.beforeListener(id);
+
+  expect(stateListener, isA<TesterStateListener>(), reason: location);
+
+  stateListener = con.afterListener(id);
 
   expect(stateListener, isA<TesterStateListener>(), reason: location);
 
@@ -100,4 +110,8 @@ Future<void> testsStateListener(WidgetTester tester) async {
   state.didChangeAccessibilityFeatures();
 
   state.refresh();
+
+  final removed = state.removeListener(listener);
+
+  expect(removed, isTrue, reason: location);
 }

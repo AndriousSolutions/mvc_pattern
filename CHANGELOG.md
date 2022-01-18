@@ -1,4 +1,9 @@
 
+## 8.5.2
+ January 17, 2022
+- Rewrote 'pop state' _popState()
+- Removed _popState() from deactivate()
+
 ## 8.5.1+01
  January 17, 2022
 - integration_test: in mvc_pattern

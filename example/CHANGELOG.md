@@ -1,4 +1,8 @@
 
+## 1.3.0
+ January 17, 2022
+- More coverage in the tests to 86%
+
 ## 1.2.0
  January 17, 2022
 - Introduced test_listener.dart

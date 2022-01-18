@@ -152,10 +152,12 @@ mixin _StateSets {
   /// However, if was already previously added, it's not added
   /// again to a Set object and certainly not set the 'current' StateMVC.
   bool _pushState(StateMVC? state) {
+    //
     if (state == null) {
       return false;
     }
     _statePushed = _stateMVCSet.add(state);
+    // If added, assign as the 'current' state object.
     if (_statePushed) {
       _stateMVC = state;
     }
@@ -166,33 +168,29 @@ mixin _StateSets {
   /// to the Set of StateMVC state objects.
   /// Primarily internal use only: This disconnects the Controller from that StateMVC object.
   bool _popState([StateMVC? state]) {
-    bool pop;
-
-    // Remove if the current state
-    if (state != null && state == _stateMVC) {
-      _statePushed = false;
-      _stateWidgetMap.removeWhere((key, value) => value == state);
-      _stateMVCSet.remove(state);
+    // Return false if null
+    if (state == null) {
+      return false;
     }
 
-    // Another state object was already pushed onto the Set.
-    if (_statePushed) {
+    // Remove from the Map and Set object.
+    _stateWidgetMap.removeWhere((key, value) => value == state);
+
+    final pop = _stateMVCSet.remove(state);
+
+    // Was the 'popped' state the 'current' state?
+    if (state == _stateMVC) {
+      //
       _statePushed = false;
-      pop = false;
-    } else {
-      // Remove all Stat objects that have been disposed of.
-      _stateMVCSet.retainWhere((state) => state.mounted);
+
+      // Remove all State objects that have been disposed of.
+      _stateMVCSet.retainWhere((item) => item.mounted);
       _stateWidgetMap.removeWhere((key, value) => !value.mounted);
 
       if (_stateMVCSet.isEmpty) {
-        //
         _stateMVC = null;
-        pop = false;
       } else {
-        //
         _stateMVC = _stateMVCSet.last;
-        // A replacement was found.
-        pop = true;
       }
     }
     return pop;
@@ -462,7 +460,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
   /// Provide the 'main' controller to this 'State View.'
   /// If _controller == null, get the 'first assigned' controller.
-  ControllerMVC? get controller => _controller ??= firstCon;
+  ControllerMVC? get controller => _controller ??= rootCon;
 
   /// Retrieve a Controller by its a unique String identifier.
   ControllerMVC? controllerById(String? keyId) => super._con(keyId);
@@ -593,9 +591,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.deactivate();
     }
     for (final con in _controllerList) {
-      // This state's association is severed.
-      con._popState(this);
-
       // Don't call its deactivate if it's in other State objects.
       if (con._stateMVCSet.isEmpty) {
         con.deactivate();
@@ -1090,6 +1085,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.reassemble();
     }
     for (final con in _controllerList) {
+      // This state's association is severed.
+//      con._popState(this);
+
       con.reassemble();
     }
     for (final listener in _afterList) {

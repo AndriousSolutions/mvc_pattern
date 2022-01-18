@@ -10,6 +10,8 @@ import 'package:example/src/view.dart';
 
 void testsController(WidgetTester tester) {
   //
+  const location = '========================== test_controller.dart';
+
   /// Explicitly provide what's intentionally should be accessible
   /// but is made accessible for 'internal testing' of this framework.
   // Find its StatefulWidget first then the 'type' of State object.
@@ -23,11 +25,14 @@ void testsController(WidgetTester tester) {
   /// In fact, it's already there and will merely return its assigned id.
   String conId = stateObj.add(Controller());
 
-  expect(conId, isA<String>(), reason: 'The unique key identifier.');
+  expect(conId, isA<String>(), reason: location);
 
   Controller con = stateObj.controllerById(conId) as Controller;
 
-  expect(con, isA<Controller>(), reason: 'Supply the id to other developers');
+  expect(con, isA<Controller>(), reason: location);
+
+  /// Do the reverse, test 'adding' a State object to a Controller.
+  conId = con.addState(stateObj);
 
   /// null testing
   conId = stateObj.add(null);
@@ -43,19 +48,19 @@ void testsController(WidgetTester tester) {
 
   con = appState.controllerById(keyId) as Controller;
 
-  expect(con, isA<Controller>());
+  expect(con, isA<Controller>(), reason: location);
 
   List<String> keyIds = stateObj.addList([Controller()]);
 
-  expect(keyIds, isNotEmpty);
+  expect(keyIds, isNotEmpty, reason: location);
 
   con = stateObj.controllerById(keyIds[0]) as Controller;
 
-  expect(con, isA<Controller>(), reason: 'Supply the id to other developers');
+  expect(con, isA<Controller>(), reason: location);
 
   appState = stateObj.rootState!;
 
-  expect(appState.widget, isA<MyApp>());
+  expect(appState.widget, isA<MyApp>(), reason: location);
 
   /// Test AppController class
   _testAppController(tester);
@@ -67,7 +72,7 @@ void testsController(WidgetTester tester) {
 
   another = appState.controllerById(keyId) as AnotherController;
 
-  expect(another, isA<AnotherController>());
+  expect(another, isA<AnotherController>(), reason: location);
 
   /// This State object 'contains' this Controller.
   YetAnotherController andAnother =
@@ -77,7 +82,7 @@ void testsController(WidgetTester tester) {
 
   andAnother = appState.controllerById(keyId) as YetAnotherController;
 
-  expect(andAnother, isA<YetAnotherController>());
+  expect(andAnother, isA<YetAnotherController>(), reason: location);
 
   /// Another way to retrieve its Controller from a list of Controllers
   /// Retrieve it by 'type'
@@ -85,7 +90,7 @@ void testsController(WidgetTester tester) {
   /// but with the AppMVC (the App's State object)
   another = stateObj.controllerByType<AnotherController>()!;
 
-  expect(another, isA<AnotherController>());
+  expect(another, isA<AnotherController>(), reason: location);
 
   /// This Controller will be found in this State object's listing.
   con = stateObj.controllerByType<Controller>()!;
@@ -98,14 +103,14 @@ void testsController(WidgetTester tester) {
   /// Retrieve it by its key id Note the casting.
   con = stateObj.controllerById(conId) as Controller;
 
-  expect(con, isA<Controller>());
+  expect(con, isA<Controller>(), reason: location);
 
   /// Return a List of Controllers specified by key id.
   final listCons = con.listControllers([conId]);
 
-  expect(listCons, isA<List<ControllerMVC?>>());
+  expect(listCons, isA<List<ControllerMVC?>>(), reason: location);
 
-  expect(listCons[0], isA<Controller>());
+  expect(listCons[0], isA<Controller>(), reason: location);
 
   /// Only when the [StateMVC] object is first created.
   con.initState();
@@ -157,7 +162,7 @@ void testsController(WidgetTester tester) {
   /// Return a 'copy' of the Set of State objects.
   final Set<StateMVC>? states = con.states;
 
-  expect(states, isA<Set<StateMVC>>());
+  expect(states, isA<Set<StateMVC>>(), reason: location);
 }
 
 bool _testAppController(WidgetTester tester) {

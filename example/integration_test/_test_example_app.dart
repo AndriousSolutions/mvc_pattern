@@ -80,6 +80,10 @@ Future<void> integrationTesting(WidgetTester tester) async {
   expect(find.text('0'), findsOneWidget, reason: location);
 
   await testHomePageApp(tester);
+
+  /// Return to Page 1
+  await tester.tap(find.byKey(const Key('Page 1')));
+  await tester.pumpAndSettle();
 }
 
 Future<void> testHomePageApp(WidgetTester tester) async {
@@ -124,4 +128,8 @@ Future<void> testHomePageApp(WidgetTester tester) async {
   }
 
   expect(find.text('Are you good?'), findsOneWidget);
+
+  /// Retreat back one screen
+  await tester.tap(find.byTooltip('Back'));
+  await tester.pumpAndSettle();
 }
