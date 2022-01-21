@@ -37,6 +37,9 @@ Future<void> testsStateMVC(WidgetTester tester) async {
   /// Test its if statement.
   appState.catchError(null);
 
+  /// setState((){});
+  appState.refresh();
+
   /// Every StateMVC and ControllerMVC has a unique String identifier.
   final myAppStateId = appState.keyId;
 
@@ -153,12 +156,18 @@ Future<void> testsStateMVC(WidgetTester tester) async {
 
   expect(_state, isA<State>(), reason: location);
 
+  final noCon = appState.controllerByType<TestingController>();
+
+  expect(noCon, isNull, reason: location);
+
   /// Test for the unique identifier assigned to every Controller.
   var id = stateObj.add(TestingController());
 
-  expect(id, isA<String>(), reason: location);
-
   expect(id, isNotEmpty, reason: location);
+
+  final keyList = stateObj.addList(null);
+
+  expect(keyList, isEmpty, reason: location);
 
   final removed = stateObj.remove(id);
 
@@ -168,6 +177,20 @@ Future<void> testsStateMVC(WidgetTester tester) async {
   final mounted = stateObj.mounted;
 
   expect(mounted, isA<bool>(), reason: location);
+
+  expect(stateObj.futureBuilt, isA<bool>(), reason: location);
+
+  appState = StateMVC.of<AppStateMVC>(context)!;
+
+  expect(appState, isA<AppStateMVC>(), reason: location);
+
+  final errorDetails = FlutterErrorDetails(
+    exception: Exception('Pretend Error'),
+    context: ErrorDescription('Created merely for testing purposes.'),
+    library: 'widget_test',
+  );
+
+  expect(appState.onAsyncError(errorDetails), isA<bool>());
 
   /// Usually you would call this function on a subclass of StateMVC
   /// We're testing the very class, StateMVC, itself and so the warning if fine:

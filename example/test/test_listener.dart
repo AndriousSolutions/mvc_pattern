@@ -67,6 +67,20 @@ Future<void> testsStateListener(WidgetTester tester) async {
 
   expect(stateListener, isA<TesterStateListener>(), reason: location);
 
+  var list = state.beforeList([id]);
+
+  list = state.afterList([id]);
+
+  expect(list, isNotEmpty, reason: location);
+
+  var controller = state.firstCon;
+
+  expect(controller, isA<ControllerMVC>(), reason: location);
+
+  final debug = state.inDebugger;
+
+  expect(debug, isA<bool>(), reason: location);
+
   bool? boolean = await state.didPopRoute();
 
   expect(boolean, isFalse, reason: location);

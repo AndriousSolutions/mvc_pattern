@@ -1,8 +1,9 @@
 
-## 8.5.2
+## 8.5.2+01
  January 17, 2022
 - Rewrote 'pop state' _popState()
 - Removed _popState() from deactivate()
+- _AppStateMVC class merged into AppStateMVC class
 
 ## 8.5.1+01
  January 17, 2022

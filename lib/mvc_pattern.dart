@@ -1333,7 +1333,7 @@ mixin _ControllerListing {
 }
 
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
-/// AppStatefulWidget is its subclass.
+/// Its sole purpose is to create the 'App State object', AppStateMVC.
 abstract class AppStatefulWidgetMVC extends StatefulWidget {
   const AppStatefulWidgetMVC({Key? key}) : super(key: key);
 
@@ -1353,8 +1353,7 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
 }
 
 /// The StatMVC object at the 'app level.' Used to effect the whole app.
-abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
-    extends _AppStateMVC<T> {
+abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
   //
   AppStateMVC({
     ControllerMVC? controller,
@@ -1388,7 +1387,7 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
       _InheritedMVC(state: this, child: buildApp(context));
 
   /// Clean up memory
-  /// Unlike dispose, this function is liekly to always fire.
+  /// Unlike dispose, this function is likely to always fire.
   @protected
   @mustCallSuper
   @override
@@ -1398,10 +1397,6 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     _clearRootStateMVC();
     super.deactivate();
   }
-
-  // /// Link a widget to InheritedWidget
-  // static void inheritWidget(BuildContext context) =>
-  //     context.dependOnInheritedWidgetOfExactType<_InheritedWidget>();
 
   @Deprecated('Replaced with a more recognizable name, inheritedNeedsBuild()')
   void setStatesInherited([Object? object]) => inheritedNeedsBuild(object);
@@ -1449,7 +1444,6 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
   }
 
   /// Returns a StateView object using a unique String identifier.
-  // There's a better way. Just too tired now.
   StateMVC? getState(String keyId) {
     StateMVC? sv;
     for (final map in _states) {
@@ -1484,9 +1478,6 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     final Map<String, StateMVC> map = {};
     map[state._keyId] = state;
     _states.add(map);
-    // for (final con in state._controllerList) {
-    //   _controllers.add(con);
-    // }
     state._controllerList.forEach(_controllers.add);
   }
 
@@ -1519,14 +1510,6 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     }
     return state;
   }
-}
-
-/// The App's first State object.
-/// It brings in the first State object
-abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
-    extends StateMVC<T> {
-  //
-  _AppStateMVC(ControllerMVC? con) : super(con);
 
   /// Initialize any 'time-consuming' operations at the beginning.
   /// Initialize asynchronous items essential to the Mobile Applications.
@@ -1544,8 +1527,7 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
     /// No 'setState()' functions are allowed to fully function at this point.
     StateMVC._rebuildAllowed = false;
 
-//    for (final con in _controllerList) {
-    final controllers = rootState!._controllers.toList();
+    final controllers = _controllers.toList();
     for (final con in controllers) {
       if (con is! AppControllerMVC) {
         continue;
@@ -1585,11 +1567,6 @@ abstract class _AppStateMVC<T extends AppStatefulWidgetMVC>
     StateMVC._rebuildAllowed = true;
     return handled;
   }
-
-  //todo: Look at the State object's error routine.
-  // /// Call the StatefulWidget's error routine;
-  // @override
-  // void onError(FlutterErrorDetails details) => widget.onError(details);
 }
 
 /// Builds a [InheritedWidget].
