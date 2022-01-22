@@ -8,38 +8,39 @@ import 'package:example/src/controller.dart';
 
 import 'package:example/src/view.dart';
 
+const location = '========================== test_controller.dart';
+
 void testsController(WidgetTester tester) {
   //
-  const location = '========================== test_controller.dart';
 
   /// Explicitly provide what's intentionally should be accessible
   /// but is made accessible for 'internal testing' of this framework.
   // Find its StatefulWidget first then the 'type' of State object.
-  StateMVC stateObj = tester.firstState<AppStateMVC>(find.byType(MyApp));
+  AppStateMVC appState = tester.firstState<AppStateMVC>(find.byType(MyApp));
 
-  expect(stateObj.widget, isA<MyApp>());
+  expect(appState.widget, isA<MyApp>());
 
   /// Returns the unique identifier assigned to the Controller object.
   /// Unnecessary. Merely demonstrating an alternative to 'adding' a
   /// Controller object to a StatMVC object.
   /// In fact, it's already there and will merely return its assigned id.
-  String conId = stateObj.add(Controller());
+  String conId = appState.add(Controller());
 
   expect(conId, isA<String>(), reason: location);
 
-  Controller con = stateObj.controllerById(conId) as Controller;
+  Controller con = appState.controllerById(conId) as Controller;
 
   expect(con, isA<Controller>(), reason: location);
 
   /// Do the reverse, test 'adding' a State object to a Controller.
-  conId = con.addState(stateObj);
+  conId = con.addState(appState);
 
   /// null testing
-  conId = stateObj.add(null);
+  conId = appState.add(null);
 
   expect(conId, isEmpty);
 
-  AppStateMVC appState = con.rootState!;
+  appState = con.rootState!;
 
   /// This State object 'contains' this Controller.
   con = appState.controllerByType<Controller>()!;
@@ -50,17 +51,30 @@ void testsController(WidgetTester tester) {
 
   expect(con, isA<Controller>(), reason: location);
 
-  List<String> keyIds = stateObj.addList([Controller()]);
+  List<String> keyIds = appState.addList([Controller()]);
 
   expect(keyIds, isNotEmpty, reason: location);
 
-  con = stateObj.controllerById(keyIds[0]) as Controller;
+  con = appState.controllerById(keyIds[0]) as Controller;
 
   expect(con, isA<Controller>(), reason: location);
 
-  appState = stateObj.rootState!;
+  /// Event the 'first' State object has a reference to itself
+  appState = appState.rootState!;
 
   expect(appState.widget, isA<MyApp>(), reason: location);
+
+  /// Returns the most recent BuildContext/Element created in the App
+  BuildContext context = con.lastContext!;
+
+  expect(context.widget, isA<Page1>(), reason: location);
+
+  /// Call for testing coverage
+  con.inheritWidget(context);
+
+  /// Rebuild InheritedWidget
+  /// Using the deprecated function to include in testing coverage.
+  appState.setStatesInherited('Test');
 
   /// Test AppController class
   _testAppController(tester);
@@ -88,12 +102,12 @@ void testsController(WidgetTester tester) {
   /// Retrieve it by 'type'
   /// This controller exists but not with this State object
   /// but with the AppMVC (the App's State object)
-  another = stateObj.controllerByType<AnotherController>()!;
+  another = appState.controllerByType<AnotherController>()!;
 
   expect(another, isA<AnotherController>(), reason: location);
 
   /// This Controller will be found in this State object's listing.
-  con = stateObj.controllerByType<Controller>()!;
+  con = appState.controllerByType<Controller>()!;
 
   expect(con, isA<Controller>());
 
@@ -101,7 +115,7 @@ void testsController(WidgetTester tester) {
 
   /// Another way to retrieve its Controller from a list of Controllers
   /// Retrieve it by its key id Note the casting.
-  con = stateObj.controllerById(conId) as Controller;
+  con = appState.controllerById(conId) as Controller;
 
   expect(con, isA<Controller>(), reason: location);
 
@@ -180,8 +194,8 @@ bool _testAppController(WidgetTester tester) {
 
   final rootCon = controller as AppController;
 
-  /// Deprecated but still tested.
-  expect(rootCon.initAsync(), isA<Future<bool>>());
+  /// Deprecated but still tested so to be included in testing coverage.
+  rootCon.initApp();
 
   final errorDetails = FlutterErrorDetails(
     exception: Exception('Pretend Error'),

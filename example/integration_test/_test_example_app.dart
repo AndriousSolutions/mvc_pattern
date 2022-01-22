@@ -6,9 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:example/src/view.dart';
 
+const location = '========================== test_example_app.dart';
+
 Future<void> integrationTesting(WidgetTester tester) async {
   //
-  const location = '========================== test_example_app.dart';
 
   const count = 9;
 
@@ -64,20 +65,8 @@ Future<void> integrationTesting(WidgetTester tester) async {
 
   expect(find.text((count).toString()), findsOneWidget, reason: location);
 
-  expect(find.byKey(const Key('New Key')), findsOneWidget, reason: location);
-  // Tapping doesn't seem to work, and so I'll grab the State object itself.
-  await tester.tap(find.byKey(const Key('New Key')));
-  await tester.pumpAndSettle();
-
-  // Find its StatefulWidget first then the 'type' of State object.
-  AppStateMVC rootState = tester.firstState<AppStateMVC>(find.byType(MyApp));
-  rootState.setState(() {});
-  await tester.pumpAndSettle();
-
   await tester.tap(find.byKey(const Key('Page 1')));
   await tester.pumpAndSettle();
-
-  expect(find.text('0'), findsOneWidget, reason: location);
 
   await testHomePageApp(tester);
 
@@ -132,4 +121,27 @@ Future<void> testHomePageApp(WidgetTester tester) async {
   /// Retreat back one screen
   await tester.tap(find.byTooltip('Back'));
   await tester.pumpAndSettle();
+}
+
+Future<void> resetPage1Count(WidgetTester tester) async {
+  //
+  await tester.tap(find.byKey(const Key('Page 2')));
+  await tester.pumpAndSettle();
+
+  await tester.tap(find.byKey(const Key('Page 3')));
+  await tester.pumpAndSettle();
+
+  // Tapping doesn't seem to work, and so I'll grab the State object itself.
+  await tester.tap(find.byKey(const Key('New Key')));
+  await tester.pumpAndSettle();
+
+  // Find its StatefulWidget first then the 'type' of State object.
+  AppStateMVC rootState = tester.firstState<AppStateMVC>(find.byType(MyApp));
+  rootState.setState(() {});
+  await tester.pumpAndSettle();
+
+  await tester.tap(find.byKey(const Key('Page 1')));
+  await tester.pumpAndSettle();
+
+  expect(find.text('0'), findsOneWidget, reason: location);
 }

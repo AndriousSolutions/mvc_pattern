@@ -1,4 +1,10 @@
 
+
+## 8.6.0
+ January 22, 2022
+- testsStateListener02(tester); testsStateListener02(tester); resetPage1Count(tester);
+- AppStateMVC.deactivate(); to AppStateMVC.dispose();
+
 ## 8.5.2+01
  January 17, 2022
 - Rewrote 'pop state' _popState()

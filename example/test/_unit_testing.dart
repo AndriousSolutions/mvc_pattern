@@ -13,7 +13,7 @@ import 'test_statemvc.dart';
 Future<void> unitTesting(WidgetTester tester) async {
 //
   /// Tests Listener class
-  await testsStateListener(tester);
+  await testsStateListener02(tester);
 
   /// Tests StateMVC class
   await testsStateMVC(tester);

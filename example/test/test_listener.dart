@@ -9,16 +9,19 @@ import 'package:example/src/controller.dart';
 
 import 'package:example/src/view.dart';
 
-/// Assign the mixin to be tested.
-class TesterStateListener with StateListener {}
+/// A 'listener' for testing.
+class TesterStateListener with StateListener {
+  factory TesterStateListener() => _this ??= TesterStateListener._();
+  TesterStateListener._();
+  static TesterStateListener? _this;
+}
 
-Future<void> testsStateListener(WidgetTester tester) async {
+//
+const _location = '========================== test_listener.dart';
+
+Future<void> testsStateListener01(WidgetTester tester) async {
   //
-  const location = '========================== test_listener.dart';
-
-  /// Explicitly provide what's intentionally should be accessible
-  /// but is made accessible for 'internal testing' of this framework.
-  // Find its StatefulWidget first then the 'type' of State object.
+  /// Find its StatefulWidget first then the 'type' of State object.
   final appState = tester.firstState<AppStateMVC>(find.byType(MyApp));
 
   expect(appState.widget, isA<MyApp>());
@@ -35,59 +38,91 @@ Future<void> testsStateListener(WidgetTester tester) async {
 
   final id = listener.keyId;
 
+  /// Testing the Adding of Listeners to a State object
+
   var added = state.addBeforeListener(listener);
 
-  expect(added, isTrue, reason: location);
+  expect(added, isTrue, reason: _location);
 
+  /// Test for 'Before' Listener has been added.
   var contains = state.beforeContains(listener);
 
-  expect(contains, isTrue, reason: location);
+  expect(contains, isTrue, reason: _location);
 
+  /// Add an 'after' Listener.
   state.addAfterListener(listener);
 
+  /// Test for 'After' Listener has been added.
   contains = state.afterContains(listener);
 
-  expect(contains, isTrue, reason: location);
+  expect(contains, isTrue, reason: _location);
 
   final add = state.addListener(listener);
 
-  expect(add, isFalse, reason: location);
+  expect(add, isFalse, reason: _location);
 
   var stateListener = state.beforeListener(id);
 
   stateListener = state.afterListener(id)!;
 
-  expect(stateListener, isA<TesterStateListener>(), reason: location);
+  expect(stateListener, isA<TesterStateListener>(), reason: _location);
 
   stateListener = con.beforeListener(id);
 
-  expect(stateListener, isA<TesterStateListener>(), reason: location);
+  expect(stateListener, isA<TesterStateListener>(), reason: _location);
 
   stateListener = con.afterListener(id);
 
-  expect(stateListener, isA<TesterStateListener>(), reason: location);
+  expect(stateListener, isA<TesterStateListener>(), reason: _location);
 
   var list = state.beforeList([id]);
 
   list = state.afterList([id]);
 
-  expect(list, isNotEmpty, reason: location);
+  expect(list, isNotEmpty, reason: _location);
+}
+
+Future<void> testsStateListener02(WidgetTester tester) async {
+  //
+  /// Find the 'first State object' of the App.
+  /// Find its StatefulWidget first then the 'type' of State object.
+  final appState = tester.firstState<AppStateMVC>(find.byType(MyApp));
+
+  expect(appState.widget, isA<MyApp>());
+
+  /// If the State object has 'added' it, you can retrieve one of its
+  /// Controllers by type.
+  final con = appState.controllerByType<Controller>()!;
+
+  /// Of course, you can retrieve the State object its currently collected.
+  /// In this case, there's only one, the one in con.state.
+  StateMVC state = con.stateOf<Page1>()!;
+
+  /// The Test Listener
+  final listener = TesterStateListener();
+
+  /// Testing the Life-cycle Event Handling
 
   var controller = state.firstCon;
 
-  expect(controller, isA<ControllerMVC>(), reason: location);
+  expect(controller, isA<Controller>(), reason: _location);
 
   final debug = state.inDebugger;
 
-  expect(debug, isA<bool>(), reason: location);
+  expect(debug, isA<bool>(), reason: _location);
 
   bool? boolean = await state.didPopRoute();
 
-  expect(boolean, isFalse, reason: location);
+  expect(boolean, isFalse, reason: _location);
 
   boolean = await state.didPushRoute('/');
 
-  expect(boolean, isFalse, reason: location);
+  expect(boolean, isFalse, reason: _location);
+
+  boolean = await state.didPushRouteInformation(RouteInformation(
+      location: WidgetsBinding.instance!.window.defaultRouteName));
+
+  expect(boolean, isFalse, reason: _location);
 
   final widget = state.widget;
 
@@ -103,12 +138,9 @@ Future<void> testsStateListener(WidgetTester tester) async {
   /// Called when the returning from another app.
   state.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
+  state.didChangeDependencies();
+
   state.reassemble();
-
-  state.deactivate();
-
-  /// They have to be returned after a 'deactivate' in testing.
-  state.add(con);
 
   /// null testing
   state.add(null);
@@ -127,5 +159,5 @@ Future<void> testsStateListener(WidgetTester tester) async {
 
   final removed = state.removeListener(listener);
 
-  expect(removed, isTrue, reason: location);
+  expect(removed, isTrue, reason: _location);
 }

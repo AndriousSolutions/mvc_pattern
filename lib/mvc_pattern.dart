@@ -1391,11 +1391,11 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
   @protected
   @mustCallSuper
   @override
-  void deactivate() {
+  void dispose() {
     _controllers.clear();
     _states.clear();
     _clearRootStateMVC();
-    super.deactivate();
+    super.dispose();
   }
 
   @Deprecated('Replaced with a more recognizable name, inheritedNeedsBuild()')
