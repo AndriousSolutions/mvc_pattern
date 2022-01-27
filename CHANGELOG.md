@@ -1,9 +1,10 @@
 
-
-## 8.6.0
+## 8.6.0+01
  January 22, 2022
 - testsStateListener02(tester); testsStateListener02(tester); resetPage1Count(tester);
 - AppStateMVC.deactivate(); to AppStateMVC.dispose();
+- Further API documentation
+- sdk: ">=2.15.1 <3.0.0"
 
 ## 8.5.2+01
  January 17, 2022

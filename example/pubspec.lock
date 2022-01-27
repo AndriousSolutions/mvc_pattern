@@ -137,7 +137,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "8.6.0"
+    version: "8.6.0+01"
   path:
     dependency: transitive
     description:
@@ -242,4 +242,4 @@ packages:
     source: hosted
     version: "3.0.0"
 sdks:
-  dart: ">=2.15.0 <3.0.0"
+  dart: ">=2.15.1 <3.0.0"

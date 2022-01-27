@@ -72,9 +72,9 @@ import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
 /// This class is to be concerned with the data
 /// It is accessed by the Controller but can call setState() as well.
 class ModelMVC extends StateSetter with _RootStateMixin {
-  //
+  /// Optionally supply a State object to 'link' to this object.
+  /// Thus, assigned as 'current' StateMVC for this object
   ModelMVC([StateMVC? state]) : super() {
-    /// Assign as 'current' StateMVC for this object
     _pushState(state);
   }
 }
@@ -82,7 +82,8 @@ class ModelMVC extends StateSetter with _RootStateMixin {
 /// Your 'working' class most concerned with the app's functionality.
 /// Add it to a 'StateMVC' object to associate it with that State object.
 class ControllerMVC extends StateSetter with StateListener, _RootStateMixin {
-  //
+  /// Optionally supply a State object to 'link' to this object.
+  /// Thus, assigned as 'current' StateMVC for this object
   ControllerMVC([StateMVC? state]) : super() {
     addState(state);
   }
@@ -142,6 +143,8 @@ mixin _StateSets {
   final Map<Type, StateMVC> _stateWidgetMap = {};
   bool _statePushed = false;
 
+  /// Add the provided State object to the Map object if
+  /// it's the 'current' StateMVC object in _stateMVC.
   void _addState(StateMVC state) {
     if (_statePushed && _stateMVC != null && _stateMVC == state) {
       _stateWidgetMap.addAll({state.widget.runtimeType: state});
@@ -223,6 +226,7 @@ mixin _StateSets {
   Set<StateMVC> get states => Set.from(_stateMVCSet.whereType<StateMVC>());
 }
 
+/// Used to explicitly return the 'type' indicated.
 Type _type<U>() => U;
 
 /// Responsible for the event handling in all the Controllers, Listeners and Views.
@@ -1114,14 +1118,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
         /// Call the State object's setState() function.
         super.setState(fn);
       }
-      // else {
-      //   // Don't recall why this if statement if not mounted?
-      //   if (WidgetsBinding.instance == null ||
-      //       WidgetsBinding.instance is WidgetsFlutterBinding) {
-      //     /// Refresh the interface by 'rebuilding' the Widget Tree
-      //     super.setState(fn);
-      //   }
-      // }
       _rebuildAllowed = true;
     } else {
       /// Can't rebuild at this moment but at least make the request.
@@ -1142,6 +1138,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 /// Add, List, and Remove Listeners.
 mixin _StateListeners {
   List<StateListener> get _beforeList => _listenersBefore.toList();
+
+  /// Returns a List of 'before' listeners by matching key identifiers.
   List<StateListener> beforeList(List<String> keys) {
     return _getList(keys, _listenersBefore);
   }
@@ -1149,6 +1147,8 @@ mixin _StateListeners {
   final Set<StateListener> _listenersBefore = {};
 
   List<StateListener> get _afterList => _listenersAfter.toList();
+
+  /// Returns the list of 'after' listeners by matching key identifiers.
   List<StateListener> afterList(List<String> keys) {
     return _getList(keys, _listenersAfter);
   }
@@ -1338,6 +1338,7 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
   const AppStatefulWidgetMVC({Key? key}) : super(key: key);
 
   /// You create the App's State object.
+  /// Return a type AppStateMVC that extends State<AppStatefulWidgetMVC>
   @override
   AppStateMVC createState();
 
@@ -1352,9 +1353,11 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
   }
 }
 
-/// The StatMVC object at the 'app level.' Used to effect the whole app.
+/// The StateMVC object at the 'app level.' Used to effect the whole app and
+/// is the State class for the StatefulWidget, AppStatefulWidgetMVC.
 abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
-  //
+  /// Optionally supply as many State Controllers as you like to work with this App.
+  /// Supply a 'data object' to to be accessible to the App's InheritedWidget. Optional.
   AppStateMVC({
     ControllerMVC? controller,
     List<ControllerMVC>? controllers,
@@ -1528,6 +1531,7 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
     StateMVC._rebuildAllowed = false;
 
     final controllers = _controllers.toList();
+
     for (final con in controllers) {
       if (con is! AppControllerMVC) {
         continue;
@@ -1584,6 +1588,7 @@ class _InheritedMVC extends StatefulWidget {
   /// Allows for the static setState() function defined in this StatefulWidget
   static final _inheritedState = _InheritedMVCState();
 
+  /// Return the 'inherited' State object if not overridden.
   @override
   //ignore: no_logic_in_create_state
   State createState() => _inheritedState;
@@ -1623,7 +1628,9 @@ class _InheritedWidget extends InheritedWidget {
   final AppStateMVC state;
   final Object? object;
 
-  ///
+  /// Notfiy dependencies if explicitly flagged to do so
+  /// or if StateSet objects were implemented and the 'object' property
+  /// has changed in value.
   @override
   bool updateShouldNotify(_InheritedWidget oldWidget) {
     bool notify = false;
@@ -1643,10 +1650,13 @@ class _InheritedWidget extends InheritedWidget {
 ///  Used like the function, setState(), to 'spontaneously' call
 ///  build() functions here and there in your app. Much like the Scoped
 ///  Model's ScopedModelDescendant() class.
+///  This class object will only rebuild if the App's InheritedWidget notifies it
+///  as it is a dependency.
 ///  More information:
 ///  https://medium.com/flutter-community/shrine-in-mvc-7984e08d8e6b#488c
 @protected
 class SetState extends StatelessWidget {
+  /// Supply a 'builder' passing in the App's 'data object' and latest BuildContext object.
   const SetState({Key? key, required this.builder}) : super(key: key);
   final BuilderWidget builder;
 
@@ -1698,10 +1708,10 @@ mixin _RootStateMixin {
   /// StateMVC objects, ControllerMVC objects and Model objects
   static AppStateMVC? _rootStateMVC;
 
-  /// Returns the 'first' StateMVC object
+  /// Returns the 'first' StateMVC object in the App
   AppStateMVC? get rootState => _rootStateMVC;
 
-  /// Returns the 'latest' context
+  /// Returns the 'latest' context in the App.
   BuildContext? get lastContext => _rootStateMVC?._lastStateMVC()?.context;
 
   /// Link a widget to InheritedWidget
@@ -1716,6 +1726,10 @@ mixin _RootStateMixin {
   /// to propagate any class object you wish down the widget tree.
   Object? get dataObject => _rootStateMVC?._dataObj;
 
+  /// Assign an object to the property, dataObject.
+  /// It will not assign null and if SetState objects are implemented,
+  /// will call the App's InheritedWidget to be rebuilt and call its
+  /// dependencies.
   set dataObject(Object? object) {
     // Never explicitly set to null
     if (object != null) {

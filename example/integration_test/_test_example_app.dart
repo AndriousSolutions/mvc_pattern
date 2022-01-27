@@ -10,7 +10,6 @@ const location = '========================== test_example_app.dart';
 
 Future<void> integrationTesting(WidgetTester tester) async {
   //
-
   const count = 9;
 
   // Verify that our counter starts at 0.

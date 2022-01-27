@@ -4,17 +4,21 @@
 
 /// The 'show' clause is not essential. Merely for your reference.
 
-import 'package:example/src/view.dart';
+// Show clause is used for you to appreciate what is used in the testing.
 
-import '../integration_test/_test_example_app.dart';
+import 'package:example/src/view.dart' show MyApp, UniqueKey;
+
+import '../integration_test/_test_example_app.dart'
+    show integrationTesting, resetPage1Count;
 
 import 'test_listener.dart' show testsStateListener01;
 
 import '_unit_testing.dart' show unitTesting;
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
 
-import 'package:integration_test/integration_test.dart';
+import 'package:integration_test/integration_test.dart'
+    show IntegrationTestWidgetsFlutterBinding;
 
 void main() => testMyApp();
 
