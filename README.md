@@ -8,7 +8,7 @@
 ![flutter and mvc](https://user-images.githubusercontent.com/32497443/47087365-c9524f80-d1e9-11e8-85e5-6c8bbabb18cc.png)
 Note, the Framework package, [mvc_application](https://pub.dev/packages/mvc_application), uses mvc_pattern at its core.
 [![MVC](https://user-images.githubusercontent.com/32497443/104046248-658b1700-51a5-11eb-83b6-2b8be54ecc3a.jpg)](https://pub.dev/packages/mvc_application)
-The package, [mvc_application](https://pub.dev/packages/mvc_application), allows for easier and, dare I say, faster development and better maintenability. No 're-inventing of the wheel' with already built-in capabilities and features. Accommodating and Intergrated features:
+The package, [mvc_application](https://pub.dev/packages/mvc_application), allows for easier and, dare I say, faster development and better maintainability. No 're-inventing of the wheel' with already built-in capabilities and features. Accommodating and Intergrated features:
 * Error Handling
 * System Preferences
 * Notifications

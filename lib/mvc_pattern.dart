@@ -231,7 +231,8 @@ Type _type<U>() => U;
 
 /// Responsible for the event handling in all the Controllers, Listeners and Views.
 mixin StateListener {
-  // Assigned an unique key.
+  /// A unique key is assigned to all State Controllers, State objects,
+  /// and listeners. Used in large projects to separate objects into teams.
   String get keyId => _keyId;
   final String _keyId = Uuid().generateV4();
 
@@ -1333,8 +1334,8 @@ mixin _ControllerListing {
 }
 
 /// Main or first class to pass to the 'main.dart' file's runApp() function.
-/// Its sole purpose is to create the 'App State object', AppStateMVC.
 abstract class AppStatefulWidgetMVC extends StatefulWidget {
+  /// Its sole purpose is to create the 'App State object', AppStateMVC.
   const AppStatefulWidgetMVC({Key? key}) : super(key: key);
 
   /// You create the App's State object.
@@ -1401,10 +1402,11 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
     super.dispose();
   }
 
+  /// Call the build() functions of all the dependencies of the _InheritedWidget widget.
   @Deprecated('Replaced with a more recognizable name, inheritedNeedsBuild()')
   void setStatesInherited([Object? object]) => inheritedNeedsBuild(object);
 
-  /// Call the build() functions of all the widgets 'linked' to the Inherited widget.
+  /// Call the build() functions of all the dependencies of the _InheritedWidget widget.
   void inheritedNeedsBuild([Object? object]) {
     if (object != null) {
       dataObject = object;
@@ -1658,6 +1660,8 @@ class _InheritedWidget extends InheritedWidget {
 class SetState extends StatelessWidget {
   /// Supply a 'builder' passing in the App's 'data object' and latest BuildContext object.
   const SetState({Key? key, required this.builder}) : super(key: key);
+
+  /// This is called with every rebuild of the App's inherited widget, _InheritedWidget
   final BuilderWidget builder;
 
   /// Calls the required Function object:
