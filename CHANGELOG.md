@@ -1,5 +1,5 @@
 
-## 8.6.0+02
+## 8.6.0+03
  January 22, 2022
 - testsStateListener02(tester); testsStateListener02(tester); resetPage1Count(tester);
 - AppStateMVC.deactivate(); to AppStateMVC.dispose();
