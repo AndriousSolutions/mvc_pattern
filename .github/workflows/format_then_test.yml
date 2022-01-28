@@ -1,4 +1,4 @@
-# This is a basic workflow to help you get started with Actions
+# This workflow tests and releases the latest build
 
 name: CI
 
@@ -54,22 +54,22 @@ jobs:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage/lcov.info
 
-#      # Parse a tag from the commit message
-#      - id: get-tag
-#        run: |
-#          id=$(echo ${{github.event.head_commit.message}} | cut -d' ' -f1)
-#          echo "::set-output name=tag::$id"
-#
-#      # Create a Release up on Github
-#      if: !contains('${{ steps.get-tag.outputs.TAG }}', '+')
-#      - uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-#        with:
-#          tag_name: ${{ steps.get-tag.outputs.TAG }}
-#          release_name: Release ${{ steps.get-tag.outputs.TAG }}
-##          body_path: CHANGELOG.md
-#          body: |
-#            See CHANGELOG.md
-#          draft: false
-#          prerelease: false
+      # Parse a tag from the commit message
+      - id: get-tag
+        run: |
+          id=$(echo ${{github.event.head_commit.message}} | cut -d' ' -f1)
+          echo "::set-output name=tag::$id"
+
+        # Create a Release up on Github
+        if: !contains('${{ steps.get-tag.outputs.TAG }}', '+')
+      - uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ steps.get-tag.outputs.TAG }}
+          release_name: Release ${{ steps.get-tag.outputs.TAG }}
+#          body_path: CHANGELOG.md
+          body: |
+            See CHANGELOG.md
+          draft: false
+          prerelease: false
