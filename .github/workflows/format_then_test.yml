@@ -57,7 +57,7 @@ jobs:
       # Parse a tag from the commit message
       - id: get-tag
         run: |
-          id=$(echo ${{github.event.head_commit.message}} | cut -d -f1)
+          id=$(echo ${{github.event.head_commit.message}} | cut -d " " -f1)
           echo "::set-output name=tag::${id}"
         # Create a Release up on Github
 #        if: !contains('${{ steps.get-tag.outputs.TAG }}', '+')
