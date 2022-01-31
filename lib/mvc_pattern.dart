@@ -443,6 +443,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
     _stateMVC = this;
 
+    /// Collect all the StateMVC objects to the 'root' State object;
+    rootState?._addStateMVC(this);
+
     /// Any subsequent calls to add() will be assigned to stateMVC.
     add(_controller);
   }
@@ -478,10 +481,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       /// Collect all the Controllers to the 'root' State object;
       rootState?._controllers.add(c);
     }
-
-    /// Collect all the StateMVC objects to the 'root' State object;
-    rootState?._addStateMVC(this);
-
     return super.add(c);
   }
 
