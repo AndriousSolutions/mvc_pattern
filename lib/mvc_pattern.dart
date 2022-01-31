@@ -443,9 +443,6 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// IMPORTANT! Assign itself to stateView before adding any Controller. -gp
     _stateMVC = this;
 
-    /// Collects this StateMVC object to the 'main list' of such objects.
-    rootState?._addStateMVC(this);
-
     /// Any subsequent calls to add() will be assigned to stateMVC.
     add(_controller);
   }
@@ -477,7 +474,11 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     if (c != null) {
       /// It may have been a listener. Can't be both.
       removeListener(c);
+
+      /// Collect all the Controllers to the 'root' State object;
+      rootState?._controllers.add(c);
     }
+
     return super.add(c);
   }
 
@@ -1369,7 +1370,11 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
     _dataObj = object;
     addList(controllers?.toList());
   }
+
+  /// All the State Controllers in this app.
   final Set<ControllerMVC> _controllers = {};
+
+  /// All the State objects in this app.
   final Set<Map<String, StateMVC>> _states = {};
 
   bool _buildInherited = false;
@@ -1483,7 +1488,6 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
     final Map<String, StateMVC> map = {};
     map[state._keyId] = state;
     _states.add(map);
-    state._controllerList.forEach(_controllers.add);
   }
 
   /// Remove the specified State object from static Set object.
@@ -1532,6 +1536,7 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC> extends StateMVC<T> {
     /// No 'setState()' functions are allowed to fully function at this point.
     StateMVC._rebuildAllowed = false;
 
+    /// All the controllers so far used in this App.
     final controllers = _controllers.toList();
 
     for (final con in controllers) {
@@ -1697,11 +1702,20 @@ typedef BuilderWidget<T extends Object> = Widget Function(
 mixin _RootStateMixin {
   ///Record the 'root' StateMVC object
   void _setRootStateMVC(StateMVC state) {
+    //
     if (_rootStateMVC == null && state is AppStateMVC) {
+      //
       _rootStateMVC = state;
 
-      /// Special case: It must now add itself to the list.
+      /// It must now add itself to the State objects list.
       _rootStateMVC!._addStateMVC(state);
+
+      final controller = rootState?.controller;
+
+      if (controller != null) {
+        /// Collect all the Controllers to the 'root' State object;
+        _rootStateMVC?._controllers.add(controller);
+      }
     }
   }
 

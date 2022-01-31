@@ -1,4 +1,8 @@
 
+### 8.6.1
+ January 30, 2022
+- Collect all the Controllers to the 'root' State object;
+
 ## 8.6.0+03
  January 22, 2022
 - testsStateListener02(tester); testsStateListener02(tester); resetPage1Count(tester);

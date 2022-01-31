@@ -49,18 +49,20 @@ jobs:
       - run: flutter test --coverage
 
       # Upload to codecov
-      - uses: codecov/codecov-action@v1.0.2
+      - uses: codecov/codecov-action@v2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage/lcov.info
 
       # Parse a tag from the commit message
       - id: get-tag
+        shell: python3 {0}
         run: |
-          id=$(echo ${{github.event.head_commit.message}} | cut -d" " -f1)
-          echo "::set-output name=tag::$id"
-        # Create a Release up on Github
-#        if: !contains('${{ steps.get-tag.outputs.TAG }}', '+')
+          import json
+          import os
+          with open(os.environ['GITHUB_EVENT_PATH']) as fh:
+            event = json.load(fh)
+            tag = event['head_commit']['message'].split()[0]
       - uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
