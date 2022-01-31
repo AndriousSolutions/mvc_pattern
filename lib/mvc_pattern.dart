@@ -479,6 +479,9 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       rootState?._controllers.add(c);
     }
 
+    /// Collect all the StateMVC objects to the 'root' State object;
+    rootState?._addStateMVC(this);
+
     return super.add(c);
   }
 

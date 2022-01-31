@@ -1,7 +1,9 @@
 
-### 8.6.1
+### 8.6.1+01
  January 30, 2022
 - Collect all the Controllers to the 'root' State object;
+- Collect all the StateMVC objects to the 'root' State object;
+
 
 ## 8.6.0+03
  January 22, 2022
