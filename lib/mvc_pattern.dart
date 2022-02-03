@@ -1595,15 +1595,17 @@ class _InheritedMVC extends StatefulWidget {
   final Widget child;
 
   /// Allows for the static setState() function defined in this StatefulWidget
-  static final _inheritedState = _InheritedMVCState();
+  //ignore: prefer_final_fields
+  static _InheritedMVCState? inheritedState;
 
-  /// Return the 'inherited' State object if not overridden.
+  /// Return the 'inherited' State object (allow for hot reload)
+  /// Allow the Inherited State object to be recreated on hot reload.
   @override
   //ignore: no_logic_in_create_state
-  State createState() => _inheritedState;
+  State createState() => inheritedState = _InheritedMVCState();
 
   /// Calls the build() function in this Widget's State object.
-  static void setState(VoidCallback fn) => _inheritedState.setState(fn);
+  static void setState(VoidCallback fn) => inheritedState!.setState(fn);
 }
 
 class _InheritedMVCState extends State<_InheritedMVC> {
@@ -1637,7 +1639,7 @@ class _InheritedWidget extends InheritedWidget {
   final AppStateMVC state;
   final Object? object;
 
-  /// Notfiy dependencies if explicitly flagged to do so
+  /// Notify dependencies if explicitly flagged to do so
   /// or if StateSet objects were implemented and the 'object' property
   /// has changed in value.
   @override

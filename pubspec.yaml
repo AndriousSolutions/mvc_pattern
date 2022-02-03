@@ -1,7 +1,7 @@
 name: mvc_pattern
 description: To develop apps using a framework following the MVC design pattern separating the app's 'interface' from its 'business logic' and from its 'data source' if any.
 
-version: 8.6.1+02
+version: 8.7.0
 
 homepage: https://www.andrioussolutions.com
 repository: https://github.com/AndriousSolutions/mvc_pattern

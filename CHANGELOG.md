@@ -1,4 +1,8 @@
 
+### 8.7.0
+ February 02, 2022
+- Allow the Inherited State object to be recreated on hot reload.
+
 ### 8.6.1+02
  January 30, 2022
 - Collect all the Controllers to the 'root' State object;
