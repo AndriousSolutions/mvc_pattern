@@ -11,7 +11,7 @@ export 'package:mvc_pattern/mvc_pattern.dart';
 
 export 'package:example/src/app/view/my_app.dart';
 
-export 'package:example/src/home/view/my_home_page.dart';
+export 'package:example/src/home/view/home_page.dart';
 
 export 'package:example/src/home/view/page_01.dart';
 

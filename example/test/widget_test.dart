@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// The 'show' clause is not essential. Merely for your reference.
-
-// Show clause is used for you to appreciate what is used in the testing.
+/// Show clause is used for you to appreciate what is used in the testing.
 
 import 'package:example/src/view.dart' show MyApp, UniqueKey;
 

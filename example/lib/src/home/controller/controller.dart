@@ -23,19 +23,17 @@ class Controller extends ControllerMVC {
     //
     _model.incrementCounter();
 
-    /// Only calls only 'SetState' widgets
-    /// or widgets that called the inheritWidget(context) function
-    inheritBuild();
-
-    /// Retrieve a particular State object.
-    final homeState = stateOf<MyHomePage>();
+    /// Retrieve a particular State object. The rest is ignore if not at 'HomePage'
+    final homeState = stateOf<HomePage>();
 
     /// If working with a particular State object and if divisible by 5
     if (homeState != null && _model.counter % 5 == 0) {
       //
       dataObject = _model.sayHello();
-      setState(() {});
     }
+
+    /// Just rebuild an InheritedWidget's dependencies.
+    buildInherited();
   }
 
   /// Call the State object's setState() function to reflect the change.

@@ -1,4 +1,17 @@
 
+### 8.8.0
+ February 28, 2022
+- Installed universal_platform: ^1.0.0
+- Updated Dart version: sdk: '>=2.16.1 <3.0.0'
+- inactiveLifecycleState(), pausedLifecycleState(), detachedLifecycleState(), resumedLifecycleState()
+- Supply a FutureBuilder to a State object. mixin FutureBuilderStateMixin on State
+- A StateMVC object but inserts a InheritedWidget into the Widget tree. abstract class InheritedStateMVC
+- try { init = await con.initAsync(); in initAsync()
+- While loop so additional controllers can be added in a previous initState()
+- Link a widget to InheritedWidget  bool widgetInherited(BuildContext? context)
+- Rebuild the InheritedWidget of the 'closes' InheritedStateMVC object if any. void buildInherited()
+- AppControllerMVC Deprecated. All ControllerMVC objects now have this capability.
+
 ### 8.7.0
  February 02, 2022
 - Allow the Inherited State object to be recreated on hot reload.

@@ -70,11 +70,10 @@ void testsController(WidgetTester tester) {
   expect(context.widget, isA<Page1>(), reason: location);
 
   /// Call for testing coverage
-  con.inheritWidget(context);
+  con.widgetInherited(context);
 
   /// Rebuild InheritedWidget
-  /// Using the deprecated function to include in testing coverage.
-  appState.setStatesInherited('Test');
+  appState.inheritedNeedsBuild('Test');
 
   /// Test AppController class
   _testAppController(tester);

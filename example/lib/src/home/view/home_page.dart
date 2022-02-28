@@ -7,24 +7,23 @@ import 'package:example/src/view.dart';
 import 'package:example/src/controller.dart';
 
 /// The Home page
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, this.title = 'Flutter Demo'}) : super(key: key);
-
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key, this.title = 'Flutter Demo'}) : super(key: key);
   // Fields in a StatefulWidget should always be "final".
   final String title;
 
   @override
-  State createState() => _MyHomePageState();
+  State<StatefulWidget> createState() => _HomePageState();
 }
 
-/// This 'MVC version' is a subclass of the State class.
-/// This version is linked to the App's lifecycle using [WidgetsBindingObserver]
-class _MyHomePageState extends StateMVC<MyHomePage> {
+/// Insert an InheritedWidget at this point to be used.
+class _HomePageState extends StateMVC<HomePage> {
   /// Let the 'business logic' run in a Controller
-  _MyHomePageState() : super(Controller()) {
+  _HomePageState() : super(Controller()) {
     /// Acquire a reference to the passed Controller.
     con = controller as Controller;
   }
+
   late Controller con;
 
   @override
@@ -46,22 +45,28 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
   late AppStateMVC appState;
 
-  /// This is 'the View'; the interface of the home page.
+  /// Build the 'child' Widget passed to the InheritedWidget.
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Center(
-          child: Column(
+  Widget buildWidget(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        /// SetState class is like a setState() function but called only when the App's InheritedWidget is rebuilt.
+        child: SetState(
+          builder: (context, dataObject) => Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               /// Display the App's data object if it has something to display
-              if (con.dataObject != null && con.dataObject is String)
+              /// Note, the Stat Controllers has access to the same 'dataObject'
+              if (dataObject != null &&
+                  dataObject == con.dataObject &&
+                  con.dataObject is String)
                 Padding(
                   padding: const EdgeInsets.all(30),
                   child: Text(
-                    con.dataObject as String,
+                    dataObject as String,
                     key: const Key('greetings'),
                     style: TextStyle(
                       color: Colors.red,
@@ -73,34 +78,26 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
                 'You have pushed the button this many times:',
                 style: Theme.of(context).textTheme.bodyText2,
               ),
-              // Text(
-              //   '${con.count}',
-              //   style: Theme.of(context).textTheme.headline4,
-              // ),
-              SetState(
-                builder: (context, dataObject) => Text(
-                  '${con.count}',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
+              Text(
+                '${con.count}',
+                style: Theme.of(context).textTheme.headline4,
               ),
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          key: const Key('+'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        key: const Key('+'),
 
-          /// Refresh only the Text widget containing the counter.
-          onPressed: () => con.incrementCounter(),
+        /// Refresh only the Text widget containing the counter.
+        onPressed: () => con.incrementCounter(),
 
-          /// The traditional approach calling the State object's setState() function.
-          // onPressed: () {
-          //   setState(con.incrementCounter);
-          // },
-          /// You can have the Controller called the interface (the View).
+        /// You can have the Controller called the interface (the View).
 //          onPressed: con.onPressed,
-          child: const Icon(Icons.add),
-        ),
-      );
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
 
   /// Supply an error handler for Unit Testing.
   @override

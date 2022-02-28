@@ -16,6 +16,7 @@ class Page3 extends StatefulWidget {
   @override
   State createState() => _Page3State();
 
+  /// Note, there is more than one way below to access the State object.
   void onPressed() {
 //    final state = con.state as _Page3State;
     final state = con.stateOf<Page3>() as _Page3State;
@@ -50,6 +51,7 @@ class _Page3State extends StateMVC<Page3> {
         },
       );
 
+  /// Ignore this function. Study the features above instead.
   Widget _buildPage3({
     int count = 0,
     required void Function() counter,
@@ -79,10 +81,9 @@ class _Page3State extends StateMVC<Page3> {
                   Navigator.push(
                       lastContext!,
                       MaterialPageRoute<void>(
-                          builder: (BuildContext context) =>
-                              const MyHomePage()));
+                          builder: (BuildContext context) => const HomePage()));
                 },
-                child: const Text("object:'Hello!' example"),
+                child: const Text("'Hello!' example"),
               ),
             ),
           ]),

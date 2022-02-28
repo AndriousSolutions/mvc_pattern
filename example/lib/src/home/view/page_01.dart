@@ -44,13 +44,13 @@ class _Page1State extends StateMVC<Page1> {
 
   @override
   Widget build(_) {
-//    inheritWidget(context);
+    widgetInherited(context);
     return buildPage1(
         count: count,
         counter: () {
           count++;
-          con.setState(() {});
-//          inheritBuild();
+//          con.setState(() {});
+          buildInherited();
         });
   }
 }

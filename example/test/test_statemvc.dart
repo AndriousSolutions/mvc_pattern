@@ -60,6 +60,7 @@ Future<void> testsStateMVC(WidgetTester tester) async {
   expect(con, isA<AppController>(), reason: _location);
 
   /// Its a special Controller of type 'AppControllerMVC'
+  /// Deprecated but still tested so to be included in testing coverage.
   expect(con, isA<AppControllerMVC>(), reason: _location);
 
   /// As well as the base class, ControllerMVC
@@ -88,9 +89,9 @@ Future<void> testsStateMVC(WidgetTester tester) async {
     expect(context.widget, isA<Page1>(), reason: _location);
   }
 
-  if (context.widget is MyHomePage) {
+  if (context.widget is HomePage) {
     /// MyHomePage is currently being displayed.
-    expect(context.widget, isA<MyHomePage>(), reason: _location);
+    expect(context.widget, isA<HomePage>(), reason: _location);
   }
 
   /// We know Controller's current State object is _MyHomePageState
@@ -191,18 +192,6 @@ Future<void> testsStateMVC(WidgetTester tester) async {
 
   expect(mounted, isTrue, reason: _location);
 
-  /// The FutureBuilder was called or not.
-  expect(stateObj.futureBuilt, isFalse, reason: _location);
-
-  /// This State object has run its FutureBuilder
-  expect(appState.futureBuilt, isTrue, reason: _location);
-
-  /// Supply the StateMVC object from the widget tree.
-  /// Deprecated as it's static and prone to abuse.
-  appState = StateMVC.of<AppStateMVC>(context)!;
-
-  expect(appState, isA<AppStateMVC>(), reason: _location);
-
   final errorDetails = FlutterErrorDetails(
     exception: Exception('Pretend Error'),
     context: ErrorDescription('Created merely for testing purposes.'),
@@ -278,7 +267,7 @@ Future<void> testsStateMVC(WidgetTester tester) async {
 }
 
 /// Merely a 'tester' Controller used in the function above.
-class TestingController extends ControllerMVC with AppControllerMVC {
+class TestingController extends ControllerMVC {
   factory TestingController() => _this ??= TestingController._();
   TestingController._();
   static TestingController? _this;
