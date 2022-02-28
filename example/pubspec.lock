@@ -141,10 +141,10 @@ packages:
   mvc_pattern:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
-    version: "8.8.0"
+      name: mvc_pattern
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "8.7.0"
   path:
     dependency: transitive
     description:
@@ -227,13 +227,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.0"
-  universal_platform:
-    dependency: transitive
-    description:
-      name: universal_platform
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0+1"
   vector_math:
     dependency: transitive
     description:

@@ -1,4 +1,8 @@
 
+## 1.4.0
+ February 28, 2022
+- Updated example app
+
 ## 1.3.0
  January 17, 2022
 - More coverage in the tests to 86%
