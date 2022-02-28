@@ -1,5 +1,5 @@
 
-### 8.8.0
+### 8.8.0+01
  February 28, 2022
 - Installed universal_platform: ^1.0.0
 - Updated Dart version: sdk: '>=2.16.1 <3.0.0'
