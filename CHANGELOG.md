@@ -1,4 +1,8 @@
 
+### 8.8.1
+ March 01, 2022
+- Pass in the StatefulElement  buildWidget(this.context);
+
 ### 8.8.0+03
  February 28, 2022
 - Installed universal_platform: ^1.0.0

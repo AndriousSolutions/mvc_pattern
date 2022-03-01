@@ -1522,8 +1522,8 @@ mixin FutureBuilderStateMixin on State {
     FlutterErrorDetails? errorDetails;
 
     if (snapshot.hasData && snapshot.data!) {
-      //
-      widget = buildWidget(context);
+      // Pass in the StatefulElement
+      widget = buildWidget(this.context);
       //
     } else if (snapshot.connectionState == ConnectionState.done) {
       //
