@@ -1,4 +1,9 @@
 
+### 8.8.2
+ March 04, 2022
+- class _BuildBuilder extends StatelessWidget has a try..catch
+- ControllerMVC? get rootCon => Returns null if empty.
+
 ### 8.8.1
  March 01, 2022
 - Pass in the StatefulElement  buildWidget(this.context);

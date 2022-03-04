@@ -489,7 +489,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   T get widget => super.widget as T;
 
   /// Provide the 'main' controller to this 'State View.'
-  /// If _controller == null, get the 'first assigned' controller.
+  /// If _controller == null, get the 'first assigned' controller if any.
   ControllerMVC? get controller => _controller ??= rootCon;
 
   /// Retrieve a Controller by its a unique String identifier.
@@ -1483,7 +1483,8 @@ mixin _ControllerListing {
   ControllerMVC? get firstCon => rootCon;
 
   /// Returns 'the first' Controller associated with this StateMVC object.
-  ControllerMVC? get rootCon => _asList.first;
+  /// Returns null if empty.
+  ControllerMVC? get rootCon => _asList.isEmpty ? null : _asList.first;
 
   /// Returns true if the specified 'Controller' is associated with this StateMVC object.
   bool contains(ControllerMVC con) => _map.containsValue(con);
@@ -1982,8 +1983,28 @@ abstract class InheritedStateMVC<T extends StatefulWidget,
 class _BuildBuilder extends StatelessWidget {
   const _BuildBuilder({Key? key, required this.builder}) : super(key: key);
   final Widget Function(BuildContext context) builder;
+
   @override
-  Widget build(BuildContext context) => builder(context);
+  Widget build(BuildContext context) {
+    late Widget widget;
+    try {
+      widget = builder(context);
+    } catch (e) {
+      //
+      final errorDetails = FlutterErrorDetails(
+        exception: e,
+        stack: e is Error ? e.stackTrace : null,
+        library: 'mvc_pattern.dart',
+        context:
+            ErrorDescription("While building 'child' for InheritedWidget."),
+      );
+
+      FlutterError.reportError(errorDetails);
+
+      widget = ErrorWidget.builder(errorDetails);
+    }
+    return widget;
+  }
 }
 
 /// A Mixin to make a Controller for the 'app level' to influence the whole app.
