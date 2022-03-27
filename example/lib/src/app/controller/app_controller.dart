@@ -4,7 +4,7 @@
 
 import 'package:example/src/view.dart';
 
-class AppController extends ControllerMVC with AppControllerMVC {
+class AppController extends ControllerMVC {
   factory AppController() => _this ??= AppController._();
   AppController._();
   static AppController? _this;

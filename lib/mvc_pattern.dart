@@ -1281,7 +1281,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
           context.findAncestorStateOfType<InheritedStateMVC>();
       inherit = state != null;
       if (inherit) {
-        final element = state._inheritedElement(context);
+        final element = state.inheritedElement(context);
         inherit = element != null;
         if (inherit) {
           context.dependOnInheritedElement(element);
@@ -1503,9 +1503,9 @@ mixin _ControllerListing {
 }
 
 /// Supply a FutureBuilder to a State object.
-mixin FutureBuilderStateMixin on State {
+mixin FutureBuilderStateMixin<T extends StatefulWidget> on State<T> {
   /// Implement this function instead of the build() function
-  /// to utilize a built-in FutureBuilder Widget and InheritedWidget.
+  /// to utilize a built-in FutureBuilder Widget.
   Widget buildWidget(BuildContext context) => const SizedBox();
 
   /// Run the CircularProgressIndicator() until asynchronous operations are
@@ -1589,16 +1589,6 @@ abstract class AppStatefulWidgetMVC extends StatefulWidget {
   /// Return a type AppStateMVC that extends State<AppStatefulWidgetMVC>
   @override
   AppStateMVC createState();
-
-  /// Determines if running in an IDE or in production.
-  /// Returns true if the App is under in the Debugger and not production.
-  @Deprecated('This static getter is replaced by a instance getter')
-  static bool get inDebugger {
-    var inDebugMode = false;
-    // assert is removed in production.
-    assert(inDebugMode = true);
-    return inDebugMode;
-  }
 }
 
 /// The StateMVC object at the 'app level.' Used to effect the whole app and
@@ -1612,7 +1602,7 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     List<ControllerMVC>? controllers,
     Object? object,
   }) : super(
-          inheritedWidget: (child) => _AppInheritedWidget(
+          inheritedBuilder: (child) => _AppInheritedWidget(
             child: child,
           ),
           controller: controller,
@@ -1635,13 +1625,21 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
   Object? _dataObj;
 
   /// Implement this function to compose the App's View.
-  /// Override to impose your own WidgetsApp (like CupertinoApp or MaterialApp)
+  @Deprecated(
+      'Eventually use only buildChild(). This one not necessary and confusing.')
   Widget buildApp(BuildContext context);
 
-  /// Use buildApp() instead as this was the original function name for this class.
   /// Return the 'child' Widget then passed to an InheritedWidget
   @override
   Widget buildChild(BuildContext context) => buildApp(context);
+
+  /// Use this build instead if you don't want to use the built-in InheritedWidget
+  @override
+  Widget buildWidget(BuildContext context) => super.buildWidget(context);
+
+  /// Use the original build instead if you don't want to use the built-in FutureBuilder
+  @override
+  Widget build(BuildContext context) => super.build(context);
 
   /// Clean up memory
   /// Unlike dispose, this function is likely to always fire.
@@ -1660,8 +1658,20 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     if (object != null) {
       dataObject = object;
     }
-    super.buildInherited();
+    buildInherited();
   }
+
+  /// Rebuild the InheritedWidget and its dependencies.
+  @override
+  void buildInherited() => super.setState(() {});
+
+  /// In harmony with Flutter's own API
+  @override
+  void notifyClients() => super.setState(() {});
+
+  /// Inline with 'older' frameworks
+  @override
+  void refresh() => setState(() {});
 
   /// Calls the State object's setState() function if not
   ///  (see class SetState below).
@@ -1671,22 +1681,9 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     if (!_inSetStateBuilder) {
       // If not called by the buildInherited() function
       if (mounted && !_buildInherited) {
-        // Rebuild the InheritedWidget's child Widget first
-        _child = _BuildBuilder(builder: buildChild);
+        inheritedStatefulWidget.inheritedChildWidget = buildChild(context);
+        super.setState(() {});
       }
-      // Rebuild the InheritedWidget.
-      super.setState(fn);
-    }
-  }
-
-  /// Calls the State object's refresh() function if not
-  /// already in the SetState.builder() function (see class SetState below).
-  /// The refresh() function is just another name used to call
-  /// the State object's setState() function.
-  @override
-  void refresh() {
-    if (!_inSetStateBuilder) {
-      super.refresh();
     }
   }
 
@@ -1913,34 +1910,128 @@ mixin _AsyncOperations {
 
 /// A StateMVC object but inserts a InheritedWidget into the Widget tree.
 abstract class InheritedStateMVC<T extends StatefulWidget,
-    U extends InheritedWidget> extends StateMVC<T> {
+    U extends InheritedWidget> extends StateMVC<T> with InheritedStateMixin {
   ///
   InheritedStateMVC({
-    required this.inheritedWidget,
+    required this.inheritedBuilder,
     ControllerMVC? controller,
-  }) : super(controller);
-
-  /// Supply a child Widget to the returning InheritedWidget's child parameter.
-  final U Function(Widget child) inheritedWidget;
+  }) : super(controller) {
+    // Initialize the InheritedWidget State object
+    initInheritedState<U>(inheritedBuilder);
+  }
 
   /// Return the 'type' of InheritedWidget
   Type get inheritedType => U;
 
+  /// Supply a child Widget to the returning InheritedWidget's child parameter.
+  final U Function(Widget child) inheritedBuilder;
+
+  /// Build the 'child' Widget passed to the InheritedWidget.
+  @override
+  Widget buildChild(BuildContext context);
+
+  /// Run the CircularProgressIndicator() until asynchronous operations are
+  /// completed before the app proceeds.
+  @override
+  Widget build(BuildContext context) => FutureBuilder<bool>(
+      future: initAsync(), initialData: false, builder: _futureBuilder);
+
+  /// Implement this function instead of the build() function
+  /// to utilize a built-in FutureBuilder.
+  @override
+  Widget buildWidget(BuildContext context) => _inheritedStatefulWidget;
+
+  /// Rebuild the InheritedWidget and its dependencies.
+  @override
+  void buildInherited() => setState(() {});
+
+  /// In harmony with Flutter's own API
+  void notifyClients() => setState(() {});
+
+  /// Inline with 'older' frameworks
+  @override
+  void refresh() => setState(() {});
+}
+
+///
+mixin InheritedStateMixin<T extends StatefulWidget> on State<T> {
   /// Build the 'child' Widget passed to the InheritedWidget.
   Widget buildChild(BuildContext context);
 
-  /// The Widget to be created and passed to the InheritedWidget
-  late Widget _child;
+  /// Provide access to the 'InheritedWidget' StatefulWidget
+  InheritedStatefulWidget get inheritedStatefulWidget =>
+      _inheritedStatefulWidget;
 
-  @override
-  void initState() {
-    super.initState();
-    // Create the 'child' Widget to be passed to the InheritedWidget
-    _child = _BuildBuilder(builder: buildChild);
+  /// The Inherited StatefulWidget that contains the InheritedWidget.
+  late InheritedStatefulWidget _inheritedStatefulWidget;
+
+  /// Traditionally called in the initState() function
+  void initInheritedState<T extends InheritedWidget>(
+      T Function(Widget child) inheritedWidgetBuilder) {
+    // Create the StatefulWidget to contain the InheritedWidget
+    _inheritedStatefulWidget = InheritedStatefulWidget<T>(
+        inheritedWidgetBuilder: inheritedWidgetBuilder,
+        child: _BuildBuilder(builder: buildChild));
   }
 
   /// Link a widget to a InheritedWidget of type U
+  bool widgetInherited(BuildContext? context) =>
+      _inheritedStatefulWidget.widgetInherited(context);
+
+  ///
+  InheritedElement? inheritedElement(BuildContext? context) =>
+      _inheritedStatefulWidget.inheritedElement(context);
+
+  /// A flag to prevent infinite loops.
+  bool _buildInherited = false;
+
+  /// Don't rebuild this State object but the State object containing the InheritedWidget.
+  /// Rebuild all the dependencies of the _InheritedWidget widget.
   @override
+  void setState(VoidCallback fn) {
+    _buildInherited = true;
+    _inheritedStatefulWidget.setState(fn);
+    _buildInherited = false;
+  }
+
+  /// Provide a means to rebuild this State object anyway.
+  void setSuperState(VoidCallback fn) => super.setState(fn);
+
+  /// Implement this function instead of the build() function
+  /// to utilize a built-in FutureBuilder Widget and InheritedWidget.
+  ///
+  /// Introduce an Inherited widget and simply passing through a 'child' widget.
+  /// When the Inherited Widget is rebuilt only this build() function is called.
+  /// i.e. The rest of the widget tree, widget.child, is left alone.
+  @override
+  Widget build(BuildContext context) => _inheritedStatefulWidget;
+}
+
+/// Passes along a InheritedWidget to its State object.
+class InheritedStatefulWidget<U extends InheritedWidget>
+    extends StatefulWidget {
+  /// No key so the state object is not rebuilt because it can't be.
+  InheritedStatefulWidget({
+    Key? key,
+    required this.inheritedWidgetBuilder,
+    required this.child,
+  })  : state = _InheritedState(),
+        super(key: key);
+
+  /// Supply a child Widget to the returning InheritedWidget's child parameter.
+  final U Function(Widget child) inheritedWidgetBuilder;
+
+  /// The 'child' Widget eventually passed to the InheritedWidget.
+  final Widget child;
+
+  /// This StatefulWidget's State object.
+  final _InheritedState state;
+
+  @override
+  //ignore: no_logic_in_create_state
+  _InheritedState createState() => state;
+
+  /// Link a widget to a InheritedWidget of type U
   bool widgetInherited(BuildContext? context) {
     bool dependOn = context != null;
     if (dependOn) {
@@ -1951,7 +2042,7 @@ abstract class InheritedStateMVC<T extends StatefulWidget,
   }
 
   ///
-  InheritedElement? _inheritedElement(BuildContext? context) {
+  InheritedElement? inheritedElement(BuildContext? context) {
     InheritedElement? element;
     if (context != null) {
       element = context.getElementForInheritedWidgetOfExactType<U>();
@@ -1959,24 +2050,43 @@ abstract class InheritedStateMVC<T extends StatefulWidget,
     return element;
   }
 
-  bool _buildInherited = false;
+  /// The 'child' widget passed to the InheritedWidget
+  Widget get inheritedChildWidget => state.child!;
 
-  /// Call the build() functions of all the dependencies of the _InheritedWidget widget.
+  /// set the child widget.
+  set inheritedChildWidget(Widget? child) => state.child = child;
+
+  /// Call its State object's setState() function
+  void setState(VoidCallback fn) => state._setState(fn);
+
+  /// Rebuild the InheritedWidget and its dependencies.
+  void buildInherited() => setState(() {});
+
+  /// In harmony with Flutter's own API
+  void notifyClients() => setState(() {});
+
+  /// Inline with 'older' frameworks
+  void refresh() => setState(() {});
+}
+
+class _InheritedState extends State<InheritedStatefulWidget> {
   @override
-  void buildInherited() {
-    _buildInherited = true;
-    setState(() {});
-    _buildInherited = false;
+  void initState() {
+    super.initState();
+    _widget = widget;
   }
 
-  /// Implement this function instead of the build() function
-  /// to utilize a built-in FutureBuilder Widget and InheritedWidget.
-  ///
-  /// Introduce an Inherited widget and simply passing through a 'child' widget.
-  /// When the Inherited Widget is rebuilt only this build() function is called.
-  /// i.e. The rest of the widget tree, widget.child, is left alone.
+  late InheritedStatefulWidget _widget;
+
+  /// Supply an alternate 'child' Widget
+  Widget? child;
+
+  /// Called by the StatefulWidget
+  void _setState(VoidCallback fn) => setState(fn);
+
   @override
-  Widget buildWidget(BuildContext context) => inheritedWidget(_child);
+  Widget build(BuildContext context) =>
+      _widget.inheritedWidgetBuilder(child ??= _widget.child);
 }
 
 /// Creates a Widget but supplying contents to its build() function

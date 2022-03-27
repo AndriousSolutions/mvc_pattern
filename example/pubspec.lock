@@ -141,10 +141,10 @@ packages:
   mvc_pattern:
     dependency: "direct main"
     description:
-      name: mvc_pattern
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "8.8.0+03"
+      path: ".."
+      relative: true
+    source: path
+    version: "8.8.3"
   path:
     dependency: transitive
     description:

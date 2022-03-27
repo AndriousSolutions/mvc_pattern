@@ -193,9 +193,6 @@ bool _testAppController(WidgetTester tester) {
 
   final rootCon = controller as AppController;
 
-  /// Deprecated but still tested so to be included in testing coverage.
-  rootCon.initApp();
-
   final errorDetails = FlutterErrorDetails(
     exception: Exception('Pretend Error'),
     context: ErrorDescription('Created merely for testing purposes.'),
@@ -203,8 +200,6 @@ bool _testAppController(WidgetTester tester) {
   );
 
   expect(rootCon.onAsyncError(errorDetails), isA<bool>());
-
-  rootCon.onError(errorDetails);
 
   // Take in any Exception so not to 'fail' the running test
   tester.takeException();

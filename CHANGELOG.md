@@ -1,4 +1,12 @@
 
+### 8.9.0
+ March 16, 2022
+- mixin InheritedStateMixin<T extends StatefulWidget> on State<T>
+- mixin FutureBuilderStateMixin<T extends StatefulWidget> on State<T>
+- renamed parameter inheritedWidget to inheritedBuilder
+- abstract class InheritedStateMVC with InheritedStateMixin
+- AppStateMVC.buildApp() is deprecated yet not replaced.
+
 ### 8.8.2
  March 04, 2022
 - class _BuildBuilder extends StatelessWidget has a try..catch
