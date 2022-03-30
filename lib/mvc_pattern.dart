@@ -248,6 +248,23 @@ mixin StateListener {
     /// ancestor with a pointer to a descendant's [RenderObject]).
   }
 
+  /// Called when this object is reinserted into the tree after having been
+  /// removed via [deactivate].
+  void activate() {
+    /// In some cases, however, after a [State] object has been deactivated, the
+    /// framework will reinsert it into another part of the tree (e.g., if the
+    /// subtree containing this [State] object is grafted from one location in
+    /// the tree to another due to the use of a [GlobalKey]). If that happens,
+    /// the framework will call [activate] to give the [State] object a chance to
+    /// reacquire any resources that it released in [deactivate]. It will then
+    /// also call [build] to give the object a chance to adapt to its new
+    /// location in the tree.
+    ///
+    /// The framework does not call this method the first time a [State] object
+    /// is inserted into the tree. Instead, the framework calls [initState] in
+    /// that situation.
+  }
+
   /// The framework calls this method when this [StateMVC] object will never
   /// build again.
   /// Note: THERE IS NO GUARANTEE THIS METHOD WILL RUN in the Framework.
@@ -533,11 +550,10 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
 
     U? con = _cons[_type<U>()] as U?;
 
-    //con ??= AppStatefulWidgetMVC._controllers[_type<U>()] as U?;
     if (con == null) {
       final controllers = rootState?._controllers.toList();
-      if (controllers == null) {
-        for (final cont in controllers!) {
+      if (controllers != null) {
+        for (final cont in controllers) {
           if (cont.runtimeType == _type<U>()) {
             con = cont as U?;
             break;
@@ -674,6 +690,44 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
       listener.deactivate();
     }
     super.deactivate();
+    _rebuildAllowed = true;
+
+    /// In some cases, if then reinserted back in another part of the tree
+    /// the build is called, and so setState() is not necessary.
+    _rebuildRequested = false;
+  }
+
+  /// Called when this object is reinserted into the tree after having been
+  /// removed via [deactivate].
+  @override
+  @mustCallSuper
+  void activate() {
+    /// In most cases, after a [State] object has been deactivated, it is _not_
+    /// reinserted into the tree, and its [dispose] method will be called to
+    /// signal that it is ready to be garbage collected.
+    ///
+    /// In some cases, however, after a [State] object has been deactivated, the
+    /// framework will reinsert it into another part of the tree (e.g., if the
+    /// subtree containing this [State] object is grafted from one location in
+    /// the tree to another due to the use of a [GlobalKey]).
+
+    /// No 'setState()' functions are allowed to fully function at this point.
+    _rebuildAllowed = false;
+    for (final listener in _beforeList) {
+      listener.activate();
+    }
+    for (final con in _controllerList) {
+      // Don't call its activate if it's in other State objects.
+      if (con._stateMVCSet.isEmpty) {
+        con.activate();
+      }
+    }
+    for (final listener in _beforeList) {
+      listener.activate();
+    }
+
+    /// Must call the 'super' routine as well.
+    super.activate();
     _rebuildAllowed = true;
 
     /// In some cases, if then reinserted back in another part of the tree
@@ -1966,10 +2020,10 @@ mixin InheritedStateMixin<T extends StatefulWidget> on State<T> {
   late InheritedStatefulWidget _inheritedStatefulWidget;
 
   /// Traditionally called in the initState() function
-  void initInheritedState<T extends InheritedWidget>(
-      T Function(Widget child) inheritedWidgetBuilder) {
+  void initInheritedState<U extends InheritedWidget>(
+      U Function(Widget child) inheritedWidgetBuilder) {
     // Create the StatefulWidget to contain the InheritedWidget
-    _inheritedStatefulWidget = InheritedStatefulWidget<T>(
+    _inheritedStatefulWidget = InheritedStatefulWidget<U>(
         inheritedWidgetBuilder: inheritedWidgetBuilder,
         child: _BuildBuilder(builder: buildChild));
   }

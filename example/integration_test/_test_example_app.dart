@@ -126,6 +126,7 @@ Future<void> resetPage1Count(WidgetTester tester) async {
   //
   await tester.tap(find.byKey(const Key('Page 2')));
   await tester.pumpAndSettle();
+  await tester.pumpAndSettle();
 
   await tester.tap(find.byKey(const Key('Page 3')));
   await tester.pumpAndSettle();
@@ -139,8 +140,9 @@ Future<void> resetPage1Count(WidgetTester tester) async {
   rootState.setState(() {});
   await tester.pumpAndSettle();
 
-  await tester.tap(find.byKey(const Key('Page 1')));
-  await tester.pumpAndSettle();
+  /// It goes to Page 1 automatically.
+  // await tester.tap(find.byKey(const Key('Page 1')));
+  // await tester.pumpAndSettle();
 
   expect(find.text('0'), findsOneWidget, reason: location);
 }

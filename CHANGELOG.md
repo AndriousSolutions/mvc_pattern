@@ -1,4 +1,10 @@
 
+### 8.9.1
+ March 30, 2022
+- void activate() to mixin StateListener
+- if (controllers != null) in controllerByType<U extends ControllerMVC>()
+- Updated example app testing
+
 ### 8.9.0
  March 16, 2022
 - mixin InheritedStateMixin<T extends StatefulWidget> on State<T>

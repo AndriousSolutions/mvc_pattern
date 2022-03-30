@@ -59,10 +59,6 @@ Future<void> testsStateMVC(WidgetTester tester) async {
 
   expect(con, isA<AppController>(), reason: _location);
 
-  /// Its a special Controller of type 'AppControllerMVC'
-  /// Deprecated but still tested so to be included in testing coverage.
-  expect(con, isA<AppControllerMVC>(), reason: _location);
-
   /// As well as the base class, ControllerMVC
   expect(con, isA<ControllerMVC>(), reason: _location);
 

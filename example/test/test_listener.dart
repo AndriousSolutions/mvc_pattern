@@ -101,9 +101,13 @@ Future<void> testsStateListener02(WidgetTester tester) async {
   /// The Test Listener
   final listener = TesterStateListener();
 
+  final add = state.addListener(listener);
+
+  expect(add, isTrue, reason: _location);
+
   /// Testing the Life-cycle Event Handling
 
-  var controller = state.firstCon;
+  var controller = state.rootCon;
 
   expect(controller, isA<Controller>(), reason: _location);
 

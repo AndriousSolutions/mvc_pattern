@@ -46,11 +46,11 @@ void testMyApp() {
       /// WidgetsBinding.instance is IntegrationTestWidgetsFlutterBinding
       await integrationTesting(tester);
 
-      /// Testing the StateMVC, ControllerMVC, and ListenerMVC
-      await unitTesting(tester);
-
       /// Reset the counter to zero on Page 1
       await resetPage1Count(tester);
+
+      /// Testing the StateMVC, ControllerMVC, and ListenerMVC
+      await unitTesting(tester);
     },
   );
 }

@@ -22,7 +22,7 @@ class Page2 extends StatefulWidget {
 }
 
 /// This works with a separate 'data source'
-/// It doesn't no what, but being so, the count is never reset to zero.
+/// It doesn't no what data source, but being so, the count is never reset to zero.
 class _Page2State extends InheritedStateMVC<Page2, _Page02Inherited> {
   /// Define an InheritedWidget to be inserted above this Widget on the Widget tree.
   _Page2State()

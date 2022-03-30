@@ -1,4 +1,10 @@
 
+## 1.5.0
+ March 30, 2022
+- state.firstCon to state.rootCon;
+- Removed deprecated 'AppControllerMVC' from testing
+- Moved unitTesting(tester) to the end of testing.
+
 ## 1.4.0
  February 28, 2022
 - Updated example app
