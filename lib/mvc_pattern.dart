@@ -695,7 +695,14 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// In some cases, if then reinserted back in another part of the tree
     /// the build is called, and so setState() is not necessary.
     _rebuildRequested = false;
+
+    _deactivated = true;
   }
+
+  /// Readily determine if the State object is possibly to be disposed of.
+  bool get deactivated => _deactivated;
+  // State object's deactivated() was called.
+  bool _deactivated = false;
 
   /// Called when this object is reinserted into the tree after having been
   /// removed via [deactivate].
@@ -710,6 +717,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// framework will reinsert it into another part of the tree (e.g., if the
     /// subtree containing this [State] object is grafted from one location in
     /// the tree to another due to the use of a [GlobalKey]).
+
+    _deactivated = false;
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
@@ -1808,14 +1817,15 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     while (_states.isNotEmpty) {
       try {
         state = _states.last.values.last;
+        // The state object is 'on the way out!'
+        if (!state.mounted || state.deactivated) {
+          _states.remove(_states.last);
+          continue;
+        }
         break;
       } catch (ex) {
-        if (ex is FlutterError && ex.message.contains('unmounted')) {
-          _states.remove(_states.last);
-        } else {
-          state = null;
-          break;
-        }
+        // Just get out and see if state is null.
+        break;
       }
     }
     return state;

@@ -1,4 +1,9 @@
 
+
+### 8.10.0
+ March 31, 2022
+- bool _deactivated = false; // State object's deactivated() was called.
+
 ### 8.9.1
  March 30, 2022
 - void activate() to mixin StateListener
