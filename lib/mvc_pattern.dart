@@ -650,7 +650,8 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     int cnt = 0;
     ControllerMVC con;
     // While loop so additional controllers can be added in a previous initState()
-    while (cnt < _controllerList.length) {
+    final list = _controllerList.length;
+    while (cnt < list) {
       con = _controllerList[cnt];
       // Add this to the _StateSets Map
       con._addState(this);
@@ -1819,6 +1820,8 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
         state = _states.last.values.last;
         // The state object is 'on the way out!'
         if (!state.mounted || state.deactivated) {
+          // Remove state
+          state = null;
           _states.remove(_states.last);
           continue;
         }
@@ -1827,6 +1830,10 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
         // Just get out and see if state is null.
         break;
       }
+    }
+    // Don't supply this State object if it's deactivated.
+    if (state == null && mounted && !deactivated) {
+      state = this;
     }
     return state;
   }

@@ -1,16 +1,21 @@
 
 
-### 8.10.0
+## 8.10.1
+ April 06, 2022
+- _lastStateMVC() // Don't supply this State object if it's deactivated
+- Tightened code. // While loop so additional controllers can be added in a previous initState()
+
+## 8.10.0
  March 31, 2022
 - bool _deactivated = false; // State object's deactivated() was called.
 
-### 8.9.1
+## 8.9.1
  March 30, 2022
 - void activate() to mixin StateListener
 - if (controllers != null) in controllerByType<U extends ControllerMVC>()
 - Updated example app testing
 
-### 8.9.0
+## 8.9.0
  March 16, 2022
 - mixin InheritedStateMixin<T extends StatefulWidget> on State<T>
 - mixin FutureBuilderStateMixin<T extends StatefulWidget> on State<T>
@@ -18,16 +23,16 @@
 - abstract class InheritedStateMVC with InheritedStateMixin
 - AppStateMVC.buildApp() is deprecated yet not replaced.
 
-### 8.8.2
+## 8.8.2
  March 04, 2022
 - class _BuildBuilder extends StatelessWidget has a try..catch
 - ControllerMVC? get rootCon => Returns null if empty.
 
-### 8.8.1
+## 8.8.1
  March 01, 2022
 - Pass in the StatefulElement  buildWidget(this.context);
 
-### 8.8.0+03
+## 8.8.0+03
  February 28, 2022
 - Installed universal_platform: ^1.0.0
 - Updated Dart version: sdk: '>=2.16.1 <3.0.0'
@@ -40,11 +45,11 @@
 - Rebuild the InheritedWidget of the 'closes' InheritedStateMVC object if any. void buildInherited()
 - AppControllerMVC Deprecated. All ControllerMVC objects now have this capability.
 
-### 8.7.0
+## 8.7.0
  February 02, 2022
 - Allow the Inherited State object to be recreated on hot reload.
 
-### 8.6.1+02
+## 8.6.1+02
  January 30, 2022
 - Collect all the Controllers to the 'root' State object;
 - Collect all the StateMVC objects to the 'root' State object;
