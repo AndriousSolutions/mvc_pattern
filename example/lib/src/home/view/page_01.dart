@@ -44,13 +44,16 @@ class _Page1State extends StateMVC<Page1> {
 
   @override
   Widget build(_) {
+    // Takes this state object as a dependency to an InheritedWidget.
+    // Only useful if buildInherited() is used instead of setState().
     widgetInherited(context);
     return buildPage1(
         count: count,
         counter: () {
           count++;
-//          con.setState(() {});
-          buildInherited();
+          con.setState(() {});
+//          setState(() {});
+//          buildInherited();
         });
   }
 }

@@ -1,9 +1,10 @@
 
 
-## 8.10.1
+## 8.10.1+01
  April 06, 2022
 - _lastStateMVC() // Don't supply this State object if it's deactivated
 - Tightened code. // While loop so additional controllers can be added in a previous initState()
+- Widget buildWidget(BuildContext context) => super.buildWidget(context);
 
 ## 8.10.0
  March 31, 2022

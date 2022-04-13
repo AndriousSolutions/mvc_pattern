@@ -491,7 +491,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Implement this function instead of the build() function
   /// to utilize a built-in FutureBuilder Widget and InheritedWidget.
   @override
-  Widget buildWidget(BuildContext context);
+  Widget buildWidget(BuildContext context) => super.buildWidget(context);
 
   /// Implement the build() function.
   @override
@@ -2040,7 +2040,9 @@ mixin InheritedStateMixin<T extends StatefulWidget> on State<T> {
   void initInheritedState<U extends InheritedWidget>(
       U Function(Widget child) inheritedWidgetBuilder) {
     // Create the StatefulWidget to contain the InheritedWidget
+    // GlobalKey to 'keep' this StatefulWidget's state during it lifetime.
     _inheritedStatefulWidget = InheritedStatefulWidget<U>(
+        key: GlobalKey(),
         inheritedWidgetBuilder: inheritedWidgetBuilder,
         child: _BuildBuilder(builder: buildChild));
   }
