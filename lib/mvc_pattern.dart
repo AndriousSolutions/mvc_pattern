@@ -99,9 +99,14 @@ class ControllerMVC extends StateSetter
   /// Retrieve the 'after' listener by its unique key.
   StateListener? afterListener(String key) => _stateMVC?.afterListener(key);
 
-  /// Link this Controller's Widget to InheritedWidget
+  /// Link a widget to a InheritedWidget
+  @Deprecated('Use the better named, dependOnInheritedWidget, instead.')
   bool widgetInherited(BuildContext? context) =>
-      _stateMVC?.widgetInherited(context) ?? false;
+      dependOnInheritedWidget(context);
+
+  /// Link a widget to a InheritedWidget
+  bool dependOnInheritedWidget(BuildContext? context) =>
+      _stateMVC?.dependOnInheritedWidget(context) ?? false;
 
   /// Rebuild the InheritedWidget of the 'closes' InheritedStateMVC object if any.
   void buildInherited() => _stateMVC?.buildInherited();
@@ -640,7 +645,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     /// for example when the system locale changes. Generally, one
     /// widget in the widget tree registers itself as a binding
     /// observer, and converts the system state into inherited widgets.
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     /// No 'setState()' functions are allowed to fully function at this point.
     _rebuildAllowed = false;
@@ -780,7 +785,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
     _rebuildAllowed = true;
 
     // Unregisters the given observer.
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
 
     // Remove any 'Controller' reference
     _controller = null;
@@ -1337,8 +1342,13 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// Allows the user to call setState() within the Controller.
   void refresh() => setState(() {});
 
-  /// Link a widget to InheritedWidget
-  bool widgetInherited(BuildContext? context) {
+  /// Link a widget to the InheritedWidget
+  @Deprecated('Use the better named, dependOnInheritedWidget, instead.')
+  bool widgetInherited(BuildContext? context) =>
+      dependOnInheritedWidget(context);
+
+  /// Link a widget to the InheritedWidget
+  bool dependOnInheritedWidget(BuildContext? context) {
     var inherit = context != null;
     if (inherit) {
       final InheritedStateMVC? state =
@@ -2044,12 +2054,17 @@ mixin InheritedStateMixin<T extends StatefulWidget> on State<T> {
     _inheritedStatefulWidget = InheritedStatefulWidget<U>(
         key: GlobalKey(),
         inheritedWidgetBuilder: inheritedWidgetBuilder,
-        child: _BuildBuilder(builder: buildChild));
+        child: _BuildBuilder(key: GlobalKey(), builder: buildChild));
   }
 
   /// Link a widget to a InheritedWidget of type U
+  @Deprecated('Use the better named, dependOnInheritedWidget, instead.')
   bool widgetInherited(BuildContext? context) =>
-      _inheritedStatefulWidget.widgetInherited(context);
+      dependOnInheritedWidget(context);
+
+  /// Link a widget to a InheritedWidget of type U
+  bool dependOnInheritedWidget(BuildContext? context) =>
+      _inheritedStatefulWidget.dependOnInheritedWidget(context);
 
   ///
   InheritedElement? inheritedElement(BuildContext? context) =>
@@ -2105,7 +2120,12 @@ class InheritedStatefulWidget<U extends InheritedWidget>
   _InheritedState createState() => state;
 
   /// Link a widget to a InheritedWidget of type U
-  bool widgetInherited(BuildContext? context) {
+  @Deprecated('Use the better named, dependOnInheritedWidget, instead.')
+  bool widgetInherited(BuildContext? context) =>
+      dependOnInheritedWidget(context);
+
+  /// Link a widget to a InheritedWidget of type U
+  bool dependOnInheritedWidget(BuildContext? context) {
     bool dependOn = context != null;
     if (dependOn) {
       final inheritedWidget = context.dependOnInheritedWidgetOfExactType<U>();
@@ -2143,6 +2163,7 @@ class InheritedStatefulWidget<U extends InheritedWidget>
 }
 
 class _InheritedState extends State<InheritedStatefulWidget> {
+  //
   @override
   void initState() {
     super.initState();

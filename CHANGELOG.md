@@ -1,5 +1,10 @@
 
 
+## 8.10.2
+ May 24, 2022
+- With Flutter upgrade: WidgetsBinding.instance!. changed to WidgetsBinding.instance.
+- Upgraded Dart to sdk: '>=2.17.1 <3.0.0'
+
 ## 8.10.1+01
  April 06, 2022
 - _lastStateMVC() // Don't supply this State object if it's deactivated
