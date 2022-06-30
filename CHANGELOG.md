@@ -1,4 +1,15 @@
 
+## 8.11.0
+ June 29, 2022
+- *BUGFIX* Forgot _afterList in void activate()
+- False and not True by default if initAsync() now fails: init = con.onAsyncError(details);
+- Removed deprecated mixin AppControllerMVC
+- Removed static T? of<T extends StateMVC>(BuildContext? context) {
+- Removed bool get futureBuilt
+- Removed ControllerMVC? get firstCon
+- Removed Widget buildApp(BuildContext context);
+- Removed bool widgetInherited(BuildContext? context)
+- Updated example app
 
 ## 8.10.2
  May 24, 2022

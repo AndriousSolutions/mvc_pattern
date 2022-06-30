@@ -1,4 +1,8 @@
 
+## 1.6.0
+ June 29, 2022
+- Introduce another app demonstrating the built-in FutureBuilder & InheritedWidget   
+
 ## 1.5.0
  March 30, 2022
 - state.firstCon to state.rootCon;

@@ -44,14 +44,17 @@ Future<void> integrationTesting(WidgetTester tester) async {
     await tester.pumpAndSettle();
   }
 
+  /// Got to Page 1
   await tester.tap(find.byKey(const Key('Page 1')));
   await tester.pumpAndSettle();
 
   expect(find.text((count * 2).toString()), findsOneWidget, reason: location);
 
+  /// Got to Page 2
   await tester.tap(find.byKey(const Key('Page 2')));
   await tester.pumpAndSettle();
 
+  /// Got to Page 3
   await tester.tap(find.byKey(const Key('Page 3')));
   await tester.pumpAndSettle();
 
@@ -72,13 +75,20 @@ Future<void> integrationTesting(WidgetTester tester) async {
   /// Return to Page 1
   await tester.tap(find.byKey(const Key('Page 1')));
   await tester.pumpAndSettle();
+
+  await testInheritedWidgetApp(tester);
+
+  /// Return to Page 1
+  await tester.tap(find.byKey(const Key('Page 1')));
+  await tester.pumpAndSettle();
 }
 
 Future<void> testHomePageApp(WidgetTester tester) async {
-  //
+  /// Go to Page 2
   await tester.tap(find.byKey(const Key('Page 2')));
   await tester.pumpAndSettle();
 
+  /// Go to Page 3
   await tester.tap(find.byKey(const Key('Page 3')));
   await tester.pumpAndSettle();
 
@@ -116,6 +126,26 @@ Future<void> testHomePageApp(WidgetTester tester) async {
   }
 
   expect(find.text('Are you good?'), findsOneWidget);
+
+  /// Retreat back one screen
+  await tester.tap(find.byTooltip('Back'));
+  await tester.pumpAndSettle();
+}
+
+Future<void> testInheritedWidgetApp(WidgetTester tester) async {
+  /// Go to Page 2
+  await tester.tap(find.byKey(const Key('Page 2')));
+  await tester.pumpAndSettle();
+
+  /// Go to Page 3
+  await tester.tap(find.byKey(const Key('Page 3')));
+  await tester.pumpAndSettle();
+
+  // Again, this tap doesn't seem to work, and so I go to the Navigator.
+  await tester.tap(find.byKey(const Key('InheritedWidget example')));
+  await tester.pumpAndSettle();
+
+  expect(find.text('New Dogs'), findsOneWidget);
 
   /// Retreat back one screen
   await tester.tap(find.byTooltip('Back'));

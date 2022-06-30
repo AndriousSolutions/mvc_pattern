@@ -13,7 +13,8 @@ import 'test_listener.dart' show testsStateListener01;
 
 import '_unit_testing.dart' show unitTesting;
 
-import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
+import 'package:flutter_test/flutter_test.dart'
+    show WidgetTester, tearDownAll, testWidgets;
 
 import 'package:integration_test/integration_test.dart'
     show IntegrationTestWidgetsFlutterBinding;
@@ -26,6 +27,10 @@ void testMyApp() {
   final app = MyApp(key: UniqueKey());
 
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  /// Registers a function to be run once after all tests.
+  /// Be sure the close the app after all the testing.
+  tearDownAll(() {});
 
   testWidgets(
     'test mvc_pattern',

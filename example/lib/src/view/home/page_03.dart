@@ -6,6 +6,8 @@ import 'package:example/src/view.dart';
 
 import 'package:example/src/controller.dart';
 
+import 'package:example/src/another_app/view.dart' as i;
+
 /// The third page displayed in this app.
 class Page3 extends StatefulWidget {
   Page3({Key? key})
@@ -18,8 +20,8 @@ class Page3 extends StatefulWidget {
 
   /// Note, there is more than one way below to access the State object.
   void onPressed() {
-//    final state = con.state as _Page3State;
-    final state = con.stateOf<Page3>() as _Page3State;
+    var state = con.state as _Page3State;
+    state = con.stateOf<Page3>() as _Page3State;
     state.setState(() {});
     state.count++;
   }
@@ -64,16 +66,15 @@ class _Page3State extends StateMVC<Page3> {
         count: count,
         counter: counter,
         column: (_) => [
-          Row(children: [
-            const Flexible(child: SizedBox(width: 5)),
-            Flexible(
-              child: ElevatedButton(
-                key: const Key('New Key'),
-                onPressed: newKey,
-                child: const Text('New Key for Page 1'),
-              ),
+          Flexible(
+            child: ElevatedButton(
+              key: const Key('New Key'),
+              onPressed: newKey,
+              child: const Text('New Key for Page 1'),
             ),
-            const Flexible(child: SizedBox(width: 5)),
+          ),
+          Row(children: [
+            const SizedBox(width: 5),
             Flexible(
               child: ElevatedButton(
                 key: const Key('Hello! example'),
@@ -84,6 +85,20 @@ class _Page3State extends StateMVC<Page3> {
                           builder: (BuildContext context) => const HomePage()));
                 },
                 child: const Text("'Hello!' example"),
+              ),
+            ),
+            const SizedBox(width: 5),
+            Flexible(
+              child: ElevatedButton(
+                key: const Key('InheritedWidget example'),
+                onPressed: () {
+                  Navigator.push(
+                      lastContext!,
+                      MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const i.HomePage()));
+                },
+                child: const Text("'InheritedWidget' example"),
               ),
             ),
           ]),

@@ -37,7 +37,7 @@ class _MyAppState extends AppStateMVC<MyApp> {
   static _MyAppState? _this;
 
   /// Try these different 'build' functions and get access
-  /// to a built-in FutureBuilder and or a 'app leve' InheritedWidget.
+  /// to a built-in FutureBuilder and or a 'app level' InheritedWidget.
 
   /// Override build() and stay with the traditional Flutter approach.
   // @override
@@ -56,12 +56,6 @@ class _MyAppState extends AppStateMVC<MyApp> {
   /// the built-in InheritedWidget.
   @override
   Widget buildChild(BuildContext context) => MaterialApp(
-        home: Page1(key: UniqueKey()),
-      );
-
-  /// Deprecated. To be replaced by buildChild().
-  @override
-  Widget buildApp(BuildContext context) => MaterialApp(
         home: Page1(key: UniqueKey()),
       );
 }

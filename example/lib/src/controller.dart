@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'package:example/src/app/controller/app_controller.dart';
+export 'package:example/src/controller/app/app_controller.dart';
 
-export 'package:example/src/home/controller/controller.dart';
+export 'package:example/src/controller/home/_controller.dart';
 
-export 'package:example/src/home/controller/another_controller.dart';
-
-export 'package:example/src/home/controller/yet_another_controller.dart';
+export 'package:example/src/another_app/controller.dart';

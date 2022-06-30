@@ -50,7 +50,7 @@ class BuildPage extends StatelessWidget {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.only(top: 100),
+              padding: EdgeInsets.only(top: 50),
               child: Text(
                 'You have pushed the button this many times:',
               ),

@@ -41,6 +41,9 @@ Future<void> testsStateMVC(WidgetTester tester) async {
   /// setState((){});
   appState.refresh();
 
+  /// Test 'refresh' alternative
+  appState.notifyClients();
+
   /// Every StateMVC and ControllerMVC has a unique String identifier.
   final myAppStateId = appState.keyId;
 
@@ -204,7 +207,7 @@ Future<void> testsStateMVC(WidgetTester tester) async {
 
   expect(boolean, isA<bool>(), reason: _location);
 
-  String path = WidgetsBinding.instance!.window.defaultRouteName;
+  String path = WidgetsBinding.instance.window.defaultRouteName;
 
   boolean =
       await stateObj.didPushRouteInformation(RouteInformation(location: path));
@@ -217,27 +220,11 @@ Future<void> testsStateMVC(WidgetTester tester) async {
 
   widget = stateObj.widget;
 
-  /// You're going to get these 'hints' or warnings because
-  /// the testing is dealing with the StateMVC object directly.
-  /// Normally, when using this package, you would be dealing with only
-  /// the subclass of this class. Perfectly fine.
-  ///
-  /// The member 'xxxxxx' can only be used within instance members
-  /// of subclasses of 'package:mvc_pattern/mvc_pattern.dart
-
   stateObj.didUpdateWidget(widget);
 
   context = stateObj.context;
 
   final locale = Localizations.localeOf(context);
-
-  /// You're going to get these 'hints' or warnings because
-  /// the testing is dealing with the StateMVC object directly.
-  /// Normally, when using this package, you would be dealing with only
-  /// the subclass of this class. Perfectly fine. Ignore them here.
-  ///
-  /// The member 'xxxxxx' can only be used within instance members
-  /// of subclasses of 'package:mvc_pattern/mvc_pattern.dart
 
   /// Called when the app's Locale changes
   stateObj.didChangeLocale(locale);
@@ -258,6 +245,44 @@ Future<void> testsStateMVC(WidgetTester tester) async {
   stateObj.didHaveMemoryPressure();
 
   stateObj.didChangeAccessibilityFeatures();
+
+  /// Testing the Life-cycle Event Handling
+  var controller = stateObj.rootCon;
+
+  expect(controller, isA<Controller>(), reason: _location);
+
+  final debug = stateObj.inDebugger;
+
+  expect(debug, isA<bool>(), reason: _location);
+
+  boolean = await stateObj.didPushRouteInformation(RouteInformation(
+      location: WidgetsBinding.instance.window.defaultRouteName));
+
+  expect(boolean, isFalse, reason: _location);
+
+  stateObj.didUpdateWidget(widget);
+
+  /// Simulate a reinsertion into the Widget tree
+  stateObj.activate();
+
+  /// Called when the app is inactive.
+  stateObj.didChangeAppLifecycleState(AppLifecycleState.inactive);
+
+  /// The application is not currently visible to the user, not responding to
+  /// user input, and running in the background.
+  stateObj.didChangeAppLifecycleState(AppLifecycleState.paused);
+
+  /// Either be in the progress of attaching when the engine is first initializing
+  /// or after the view being destroyed due to a Navigator pop.
+  stateObj.didChangeAppLifecycleState(AppLifecycleState.detached);
+
+  /// Called when the returning from another app.
+  stateObj.didChangeAppLifecycleState(AppLifecycleState.resumed);
+
+  stateObj.didChangeDependencies();
+
+  /// null testing
+  stateObj.add(null);
 
   stateObj.refresh();
 }

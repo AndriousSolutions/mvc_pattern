@@ -101,67 +101,32 @@ Future<void> testsStateListener02(WidgetTester tester) async {
   /// The Test Listener
   final listener = TesterStateListener();
 
-  final add = state.addListener(listener);
+  var add = state.addListener(listener);
 
   expect(add, isTrue, reason: _location);
 
-  /// Testing the Life-cycle Event Handling
+  // Add the listener as a 'before' listener
+  add = state.addBeforeListener(listener);
 
-  var controller = state.rootCon;
+  expect(add, isTrue, reason: _location);
 
-  expect(controller, isA<Controller>(), reason: _location);
-
-  final debug = state.inDebugger;
-
-  expect(debug, isA<bool>(), reason: _location);
-
-  bool? boolean = await state.didPopRoute();
-
-  expect(boolean, isFalse, reason: _location);
-
-  boolean = await state.didPushRoute('/');
-
-  expect(boolean, isFalse, reason: _location);
-
-  boolean = await state.didPushRouteInformation(RouteInformation(
-      location: WidgetsBinding.instance!.window.defaultRouteName));
-
-  expect(boolean, isFalse, reason: _location);
-
-  final widget = state.widget;
-
-  state.didUpdateWidget(widget);
-
-  final context = state.context;
-
-  final locale = Localizations.localeOf(context);
-
-  /// Called when the app's Locale changes
-  state.didChangeLocale(locale);
-
-  /// Called when the returning from another app.
-  state.didChangeAppLifecycleState(AppLifecycleState.resumed);
-
-  state.didChangeDependencies();
-
-  state.reassemble();
-
-  /// null testing
-  state.add(null);
-
-  state.didChangeMetrics();
-
-  state.didChangeTextScaleFactor();
-
-  state.didChangePlatformBrightness();
-
-  state.didHaveMemoryPressure();
-
-  state.didChangeAccessibilityFeatures();
-
-  state.refresh();
-
-  final removed = state.removeListener(listener);
+  var removed = state.removeListener(listener);
 
   expect(removed, isTrue, reason: _location);
+
+  // Add again for further testing that follows.
+  add = state.addListener(listener);
+
+  expect(add, isTrue, reason: _location);
+
+  // 'addListener' adds an 'after' listener
+  // Should return false as it's already added.
+  add = state.addAfterListener(listener);
+
+  expect(add, isFalse, reason: _location);
+
+  // Add again for further testing that follows.
+  add = state.addBeforeListener(listener);
+
+  expect(add, isTrue, reason: _location);
 }

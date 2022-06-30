@@ -9,14 +9,6 @@ export 'package:flutter/material.dart' hide StateSetter;
 
 export 'package:mvc_pattern/mvc_pattern.dart';
 
-export 'package:example/src/app/view/my_app.dart';
+export 'package:example/src/view/app/my_app.dart';
 
-export 'package:example/src/home/view/home_page.dart';
-
-export 'package:example/src/home/view/page_01.dart';
-
-export 'package:example/src/home/view/page_02.dart';
-
-export 'package:example/src/home/view/page_03.dart';
-
-export 'package:example/src/home/view/common/build_page.dart';
+export 'package:example/src/view/home/_view.dart';

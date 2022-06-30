@@ -2,4 +2,4 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'package:example/src/home/model/data_source.dart';
+export 'package:example/src/model/home/data_source.dart';

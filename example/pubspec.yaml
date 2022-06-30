@@ -15,13 +15,13 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.5.0
+version: 1.6.0
 
 homepage: https://www.andrioussolutions.com
 repository: https://github.com/AndriousSolutions/mvc_pattern/tree/master/example
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
+  sdk: ">=2.17.1 <3.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -35,6 +35,9 @@ dependencies:
 
   mvc_pattern: #^8.0.0
     path: ../
+
+  # https://pub.dev/packages/http:
+  http: any
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -14,11 +14,12 @@ class Page1 extends StatefulWidget {
   final Controller con;
 
   @override
-  State createState() => _Page1State();
+  State createState() => Page1State();
 
   void onPressed() {
     //
-    final state = con.ofState<_Page1State>()!;
+    var state = con.ofState<Page1State>()!;
+    state = con.state as Page1State;
 
     state.setState(() {
       state.count++;
@@ -26,7 +27,7 @@ class Page1 extends StatefulWidget {
   }
 }
 
-class _Page1State extends StateMVC<Page1> {
+class Page1State extends StateMVC<Page1> {
   //
   @override
   void initState() {
@@ -42,19 +43,23 @@ class _Page1State extends StateMVC<Page1> {
 
   int count = 0;
 
-  @override
-  Widget build(_) {
-    // Takes this state object as a dependency to an InheritedWidget.
-    // Only useful if buildInherited() is used instead of setState().
-    widgetInherited(context);
-    return buildPage1(
-        count: count,
-        counter: () {
-          count++;
-          con.setState(() {});
-//          setState(() {});
+  // Responsible for the incrementation
+  void onPressed() {
+    count++;
+    setState(() {});
 //          buildInherited();
-        });
+  }
+
+  @override
+  Widget build(context) {
+    // Takes this state object as a dependency to an InheritedWidget.
+    // Link this widget to the InheritedWidget
+    // Only useful if buildInherited() is used instead of setState().
+    dependOnInheritedWidget(context);
+    return buildPage1(
+      count: count,
+      counter: onPressed,
+    );
   }
 }
 

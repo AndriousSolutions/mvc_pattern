@@ -47,7 +47,7 @@ class _Page2State extends InheritedStateMVC<Page2, _Page02Inherited> {
   Widget buildChild(BuildContext context) {
     /// Comment this command out and the counter will not work.
     /// That's because this Widget is then no longer a dependency to the InheritedWidget above.
-    widgetInherited(context);
+    dependOnInheritedWidget(context);
 
     /// Ignore BuildPage(). It's used only to highlight the other features in this page
     return BuildPage(
@@ -94,7 +94,10 @@ class _Page2State extends InheritedStateMVC<Page2, _Page02Inherited> {
         ElevatedButton(
           key: const Key('Page 1 Counter'),
           style: flatButtonStyle,
-          onPressed: Page1().onPressed,
+          onPressed: () {
+            final state = con.ofState<Page1State>()!;
+            state.onPressed();
+          },
           child: const Text('Page 1 Counter'),
         ),
       ],

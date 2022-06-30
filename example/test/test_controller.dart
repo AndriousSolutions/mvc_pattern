@@ -70,7 +70,7 @@ void testsController(WidgetTester tester) {
   expect(context.widget, isA<Page1>(), reason: location);
 
   /// Call for testing coverage
-  con.widgetInherited(context);
+  con.dependOnInheritedWidget(context);
 
   /// Rebuild InheritedWidget
   appState.inheritedNeedsBuild('Test');

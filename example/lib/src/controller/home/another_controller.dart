@@ -4,7 +4,7 @@
 
 import 'package:example/src/view.dart';
 
-class AnotherController extends ControllerMVC with AppControllerMVC {
+class AnotherController extends ControllerMVC {
   /// It's a good practice to make Controllers using the Singleton pattern
   factory AnotherController() => _this ??= AnotherController._();
   AnotherController._() : super();

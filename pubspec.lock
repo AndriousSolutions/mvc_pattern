@@ -70,7 +70,7 @@ packages:
       path: example
       relative: true
     source: path
-    version: "1.5.0"
+    version: "1.6.0"
   fake_async:
     dependency: transitive
     description:
@@ -105,6 +105,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  http:
+    dependency: transitive
+    description:
+      name: http
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.13.4"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   integration_test:
     dependency: "direct dev"
     description: flutter
