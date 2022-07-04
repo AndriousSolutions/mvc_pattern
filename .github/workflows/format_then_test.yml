@@ -63,17 +63,19 @@ jobs:
           with open(os.environ['GITHUB_EVENT_PATH']) as fh:
             event = json.load(fh)
             tag = event['head_commit']['message'].split()[0]
-      # Get current datetime in ISO format
-      - id: date
-        run: echo "::set-output name=date::$(date -u +'%Y-%m-%d')"            
+#      # Get current datetime in ISO format
+#      - id: date
+#        run: echo "::set-output name=date::$(date -u +'%Y-%m-%d')"            
       # Create a Release
       - uses: softprops/action-gh-release@v1
         env:
           # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
-          name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
+#          tag_name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
+#          name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
+          tag_name: ${{ github.event.head_commit.message }}
+          name: ${{ github.event.head_commit.message }}
           body: |
                See CHANGELOG.md
           draft: false
