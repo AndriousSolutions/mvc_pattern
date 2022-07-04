@@ -80,8 +80,8 @@ jobs:
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
 #        with:
-#          tag_name: ${{ steps.get-tag.outputs.TAG }}
-#          release_name: Release ${{ steps.get-tag.outputs.TAG }}
+#          tag_name: ${{ github.ref }}
+#          release_name: Release ${{ github.ref }}
 ##          body_path: CHANGELOG.md
 #          body: |
 #            See CHANGELOG.md
