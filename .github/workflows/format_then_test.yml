@@ -23,6 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: checkout
       - uses: actions/checkout@v2
 
       # Use the standard Java Action to setup Java
@@ -63,14 +64,28 @@ jobs:
           with open(os.environ['GITHUB_EVENT_PATH']) as fh:
             event = json.load(fh)
             tag = event['head_commit']['message'].split()[0]
-      - uses: actions/create-release@v1
+      # Create a Release
+      - name: create release
+      - uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get-tag.outputs.TAG }}
-          release_name: Release ${{ steps.get-tag.outputs.TAG }}
-#          body_path: CHANGELOG.md
-          body: |
-            See CHANGELOG.md
-          draft: false
-          prerelease: false
+            tag_name: ${{ steps.get-tag.outputs.tag }}
+            name: ${{ steps.get-tag.outputs.tag }}
+            body: |
+               See CHANGELOG.md
+            draft: false
+            prerelease: false
+       # https://github.com/actions/create-release
+#      - uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: ${{ steps.get-tag.outputs.TAG }}
+#          release_name: Release ${{ steps.get-tag.outputs.TAG }}
+##          body_path: CHANGELOG.md
+#          body: |
+#            See CHANGELOG.md
+#          draft: false
+#          prerelease: false
