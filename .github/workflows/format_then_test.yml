@@ -23,7 +23,6 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: checkout
       - uses: actions/checkout@v2
 
       # Use the standard Java Action to setup Java
@@ -65,7 +64,6 @@ jobs:
             event = json.load(fh)
             tag = event['head_commit']['message'].split()[0]
       # Create a Release
-      - name: create release
       - uses: softprops/action-gh-release@v1
         env:
           # This token is provided by Actions, you do not need to create your own token
