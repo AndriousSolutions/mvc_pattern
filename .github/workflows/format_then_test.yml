@@ -72,12 +72,14 @@ jobs:
           # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            tag_name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
+#            tag_name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
 #            name: ${{ github.ref }}
-            body: |
+          tag_name: ${{ steps.get-tag.outputs.tag }}                  
+          release_name:  ${{ steps.get-tag.outputs.tag }} 
+          body: |
                See CHANGELOG.md
-            draft: false
-            prerelease: false
+          draft: false
+          prerelease: false
        # https://github.com/actions/create-release
 #      - uses: actions/create-release@v1
 #        env:
