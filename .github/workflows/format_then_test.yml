@@ -69,8 +69,8 @@ jobs:
           # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            tag_name: ${{ steps.get-tag.outputs.tag }}
-            name: ${{ steps.get-tag.outputs.tag }}
+            tag_name: ${{ github.ref }}
+            name: ${{ github.ref }}
             body: |
                See CHANGELOG.md
             draft: false
