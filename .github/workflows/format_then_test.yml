@@ -79,7 +79,7 @@ jobs:
 #          name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
 #          tag_name: ${{ github.event.commits[0].message }}
 #          name: ${{ github.event.commits[0].message }}
-          tag_name: v${{ steps.get-tag.outputs }}
+          tag_name: v${{ steps.get-tag.outputs.value }}
           name: ${{ steps.get-tag.outputs.tag }}
           body: |
                See CHANGELOG.md
