@@ -63,7 +63,7 @@ jobs:
           with open(os.environ['GITHUB_EVENT_PATH']) as fh:
             event = json.load(fh)
             version = event['head_commit']['message'].split()[0]
-            print(version)
+            print("::set-output name=tag::" + version)
 
       # Get current datetime in ISO format
       - id: date
@@ -79,7 +79,7 @@ jobs:
 #          name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
 #          tag_name: ${{ github.event.commits[0].message }}
 #          name: ${{ github.event.commits[0].message }}
-          tag_name: v${{ steps.get-tag.outputs.value }}
+          tag_name: v${{ steps.get-tag.outputs.tag }}
           name: ${{ steps.get-tag.outputs.tag }}
           body: |
                See CHANGELOG.md
