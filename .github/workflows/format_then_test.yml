@@ -60,10 +60,11 @@ jobs:
         run: |
           import json
           import os
+          import shlex
           with open(os.environ['GITHUB_EVENT_PATH']) as fh:
             event = json.load(fh)
             version = event['head_commit']['message'].split()[0]
-          echo ::set-output name=tag::$version
+          print(f'::set-output name=tag::{shlex.quote(version)}')
 #      # Get current datetime in ISO format
 #      - id: date
 #        run: echo "::set-output name=date::$(date -u +'%Y-%m-%d')"            
@@ -83,15 +84,3 @@ jobs:
                See CHANGELOG.md
           draft: false
           prerelease: false
-       # https://github.com/actions/create-release
-#      - uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-#        with:
-#          tag_name: ${{ steps.get-tag.outputs.tag }}
-#          release_name: Release ${{ steps.get-tag.outputs.tag }}
-##          body_path: CHANGELOG.md
-#          body: |
-#            See CHANGELOG.md
-#          draft: false
-#          prerelease: false
