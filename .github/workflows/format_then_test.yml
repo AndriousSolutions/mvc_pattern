@@ -63,7 +63,7 @@ jobs:
           with open(os.environ['GITHUB_EVENT_PATH']) as fh:
             event = json.load(fh)
             version = event['head_commit']['message'].split()[0]
-          print(f'::set-output name=tag::${{version}}')
+            print(f'::set-output name=tag::${{version}}')
 #      # Get current datetime in ISO format
 #      - id: date
 #        run: echo "::set-output name=date::$(date -u +'%Y-%m-%d')"            
