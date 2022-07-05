@@ -74,8 +74,8 @@ jobs:
         with:
 #          tag_name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
 #          name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
-          tag_name: ${{ github.event.head_commit.message }}
-          name: ${{ github.event.head_commit.message }}
+          tag_name: ${{ github.event.commits[0].message }}
+          name: ${{ github.event.commits[0].message }}
           body: |
                See CHANGELOG.md
           draft: false
