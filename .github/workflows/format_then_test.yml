@@ -54,23 +54,34 @@ jobs:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage/lcov.info
 
-      # Parse a tag from the commit message
-      - id: get-tag
-        shell: python3 {0}
-        run: |
-          import json
-          import os
-          with open(os.environ['GITHUB_EVENT_PATH']) as fh:
-            event = json.load(fh)
-            tag = event['head_commit']['message'].split()[0]
-      - uses: actions/create-release@v1
+#      # Parse a tag from the commit message
+#      - id: get-tag
+#        shell: python3 {0}
+#        run: |
+#          import json
+#          import os
+#          with open(os.environ['GITHUB_EVENT_PATH']) as fh:
+#            event = json.load(fh)
+#            version = event['head_commit']['message'].split()[0]
+#            print("::set-output name=tag::" + version)
+
+      # Get current datetime in ISO format
+      - id: date
+        run: echo "::set-output name=date::$(date -u +'%Y-%m-%d')"
+        
+      # Create a Release
+      - uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get-tag.outputs.TAG }}
-          release_name: Release ${{ steps.get-tag.outputs.TAG }}
-#          body_path: CHANGELOG.md
+          tag_name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
+          name: ${{ steps.date.outputs.date }}v${{ github.run_number }}
+#          tag_name: ${{ github.event.commits[0].message }}
+#          name: ${{ github.event.commits[0].message }}
+#          tag_name: v${{ steps.get-tag.outputs.tag }}
+#          name: ${{ steps.get-tag.outputs.tag }}
           body: |
-            See CHANGELOG.md
+               See CHANGELOG.md
           draft: false
           prerelease: false
