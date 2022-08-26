@@ -469,8 +469,7 @@ abstract class StateMVC<T extends StatefulWidget> extends State<StatefulWidget>
   /// With an optional Controller parameter, this constructor imposes its own Error Handler.
   StateMVC([this._controller]) : currentErrorFunc = FlutterError.onError {
     /// If a tester is running. Don't switch out its error handler.
-    if (WidgetsBinding.instance == null ||
-        WidgetsBinding.instance is WidgetsFlutterBinding) {
+    if (WidgetsBinding.instance is WidgetsFlutterBinding) {
       /// This allows one to place a breakpoint at 'onError(details)' to determine error location.
       FlutterError.onError = onError;
     } else {
@@ -1740,8 +1739,7 @@ abstract class AppStateMVC<T extends AppStatefulWidgetMVC>
     }
 
     /// If a tester is running. Don't handle the error.
-    if (WidgetsBinding.instance == null ||
-        WidgetsBinding.instance is WidgetsFlutterBinding) {
+    if (WidgetsBinding.instance is WidgetsFlutterBinding) {
       FlutterError.onError!(FlutterErrorDetails(exception: ex));
     }
   }

@@ -16,13 +16,18 @@ class Page1 extends StatefulWidget {
   @override
   State createState() => Page1State();
 
+  ///
   void onPressed() {
-    //
-    var state = con.ofState<Page1State>()!;
-    state = con.state as Page1State;
+    // See the number of ways to retrieve a State object.
+    // by its StatefulWidget
+    var state = con.stateOf<Page1>();
+    // by its type
+    state = con.ofState<Page1State>();
+
+    final pageState = state as Page1State;
 
     state.setState(() {
-      state.count++;
+      pageState.count++;
     });
   }
 }
@@ -61,31 +66,31 @@ class Page1State extends StateMVC<Page1> {
       counter: onPressed,
     );
   }
-}
 
-Widget buildPage1({
-  int count = 0,
-  required void Function() counter,
-}) =>
-    BuildPage(
-      label: '1',
-      count: count,
-      counter: counter,
-      row: (BuildContext context) => [
-        const SizedBox(),
-        ElevatedButton(
-          key: const Key('Page 2'),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (BuildContext context) => Page2(),
-              ),
-            );
-          },
-          child: const Text(
-            'Page 2',
+  Widget buildPage1({
+    int count = 0,
+    required void Function() counter,
+  }) =>
+      BuildPage(
+        label: '1',
+        count: count,
+        counter: counter,
+        row: (BuildContext context) => [
+          const SizedBox(),
+          ElevatedButton(
+            key: const Key('Page 2'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (BuildContext context) => Page2(),
+                ),
+              );
+            },
+            child: const Text(
+              'Page 2',
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+}

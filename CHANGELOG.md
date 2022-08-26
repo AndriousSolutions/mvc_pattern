@@ -1,4 +1,10 @@
 
+## 8.12.0
+ August 25, 2022
+- Introduce StateX class
+- Updated analysis_options.yaml
+- page_02.dart offers a means to trip an error
+
 ## 8.11.0
  June 29, 2022
 - *BUGFIX* Forgot _afterList in void activate()

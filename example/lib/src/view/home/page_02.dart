@@ -8,10 +8,16 @@ import 'package:example/src/controller.dart';
 
 /// The second page displayed in this app.
 class Page2 extends StatefulWidget {
-  Page2({Key? key})
+  /// Offer a means to trip an error
+  Page2({Key? key, this.tripError})
       : con = Controller(),
         super(key: key);
+
+  /// controller
   final Controller con;
+
+  /// trip an error
+  final bool? tripError;
 
   @override
   State createState() => _Page2State();
@@ -45,6 +51,13 @@ class _Page2State extends InheritedStateMVC<Page2, _Page02Inherited> {
   /// Define the 'child' Widget that will be passed to the InheritedWidget above.
   @override
   Widget buildChild(BuildContext context) {
+    final tripError = widget.tripError ?? false;
+
+    if (tripError) {
+      //ignore: only_throw_errors
+      throw 'Pretend a error occurs here in this function.';
+    }
+
     /// Comment this command out and the counter will not work.
     /// That's because this Widget is then no longer a dependency to the InheritedWidget above.
     dependOnInheritedWidget(context);
